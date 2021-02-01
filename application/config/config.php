@@ -23,7 +23,7 @@ date_default_timezone_set("Asia/KolKata");
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = ($_SERVER['SERVER_NAME']=='localhost') ? 'http://localhost/kmcV2Development/' : 'http://52.201.54.81/kmcV2Development/'  ;
+$config['base_url'] = ($_SERVER['SERVER_NAME']=='localhost') ? 'http://localhost/KMC-Web/' : 'https://up.kmc.world/kmcV2/';
 
 /*
 |--------------------------------------------------------------------------
