@@ -1,0 +1,58 @@
+<?php  
+
+	class Enryption
+        {
+                private $iv = '117ab263fe4fc695'; #Same as in JAVA
+                private $key = '67eb8b0439aeba175dbb637ead185031'; #Same as in JAVA
+
+
+                function __construct()
+                {
+                }
+
+                function encrypt($str) {
+
+                  //$key = $this->hex2bin($key);    
+                  $iv = $this->iv;
+
+                  $td = mcrypt_module_open('rijndael-128', '', 'cbc', $iv);
+
+                  mcrypt_generic_init($td, $this->key, $iv);
+                  $encrypted = mcrypt_generic($td, utf8_encode($str));
+
+                  mcrypt_generic_deinit($td);
+                  mcrypt_module_close($td);
+
+                  return bin2hex($encrypted);
+                }
+
+                function decrypt($code) {
+                  //$key = $this->hex2bin($key);
+                  $code = $this->hex2bin($code);
+                  $iv = $this->iv;
+
+                  $td = mcrypt_module_open('rijndael-128', '', 'cbc', $iv);
+
+                  mcrypt_generic_init($td, $this->key, $iv);
+                  $decrypted = mdecrypt_generic($td, $code);
+
+                  mcrypt_generic_deinit($td);
+                  mcrypt_module_close($td);
+                    
+                  return utf8_decode(trim($decrypted));
+                  
+                }
+
+                protected function hex2bin($hexdata) {
+                  $bindata = '';
+
+                  for ($i = 0; $i < strlen($hexdata); $i += 2) {
+                        $bindata .= chr(hexdec(substr($hexdata, $i, 2)));
+                  }
+
+                  return trim($bindata);
+                }
+
+        }
+
+?>
