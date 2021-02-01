@@ -1,0 +1,141 @@
+[07-Jun-2018 17:18:58 Asia/KolKata] PHP Parse error:  syntax error, unexpected 'ucwords' (T_STRING) in /home/trendytoday/public_html/kmc_development/application/models/api/Baby_model.php on line 395
+[07-Jun-2018 17:19:14 Asia/KolKata] PHP Parse error:  syntax error, unexpected 'ucwords' (T_STRING) in /home/trendytoday/public_html/kmc_development/application/models/api/Baby_model.php on line 395
+[15-Jun-2018 10:38:04 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';' in /home/trendytoday/public_html/kmc_development/application/controllers/api/GetVideo.php on line 20
+[15-Jun-2018 10:38:17 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';' in /home/trendytoday/public_html/kmc_development/application/controllers/api/GetVideo.php on line 20
+[15-Jun-2018 10:38:26 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';' in /home/trendytoday/public_html/kmc_development/application/controllers/api/GetVideo.php on line 20
+[15-Jun-2018 10:38:55 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';' in /home/trendytoday/public_html/kmc_development/application/controllers/api/GetVideo.php on line 20
+[15-Jun-2018 10:39:43 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';' in /home/trendytoday/public_html/kmc_development/application/controllers/api/GetVideo.php on line 20
+[15-Jun-2018 10:39:57 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';' in /home/trendytoday/public_html/kmc_development/application/controllers/api/GetVideo.php on line 20
+[15-Jun-2018 16:17:22 Asia/KolKata] PHP Parse error:  syntax error, unexpected '<' in /home/trendytoday/public_html/kmc_development/application/models/api/Mother_model.php on line 55
+[15-Jun-2018 18:36:48 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';' in /home/trendytoday/public_html/kmc_development/application/models/api/Baby_model.php on line 17
+[26-Dec-2018 19:34:45 Asia/KolKata] PHP Fatal error:  Call to a member function GetBabyWeight2() on a non-object in /home/trendytoday/public_html/kclounge_offline/application/models/api/FeedModel.php on line 60
+[27-Dec-2018 12:11:22 Asia/KolKata] PHP Parse error:  syntax error, unexpected '*' in /home/trendytoday/public_html/kclounge_offline/application/models/api/FeedModel.php on line 154
+[27-Dec-2018 12:11:27 Asia/KolKata] PHP Parse error:  syntax error, unexpected '*' in /home/trendytoday/public_html/kclounge_offline/application/models/api/FeedModel.php on line 154
+[27-Dec-2018 13:53:21 Asia/KolKata] PHP Fatal error:  Allowed memory size of 536870912 bytes exhausted (tried to allocate 72 bytes) in /home/trendytoday/public_html/kclounge_offline/application/models/api/FeedModel.php on line 207
+[27-Dec-2018 13:59:25 Asia/KolKata] PHP Fatal error:  Allowed memory size of 536870912 bytes exhausted (tried to allocate 72 bytes) in /home/trendytoday/public_html/kclounge_offline/application/models/api/FeedModel.php on line 207
+[29-Dec-2018 13:59:20 Asia/KolKata] PHP Parse error:  syntax error, unexpected '$settingDetail' (T_VARIABLE) in /home/trendytoday/public_html/kclounge_offline/application/models/api/Nurse_model.php on line 807
+[29-Dec-2018 14:01:40 Asia/KolKata] PHP Parse error:  syntax error, unexpected '$settingDetail' (T_VARIABLE) in /home/trendytoday/public_html/kclounge_offline/application/models/api/Nurse_model.php on line 807
+[29-Dec-2018 14:04:06 Asia/KolKata] PHP Parse error:  syntax error, unexpected '$paramArray' (T_VARIABLE) in /home/trendytoday/public_html/kclounge_offline/application/models/api/Nurse_model.php on line 845
+[19-Mar-2019 13:20:32 Asia/KolKata] PHP Parse error:  syntax error, unexpected '$this' (T_VARIABLE) in /home/trendytoday/public_html/kclounge_offline/application/models/api/Api_model.php on line 17
+[19-Mar-2019 13:20:43 Asia/KolKata] PHP Parse error:  syntax error, unexpected '$this' (T_VARIABLE) in /home/trendytoday/public_html/kclounge_offline/application/models/api/Api_model.php on line 17
+[19-Mar-2019 13:24:22 Asia/KolKata] PHP Parse error:  syntax error, unexpected '$this' (T_VARIABLE) in /home/trendytoday/public_html/kclounge_offline/application/models/api/Api_model.php on line 17
+[19-Mar-2019 13:24:57 Asia/KolKata] PHP Parse error:  syntax error, unexpected '$this' (T_VARIABLE) in /home/trendytoday/public_html/kclounge_offline/application/models/api/Api_model.php on line 17
+[19-Mar-2019 13:27:27 Asia/KolKata] PHP Parse error:  syntax error, unexpected '$this' (T_VARIABLE) in /home/trendytoday/public_html/kclounge_offline/application/models/api/Api_model.php on line 17
+[26-Apr-2019 19:41:42 Asia/KolKata] PHP Fatal error:  Call to undefined method Nurse_model::countBabySign() in /home/trendytoday/public_html/kclounge_offline/application/views/admin/baby/BabysViaLounge.php on line 38
+[01-May-2019 18:56:32 Asia/KolKata] PHP Fatal error:  Call to undefined method Staff_model::getStaffData() in /home/trendytoday/public_html/kclounge_offline/application/controllers/StaffManagenent.php on line 19
+[01-May-2019 19:04:14 Asia/KolKata] PHP Fatal error:  Call to undefined method Staff_model::getTransactionPoint() in /home/trendytoday/public_html/kclounge_offline/application/views/admin/staff/staffList.php on line 80
+[02-May-2019 16:44:46 Asia/KolKata] PHP Fatal error:  Call to a member function row_array() on a non-object in /home/trendytoday/public_html/kclounge_offline/application/models/Mother_model.php on line 250
+[02-May-2019 16:46:44 Asia/KolKata] PHP Fatal error:  Call to a member function row_array() on a non-object in /home/trendytoday/public_html/kclounge_offline/application/models/Mother_model.php on line 250
+[02-May-2019 16:53:29 Asia/KolKata] PHP Fatal error:  Call to a member function row_array() on a non-object in /home/trendytoday/public_html/kclounge_offline/application/models/Mother_model.php on line 250
+[03-May-2019 18:51:11 Asia/KolKata] PHP Fatal error:  Call to undefined method Mother_model::GetMotherDetail() in /home/trendytoday/public_html/kclounge_offline/application/controllers/api/GetMotherDetail.php on line 45
+[03-May-2019 19:27:10 Asia/KolKata] PHP Parse error:  syntax error, unexpected 'else' (T_ELSE), expecting function (T_FUNCTION) in /home/trendytoday/public_html/kclounge_offline/application/controllers/api/PostCommentOnTimeline.php on line 58
+[04-May-2019 13:35:46 Asia/KolKata] PHP Fatal error:  Call to undefined method Facility_model::getLastLogin() in /home/trendytoday/public_html/kclounge_offline/application/views/admin/staff/staffList.php on line 79
+[04-May-2019 13:35:49 Asia/KolKata] PHP Fatal error:  Call to undefined method Facility_model::getLastLogin() in /home/trendytoday/public_html/kclounge_offline/application/views/admin/staff/staffList.php on line 79
+[04-May-2019 13:36:53 Asia/KolKata] PHP Fatal error:  Call to undefined method Facility_model::getLastLogin() in /home/trendytoday/public_html/kclounge_offline/application/views/admin/staff/staffList.php on line 79
+[04-May-2019 16:58:06 Asia/KolKata] PHP Fatal error:  Call to undefined method Facility_model::getLastLogin() in /home/trendytoday/public_html/kclounge_offline/application/views/admin/staff/staffList.php on line 79
+[10-May-2019 15:06:15 Asia/KolKata] PHP Fatal error:  Call to a member function getMotherIcon() on a non-object in /home/trendytoday/public_html/kclounge_offline/application/views/admin/mother/MothersViaLounge.php on line 136
+[10-May-2019 15:06:29 Asia/KolKata] PHP Fatal error:  Call to undefined method Baby_model::getMonitoringExistData() in /home/trendytoday/public_html/kclounge_offline/application/views/admin/baby/BabysViaLounge.php on line 121
+[10-May-2019 15:08:33 Asia/KolKata] PHP Fatal error:  Call to undefined method Baby_model::getMonitoringExistData() in /home/trendytoday/public_html/kclounge_offline/application/views/admin/baby/BabysViaLounge.php on line 121
+[10-May-2019 15:11:11 Asia/KolKata] PHP Fatal error:  Call to a member function getMotherIcon() on a non-object in /home/trendytoday/public_html/kclounge_offline/application/views/admin/mother/MothersViaLounge.php on line 136
+[10-May-2019 16:42:27 Asia/KolKata] PHP Fatal error:  Call to undefined method Mother_model::GetBabiesViaMotherID() in /home/trendytoday/public_html/kclounge_offline/application/controllers/BabyManagenent.php on line 123
+[10-May-2019 16:49:15 Asia/KolKata] PHP Fatal error:  Call to a member function getBabyIcon() on a non-object in /home/trendytoday/public_html/kclounge_offline/application/views/get_data.php on line 497
+[13-May-2019 18:55:49 Asia/KolKata] PHP Parse error:  syntax error, unexpected 'if' (T_IF) in /home/trendytoday/public_html/kclounge_offline/application/views/admin/baby/view_baby.php on line 86
+[13-May-2019 19:02:49 Asia/KolKata] PHP Parse error:  syntax error, unexpected end of file in /home/trendytoday/public_html/kclounge_offline/application/views/admin/baby/view_baby.php on line 1175
+[14-May-2019 12:30:21 Asia/KolKata] PHP Parse error:  syntax error, unexpected '{' in /home/trendytoday/public_html/kclounge_offline/application/views/admin/timeline.php on line 465
+[14-May-2019 12:31:51 Asia/KolKata] PHP Parse error:  syntax error, unexpected '}', expecting ',' or ';' in /home/trendytoday/public_html/kclounge_offline/application/views/admin/timeline.php on line 465
+[14-May-2019 13:56:07 Asia/KolKata] PHP Fatal error:  Cannot redeclare SmsManagenent::commentList() in /home/trendytoday/public_html/kclounge_offline/application/controllers/SmsManagenent.php on line 182
+[14-May-2019 14:01:21 Asia/KolKata] PHP Fatal error:  Cannot redeclare SmsManagenent::commentList() in /home/trendytoday/public_html/kclounge_offline/application/controllers/SmsManagenent.php on line 182
+[14-May-2019 14:02:13 Asia/KolKata] PHP Parse error:  syntax error, unexpected '!=' (T_IS_NOT_EQUAL), expecting ')' in /home/trendytoday/public_html/kclounge_offline/application/views/admin/likeList.php on line 74
+[30-Jun-2019 15:47:56 Asia/KolKata] PHP Fatal error:  Call to undefined method Mother_model::MotherDailyMonitering() in /home/trendytoday/public_html/mncu/application/controllers/api/DailyMotherMonitoring.php on line 38
+[10-Jul-2019 17:40:31 Asia/KolKata] PHP Fatal error:  Call to undefined method DashboardDataModel::getLowBirthWeightBabies() in /home/trendytoday/public_html/mncu/application/models/api/Common_model.php on line 624
+[24-Jul-2019 19:13:46 Asia/KolKata] PHP Fatal error:  Call to a member function BabyWeightPdfFile() on a non-object in /home/trendytoday/public_html/mncu/application/models/api/Api_model.php on line 271
+[30-Jul-2019 16:05:38 Asia/KolKata] PHP Parse error:  syntax error, unexpected '?', expecting ')' in /home/trendytoday/public_html/mncu/application/views/admin/staff/dutychange.php on line 61
+[03-Aug-2019 14:51:17 Asia/KolKata] PHP Parse error:  syntax error, unexpected '$i' (T_VARIABLE), expecting function (T_FUNCTION) in /home/trendytoday/public_html/mncu/application/models/api/CreatePdf.php on line 573
+[05-Aug-2019 16:45:04 Asia/KolKata] PHP Parse error:  syntax error, unexpected '@' in /home/trendytoday/public_html/mncu/application/models/api/CreatePdf.php on line 108
+[05-Aug-2019 16:46:02 Asia/KolKata] PHP Parse error:  syntax error, unexpected '@' in /home/trendytoday/public_html/mncu/application/models/api/CreatePdf.php on line 108
+[05-Aug-2019 16:48:53 Asia/KolKata] PHP Parse error:  syntax error, unexpected '@' in /home/trendytoday/public_html/mncu/application/models/api/CreatePdf.php on line 108
+[05-Aug-2019 16:49:21 Asia/KolKata] PHP Parse error:  syntax error, unexpected '@' in /home/trendytoday/public_html/mncu/application/models/api/CreatePdf.php on line 108
+[05-Aug-2019 16:52:46 Asia/KolKata] PHP Parse error:  syntax error, unexpected '@' in /home/trendytoday/public_html/mncu/application/models/api/CreatePdf.php on line 108
+[05-Aug-2019 16:52:52 Asia/KolKata] PHP Parse error:  syntax error, unexpected '@' in /home/trendytoday/public_html/mncu/application/models/api/CreatePdf.php on line 108
+[06-Aug-2019 15:06:12 Asia/KolKata] PHP Parse error:  syntax error, unexpected '$html' (T_VARIABLE), expecting function (T_FUNCTION) in /home/trendytoday/public_html/mncu/application/models/api/CreatePdf.php on line 182
+[06-Aug-2019 15:48:31 Asia/KolKata] PHP Parse error:  syntax error, unexpected ')' in /home/trendytoday/public_html/mncu/application/models/api/CreatePdf.php on line 106
+[06-Aug-2019 18:23:01 Asia/KolKata] PHP Fatal error:  Call to a member function generateNurseOrderPdf() on a non-object in /home/trendytoday/public_html/mncu/application/models/api/Nurse_model.php on line 1645
+[14-Nov-2019 18:16:38 Asia/KolKata] PHP Fatal error:  Call to a member function GetStaffType1() on a non-object in /home/trendytoday/public_html/mncu/application/views/admin/staff/StaffType.php on line 108
+[15-Nov-2019 17:58:58 Asia/KolKata] PHP Fatal error:  Call to a member function flashdata() on a non-object in /home/trendytoday/public_html/mncu/application/views/admin/timeline.php on line 22
+[15-Nov-2019 18:00:06 Asia/KolKata] PHP Fatal error:  Call to a member function flashdata() on a non-object in /home/trendytoday/public_html/mncu/application/views/admin/timeline.php on line 22
+[18-Nov-2019 16:34:11 Asia/KolKata] PHP Fatal error:  Call to undefined function calculateDays() in /home/trendytoday/public_html/mncu/application/views/admin/timeline.php on line 288
+[18-Nov-2019 16:35:25 Asia/KolKata] PHP Fatal error:  Call to undefined function calculateDays() in /home/trendytoday/public_html/mncu/application/views/admin/timeline.php on line 288
+[18-Nov-2019 16:37:19 Asia/KolKata] PHP Fatal error:  Call to undefined function calculateDays() in /home/trendytoday/public_html/mncu/application/views/admin/timeline.php on line 160
+[18-Nov-2019 16:54:23 Asia/KolKata] PHP Fatal error:  Call to undefined function validateJson() in /home/trendytoday/public_html/mncu/application/controllers/api/CheckIMEI.php on line 19
+[18-Nov-2019 16:57:10 Asia/KolKata] PHP Fatal error:  Call to undefined function validateJson() in /home/trendytoday/public_html/mncu/application/controllers/api/CheckIMEI.php on line 19
+[18-Nov-2019 17:04:24 Asia/KolKata] PHP Fatal error:  Call to undefined function validateJson() in /home/trendytoday/public_html/mncu/application/controllers/api/CheckIMEI.php on line 19
+[18-Nov-2019 17:06:58 Asia/KolKata] PHP Fatal error:  Call to undefined function validateJson() in /home/trendytoday/public_html/mncu/application/controllers/api/CheckIMEI.php on line 20
+[18-Nov-2019 17:07:25 Asia/KolKata] PHP Fatal error:  Call to undefined function validateJson() in /home/trendytoday/public_html/mncu/application/controllers/api/CheckIMEI.php on line 20
+[18-Nov-2019 17:09:19 Asia/KolKata] PHP Fatal error:  Call to undefined function generateServerResponse() in /home/trendytoday/public_html/mncu/application/controllers/api/GetVideo.php on line 39
+[18-Nov-2019 17:10:39 Asia/KolKata] PHP Fatal error:  Call to undefined function generateServerResponse() in /home/trendytoday/public_html/mncu/application/controllers/api/GetVideo.php on line 39
+[18-Nov-2019 17:26:42 Asia/KolKata] PHP Fatal error:  Call to undefined function generateServerResponse() in /home/trendytoday/public_html/mncu/application/controllers/api/GetVideo.php on line 39
+[18-Nov-2019 17:27:33 Asia/KolKata] PHP Fatal error:  Call to undefined function validateJson() in /home/trendytoday/public_html/mncu/application/controllers/api/CheckIMEI.php on line 20
+[20-Nov-2019 15:57:42 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 16:09:32 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 16:42:14 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 16:43:10 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 16:43:19 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 16:43:22 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 16:48:58 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 17:45:52 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 17:48:52 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 18:16:16 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 18:16:49 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 18:19:48 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 18:23:22 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 18:24:37 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 18:26:18 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 18:44:41 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 18:48:00 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[20-Nov-2019 18:50:18 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[21-Nov-2019 17:57:28 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[21-Nov-2019 18:11:00 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[21-Nov-2019 18:13:29 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[21-Nov-2019 18:17:27 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[21-Nov-2019 18:20:17 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[21-Nov-2019 18:47:33 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[21-Nov-2019 19:05:45 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[21-Nov-2019 19:10:44 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[21-Nov-2019 19:13:25 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 11:19:46 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 11:22:10 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 12:08:18 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 12:13:18 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 12:18:30 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 12:22:12 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 12:23:33 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 13:13:36 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 15:26:05 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 16:10:14 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 16:34:37 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 16:42:59 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1086
+[22-Nov-2019 16:43:50 Asia/KolKata] PHP Parse error:  syntax error, unexpected ';', expecting ')' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1105
+[22-Nov-2019 16:44:31 Asia/KolKata] PHP Fatal error:  Cannot redeclare BabyModel::BabyVaccination() in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 2960
+[22-Nov-2019 16:46:46 Asia/KolKata] PHP Fatal error:  Cannot redeclare BabyModel::babyVaccination() in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 2960
+[22-Nov-2019 16:49:17 Asia/KolKata] PHP Fatal error:  Cannot redeclare BabyModel::babyVaccination() in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 2960
+[22-Nov-2019 16:50:14 Asia/KolKata] PHP Fatal error:  Cannot redeclare BabyModel::babyVaccination() in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 2960
+[22-Nov-2019 16:52:11 Asia/KolKata] PHP Fatal error:  Cannot redeclare BabyModel::babyVaccination() in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 2960
+[22-Nov-2019 16:53:13 Asia/KolKata] PHP Fatal error:  Cannot redeclare BabyModel::babyVaccination() in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 2960
+[22-Nov-2019 16:53:34 Asia/KolKata] PHP Fatal error:  Cannot redeclare BabyModel::babyVaccination() in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 2960
+[22-Nov-2019 16:55:32 Asia/KolKata] PHP Fatal error:  Cannot redeclare BabyModel::GetVaccination() in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 2992
+[25-Nov-2019 11:41:21 Asia/KolKata] PHP Fatal error:  Call to a member function countBabySign() on a non-object in /home/trendytoday/public_html/mncu/application/views/admin/baby/BabysViaLounge.php on line 38
+[25-Nov-2019 16:21:53 Asia/KolKata] PHP Fatal error:  Cannot redeclare BabyModel::getBabyDetail() in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1248
+[25-Nov-2019 16:22:41 Asia/KolKata] PHP Fatal error:  Cannot redeclare BabyModel::getBabyDetail() in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1248
+[25-Nov-2019 18:18:48 Asia/KolKata] PHP Fatal error:  Class 'CI_Model' not found in /home/trendytoday/public_html/mncu/application/controllers/api/PostFeedingData.php on line 3
+[25-Nov-2019 18:18:55 Asia/KolKata] PHP Fatal error:  Class 'CI_Model' not found in /home/trendytoday/public_html/mncu/application/controllers/api/PostFeedingData.php on line 3
+[25-Nov-2019 19:12:02 Asia/KolKata] PHP Fatal error:  Call to undefined function singlerowparameter2() in /home/trendytoday/public_html/mncu/application/views/admin/baby/BabyList.php on line 108
+[26-Nov-2019 15:12:11 Asia/KolKata] PHP Fatal error:  Cannot redeclare BabyModel::getBabyMonitoringData() in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 1248
+[27-Nov-2019 13:23:02 Asia/KolKata] PHP Fatal error:  Call to undefined function singlerowparameter2() in /home/trendytoday/public_html/mncu/application/views/admin/baby/BabyList.php on line 108
+[27-Nov-2019 13:50:42 Asia/KolKata] PHP Fatal error:  Call to undefined function singlerowparameter2() in /home/trendytoday/public_html/mncu/application/views/admin/baby/view_baby.php on line 672
+[27-Nov-2019 13:50:50 Asia/KolKata] PHP Fatal error:  Call to undefined function singlerowparameter2() in /home/trendytoday/public_html/mncu/application/views/admin/baby/view_baby.php on line 672
+[27-Nov-2019 18:13:18 Asia/KolKata] PHP Fatal error:  Call to a member function GetBabyWeight2() on a non-object in /home/trendytoday/public_html/mncu/application/views/admin/timeline.php on line 163
+[29-Nov-2019 17:24:17 Asia/KolKata] PHP Fatal error:  Call to undefined method UserModel::getStaffTypeList() in /home/trendytoday/public_html/mncu/application/controllers/Admin.php on line 160
+[29-Nov-2019 17:35:04 Asia/KolKata] PHP Fatal error:  Call to a member function finalPdfDischargeTime() on a non-object in /home/trendytoday/public_html/mncu/application/models/api/DischargeModel.php on line 182
+[29-Nov-2019 18:03:02 Asia/KolKata] PHP Parse error:  syntax error, unexpected '$dischargeTime' (T_VARIABLE), expecting function (T_FUNCTION) in /home/trendytoday/public_html/mncu/application/models/api/AllMixPdf.php on line 476
+[02-Dec-2019 16:23:41 Asia/KolKata] PHP Parse error:  syntax error, unexpected '=' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 156
+[02-Dec-2019 16:24:14 Asia/KolKata] PHP Parse error:  syntax error, unexpected '=' in /home/trendytoday/public_html/mncu/application/models/api/BabyModel.php on line 156
