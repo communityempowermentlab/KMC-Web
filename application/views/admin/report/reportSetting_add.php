@@ -122,7 +122,7 @@ input:checked + .slider:before {
                   </div>
                 </div>
 
-                <div class="col-md-4">
+                <!-- <div class="col-md-4">
                     <div class="form-group">
                       <label>Facility <span class="red">*</span></label>
                       <div class="controls">
@@ -135,8 +135,48 @@ input:checked + .slider:before {
                         
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                   
+              </div>
+
+              <div class="row col-12">
+                  
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>District <span class="red">*</span></label>
+                      <div class="controls">
+                        <select class="select2 form-control" multiple="multiple" name="district[]" id="district" onchange="getMultipleFacility('<?php echo base_url('coachM/getFacility/') ?>')">
+                          <?php foreach ($GetDistrict as $key => $value) {?>
+                            <option value ="<?php echo $value['PRIDistrictCode']?>" ><?php echo $value['DistrictNameProperCase'] ?></option>
+                          <?php } ?>
+                        </select>
+                        <span class="custom-error" id="err_district"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Facility <span class="red">*</span></label>
+                      <div class="controls">
+                        <select class="select2 form-control" multiple="multiple" name="facility[]" id="facility" onchange="getMultipleLounge('<?php echo base_url('coachM/getLounge/') ?>')">
+                          
+                        </select>
+                        <span class="custom-error" id="err_facility"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Lounge <span class="red">*</span></label>
+                      <div class="controls">
+                        <select class="select2 form-control" multiple="multiple" name="lounge[]" id="lounge">
+                          
+                        </select>
+                        <span class="custom-error" id="err_lounge"></span>
+                        
+                      </div>
+                    </div>
+                  </div>
               </div>
 
               <div class="row col-12">

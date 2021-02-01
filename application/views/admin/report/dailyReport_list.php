@@ -59,9 +59,7 @@
                       </div>
                     </div>
                     <div class="col-6 pull-right">
-                        <p>Resources [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/staffERDiagram.png', 'Staff Data Flow Diagram (DFD)')">Data Flow Diagram</a>]
-                         <!-- [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/staffFlowChart.png', 'Staff Functional Diagram')">Functional Diagram</a>] -->
-                        </p>
+                        <!-- <p>Resources [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/staffERDiagram.png', 'Staff Data Flow Diagram (DFD)')">Data Flow Diagram</a>] [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/staffFlowChart.png', 'Staff Functional Diagram')">Functional Diagram</a>]</p> -->
 
                     </div>
 
@@ -125,11 +123,8 @@
                                 <thead>
                                     <tr>
                                       <th>S&nbsp;No.</th>
-                                      <th>Subject</th>
-                                      <!-- <th>Body</th> -->
-                                      <th>Subscription</th>
                                       <th>Action</th>
-                                      <th>UPDATED&nbsp;AT</th>
+                                      <th>File</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -140,30 +135,14 @@
                                   foreach ($results as $value) { ?>
                                   <tr>
                                     <td><?php echo $counter; ?></td>
-                                    <td><?php echo $value['subject']; ?></td>
-                                    <!-- <td><?php echo $value['body']; ?></td> -->
                                     
-                                    <td>
-                                     <?php if($value['subscription'] == "Yes") { ?> 
-                                        <span class="badge badge-pill badge-light-success mr-1">
-                                          Yes 
-                                        </span>
-                                      <?php } else { ?>
-                                          <span class="badge badge-pill badge-light-warning mr-1">
-                                            No
-                                          </span>
-                                      <?php } ?>
-                                    </td>
-                                    <td><a href="<?php echo base_url(); ?>/GenerateReportM/updateReport/<?php echo $value['id']; ?>" title="View/Edit Report" class="btn btn-info btn-sm">View/Edit</a>
-                                      <a href="<?php echo base_url(); ?>/GenerateReportM/dailyDownloadReport/<?php echo $value['id']; ?>" title="Reports" class="btn btn-primary btn-sm">Reports</a>
+                                    <td><a href="<?php echo base_url(); ?>/assets/checkinReports/<?php echo $value['fileName']; ?>" title="Download Report Information" class="btn btn-info btn-sm">Download</a>
+                                      
                                     </td>
                                    
                                     
                                     
-                                    <td><?php if(!empty($value['addDate'])) { ?><span class="tooltiptext"><?php
-                                   echo $last_updated =     $this->load->FacilityModel->time_ago_in_php($value['addDate']);
-                                     // echo date("m/d/y, h:i A",strtotime($value['addDate'])) 
-                                     ?></span><?php } else { echo "N/A"; } ?> </td>
+                                    <td><?php echo $value['fileName']; ?></td>
                                     
                                   </tr>
                                     <?php $counter ++ ; } } else {
@@ -194,9 +173,3 @@
     </div>
 </section>
 <!-- Column selectors with Export Options and print table -->
-
-<div class="add-new">
-  <a href="<?php echo base_url('GenerateReportM/addGenerateReportM/');?>" class="btn btn btn-danger align-items-center">
-      <i class="bx bx-plus"></i>&nbsp; Add New Report
-  </a>
-</div>

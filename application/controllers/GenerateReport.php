@@ -183,10 +183,28 @@ public function updateReport(){
       $data['GetReport']       = $this->ReportSettingModel->GetReportById($id);
 
       $facilitydata = $this->ReportSettingModel->GetFacilityByReportId($id);
-      $facilitys   =       array();
+      // $facilitys   =       array();
+      // foreach ($facilitydata as $key => $value) {
+      //   $facilitys[] = $value['facilityId'];
+      // }
+
+      $key_arr = array();
+      $data['dis_arr'] = $key_arr;
+      $data['fac_arr'] = $key_arr;
+      $data['lounge_arr'] = $key_arr;
       foreach ($facilitydata as $key => $value) {
-        $facilitys[] = $value['facilityId'];
-      }
+        if(!in_array($value['districtId'], $data['dis_arr'])){
+          $data['dis_arr'][] = $value['districtId'];
+        }
+
+        if(!in_array($value['facilityId'], $data['fac_arr'])){
+          $data['fac_arr'][] = $value['facilityId'];
+        }
+
+        if(!in_array($value['loungeId'], $data['lounge_arr'])){
+          $data['lounge_arr'][] = $value['loungeId'];
+        }
+      } 
       
       $emaildata = $this->ReportSettingModel->GetEmailByReportId($id);
       $emails   =       array();
@@ -195,7 +213,7 @@ public function updateReport(){
       }
       //print_r($emails); die;
       $data['emails']   = $emails;
-      $data['facilitys']   = $facilitys;
+      //$data['facilitys']   = $facilitys;
       
       $data['GetStaffType']   = $this->ReportSettingModel->GetStaffType();
       $data['GetJobType']     = $this->ReportSettingModel->GetJobType();
@@ -224,154 +242,106 @@ public function UpdateReportPost(){
       }
   }   
 
-/* Add Staff Type Data By This */
-public function StaffTypePost(){
-        $data                              = $this->input->post();
-        if (empty($data['type'])) {
-         $fields                            = array();
-         $fields['parentId']                = '0';
-         $fields['staffTypeNameEnglish']    = $data['parent'];
-         $fields['Add_Date']                = time();
-         $insert = $this->db->insert('staffType',$fields);
-        } else {
-         $fields                            = array();
-         $fields['parentId']                = $data['type'];
-         $fields['staffTypeNameEnglish']    = $data['parent'];
-         $fields['Add_Date']                = time();
-         $insert = $this->db->insert('staffType',$fields);
-        }
-        if ($insert > 0) {
-              $this->session->set_flashdata('activate', getCustomAlert('S','Data has been Added successfully'));
-              redirect('staffM/staffType/');
-        } else {
-              $this->session->set_flashdata('activate', getCustomAlert('W','Oops! somthing is worng please try again.'));
-              redirect('staffM/staffType/');
-      }
-    }
 
-   /* Update Staff Type Data  */
-  public function UpdateStaffTypeData(){
-        $id = $this->uri->segment(3);
-        $table='staffType';
-        $data                              = $this->input->post();
-        $fields                            = array();
-        $fields['staffTypeNameEnglish']    = $data['StaffTypeNameEnglish'];
-        $fields['modify_date']             = time();
-        $this->db->where('StaffTypeID',$id);
-        $update = $this->db->update($table,$fields);
-
-        if ($update > 0) {
-              $this->session->set_flashdata('activate', getCustomAlert('S','Data has been Updated successfully'));
-              redirect('staffM/staffType/');
-          } else {
-              $this->session->set_flashdata('activate', getCustomAlert('W','Oops! somthing is worng please try again.'));
-              redirect('staffM/staffType/');
-          }
-    } 
-  /* Update Staff Type Data  */
-  public function UpdateStaffTypeData2(){
-        $id = $this->uri->segment(3);
-        $table='staffType';
-        $data                              = $this->input->post();
-        $fields                            = array();
-        $fields['parentId']                = $data['type'];
-        $fields['staffTypeNameEnglish']    = $data['StaffTypeNameEnglish'];
-        $fields['modify_date']             = time();
-        $this->db->where('StaffTypeID',$id);
-        $update = $this->db->update($table,$fields);
-
-        if ($update > 0) {
-              $this->session->set_flashdata('activate', getCustomAlert('S','Data has been Updated successfully'));
-              redirect('staffM/staffType/');
-        } else {
-              $this->session->set_flashdata('activate', getCustomAlert('W','Oops! somthing is worng please try again.'));
-              redirect('staffM/staffType/');
-          }
-    } 
+/* Daily Report Download Listing page call */
+  public function dailyDownloadReport(){
+     $reportSettingId = $this->uri->segment(3); 
+//echo $reportSettingId; die;
+    $facility_id = 'all';
     
-// for staff section
-  public function pointHistoryViaNurse(){
-      $id = $this->uri->segment(3);
-      $data['index']         = 'staff';
-      $data['index2']        = '';
-      $data['title']         = 'PointHistory | '.PROJECT_NAME; 
-      $data['StaffIDs']      = $id;
-      $GetNurseDetail        = $this->UserModel->getStaffNameBYID($id);
-      $data['fileName']      = $GetNurseDetail['Name'].'_Points_History';
-      $data['GetNurseData'] = $this->db->query("SELECT * FROM pointstransactions WHERE NurseId = ".$id." ORDER BY AddDate DESC")->result_array();
-      $this->load->view('admin/include/header',$data);
-      $this->load->view('admin/staff/pointHistoryNurse');
-      $this->load->view('admin/include/dataTable');
-      $this->load->view('admin/include/footer');
+    $limit         = DATA_PER_PAGE;
+    $pageNo        = '1';
+    $GetFacilities  = array();
+    
+
+    if($this->input->get()) { 
+      if(empty($_GET['keyword'])) { 
+        $totalRecords = $this->ReportSettingModel->getReportDownloadData('1', '', '',$reportSettingId);  
+      } else if(!empty($_GET['keyword'])) { 
+        $totalRecords = $this->StaffModel->getreportDataWhereSearching('1',trim($_GET['keyword']),$reportSettingId);
+      } 
+    } else { 
+      $totalRecords = $this->ReportSettingModel->getReportDownloadData('1', '', '',$reportSettingId); 
     }  
+     
+      // set url for seaching and without searching
+      !empty($_GET['keyword']) ? $config["base_url"] = base_url('GenerateReportM/dailyDownloadReport/?keyword=' . $_GET['keyword']) : $config["base_url"] = base_url('GenerateReportM/dailyDownloadReport/');
+      
+        if(!empty($totalRecords)){ 
+          $config["total_rows"] = count($totalRecords);
+          $config["per_page"] = $limit;
+          $config['use_page_numbers'] = TRUE;
+          $config['page_query_string'] = TRUE;
+          $config['enable_query_strings'] = TRUE;
+          $config['num_links'] = 2;
+          $config['cur_tag_open'] = '&nbsp;<li class="active"><a>';
+          $config['cur_tag_close'] = '</a></li>';
+          $config['next_link'] = 'Next';
+          $config['prev_link'] = 'Previous';
+          $this->pagination->initialize($config);
+          $str_links           = $this->pagination->create_links();
+          $links               = explode('&nbsp;', $str_links);
+          $offset              = 0;
+          if (!empty($_GET['per_page'])) {
+              $pageNo = $_GET['per_page'];
+              $offset = ($pageNo - 1) * $limit;
+          }
 
-//for lounge section
-/*  public function pointHistoryViaLounge(){
-      $id = $this->uri->segment(3);
-      $data['index']         = 'lounge';
-      $data['index2']        = '';
-      $data['title']         = 'Lounge Point History | '.PROJECT_NAME; 
-      $data['LoungeId']      = $id;
-      $data['GetNurseData'] = $this->db->query("SELECT * FROM pointstransactions WHERE LoungeId = ".$id." ORDER BY AddDate DESC")->result_array();
+          if($this->input->get()) { 
+            if(empty($_GET['keyword'])) { 
+              $AllRecord = $this->StaffModel->getReportDownloadData('2',$limit,$offset, 1); 
+            } else if(!empty($_GET['keyword']))
+            { 
+              $AllRecord = $this->StaffModel->getreportDataWhereSearching('2',trim($_GET['keyword']),$limit,$offset,$reportSettingId);
+            }
+          } else {
+            $AllRecord = $this->ReportSettingModel->getReportDownloadData('2',$limit,$offset, $reportSettingId); 
+          }
 
-      $this->load->view('admin/include/header',$data);
-      $this->load->view('admin/staff/pointHistoryLounge');
-      $this->load->view('admin/include/footer');
-    } */
+        } else {
+          $config["total_rows"] = array();
+          $config["per_page"] = '';
+          $config['use_page_numbers'] = FALSE;
+          $config['page_query_string'] = FALSE;
+          $config['enable_query_strings'] = FALSE;
+          $config['num_links'] = 0;
+          $config['cur_tag_open'] = '';
+          $config['cur_tag_close'] = '';
+          $config['next_link'] = '';
+          $config['prev_link'] = '';
+          $links = '';
+          $AllRecord = '';
+        }
 
-/* for Collected Point via lounge */
-public function pointHistoryViaLounge(){
-  $loungeId = $this->uri->segment(3);
-  $limit         = 100;
-  $pageNo        = '1';
-    if(empty($_GET['keyword'])) {
-      $totalRecords = $this->SmsModel->getLoungePointsData('1',$loungeId); 
-    } else if(!empty($_GET['keyword'])) {
-      $totalRecords = $this->SmsModel->getLoungePointsDataWhereSearching('1',$loungeId,trim($_GET['keyword']));
-    }
-    // set url for seaching and without searching
-    !empty($_GET['keyword']) ? $config["base_url"] = base_url('staffM/pointHistoryViaLounge/'.$loungeId.'?keyword='.$_GET['keyword']) : $config["base_url"] = base_url('staffM/pointHistoryViaLounge/'.$loungeId);
-      $config["total_rows"]   = $totalRecords;
-      $config["per_page"]     = $limit;
-      $config['use_page_numbers']  = TRUE;
-      $config['page_query_string'] = TRUE;
-      $config['enable_query_strings'] = TRUE;
-      $config['num_links'] = 2;
-      $config['cur_tag_open'] = '&nbsp;<li class="active"><a>';
-      $config['cur_tag_close'] = '</a></li>';
-      $config['next_link'] = 'Next';
-      $config['prev_link'] = 'Previous';
-      $this->pagination->initialize($config);
-      $str_links           = $this->pagination->create_links();
-      $links               = explode('&nbsp;', $str_links);
-      $offset              = 0;
-      if (!empty($_GET['per_page'])) {
-          $pageNo = $_GET['per_page'];
-          $offset = ($pageNo - 1) * $limit;
-      }
-        if(empty($_GET['keyword'])) {
-          $AllRecord = $this->SmsModel->getLoungePointsData('2',$loungeId,$limit,$offset); 
-        }else if(!empty($_GET['keyword']))
-        {
-           $AllRecord = $this->SmsModel->getLoungePointsDataWhereSearching('2',$loungeId,trim($_GET['keyword']),$limit,$offset);
-        } 
+        if($facility_id != 'all'){ 
+          $GetFacility    = $this->LoungeModel->GetFacilitiName($facility_id); 
+        } else {
+          $GetFacility = '';
+        }
 
-       $data = array(
-                'totalResult' => $totalRecords,
-                'results'     => $AllRecord,
-                'links'       => $links,
-                'index2'      => '',
-                'v_id'        => '',
-                'LoungeId'    => $loungeId,
-                'pageNo'      => $pageNo,
-                'index'       => 'lounge',
-                'title'       => 'Lounge Points History | '.PROJECT_NAME
-               );
-      $this->load->view('admin/include/header',$data);
-      $this->load->view('admin/staff/pointHistoryLounge');
-      $this->load->view('admin/include/tableScript');  
-      $this->load->view('admin/include/footer');
-}
+        
+        $GetDistrict    = $this->FacilityModel->selectquery(); 
+
+        $data = array(
+                  'totalResult'   => $totalRecords,
+                  'results'       => $AllRecord,
+                  'links'         => $links,
+                  'index2'        => '',
+                  'v_id'          => '',
+                  'pageNo'        => $pageNo,
+                  'index'         => 'ReportSetting',
+                  'fileName'      => 'ReportSettingList',
+                  'GetFacility'   => $GetFacility,
+                  'GetDistrict'   => $GetDistrict,
+                  'facilityList'  => $GetFacilities,
+                  'facility_id'   => $facility_id,
+                  'title'         => 'Generate Report | '.PROJECT_NAME
+                 );
+        $this->load->view('admin/include/header-new',$data);
+        $this->load->view('admin/report/dailyReport_list');
+        $this->load->view('admin/include/footer-new');
+        $this->load->view('admin/include/datatable-new');
+  }
 
 
 

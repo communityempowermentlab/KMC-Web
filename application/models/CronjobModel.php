@@ -5,22 +5,12 @@ class CronjobModel extends CI_Model {
 		$this->load->database();
 	}
 
-  public function getAllFacilities($facilityArray=false){
-    //$reportDate = date('Y-m-d',strtotime("-1 days"));
-    //$reportDate = "2021-01-26";
-    // $this->db->select('nurseDutyChange.loungeId,loungeMaster.facilityId,facilitylist.FacilityName');
-    // $this->db->join('loungeMaster','loungeMaster.loungeId=nurseDutyChange.loungeId');
-    // $this->db->join('facilitylist','facilitylist.FacilityID=loungeMaster.facilityId');
-    // $this->db->group_by('nurseDutyChange.loungeId');
-    // $this->db->where('DATE(nurseDutyChange.addDate)', $reportDate);
-    // $query = $this->db->get_where('nurseDutyChange')->result_array();
-
-    $this->db->select('loungeMaster.loungeId,loungeMaster.facilityId,facilitylist.FacilityName');
-    $this->db->join('loungeMaster','loungeMaster.facilityId=facilitylist.FacilityID');
-    if(!empty($facilityArray)){
-      $this->db->where_in('facilitylist.FacilityID',$facilityArray);
+  public function getAllLounges($loungeArray=false){
+    $this->db->select('loungeMaster.loungeId,loungeMaster.facilityId,loungeMaster.loungeName');
+    if(!empty($loungeArray)){
+      $this->db->where_in('loungeMaster.loungeId',$loungeArray);
     }
-    $query = $this->db->get_where('facilitylist')->result_array();
+    $query = $this->db->get_where('loungeMaster')->result_array();
     return $query;
   }
 

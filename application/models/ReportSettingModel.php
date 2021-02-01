@@ -14,7 +14,7 @@ class ReportSettingModel extends CI_Model {
     }     
   } 
 
-  // get staff data via facilityId
+  // get Report Settin data via facilityId
   public function getReportSettingData($type,$limit='',$offset=''){ 
     
       if ($type == '1') { 
@@ -27,6 +27,20 @@ class ReportSettingModel extends CI_Model {
       } 
        
   } 
+
+  // get Report Download data via facilityId
+  public function getReportDownloadData($type,$limit='',$offset='', $reportSettingId="1"){ 
+    
+      if ($type == '1') { 
+        $this->db->select('*');
+        $result = $this->db->query("SELECT * FROM reportLogs where `reportSettingId`= $reportSettingId order by id desc")->result_array();
+        return $result;
+       
+      } else { 
+        return $this->db->query("SELECT * FROM reportLogs  where `reportSettingId`=$reportSettingId order by id desc LIMIT ".$offset.", ".$limit."")->result_array();
+      } 
+       
+  }
 
   // get staff data with search and limit
   public function getStaffDataWhereSearching($type,$keyword,$limit='',$offset=''){
@@ -107,7 +121,7 @@ class ReportSettingModel extends CI_Model {
 
   public function GetFacilityByReportId($id)
   {
-    $this->db->select('facilityId');
+    //$this->db->select('facilityId');
     return $this->db->get_where('reportfacilities', array('reportsettingId'=>$id))->result_array();
   }
 
@@ -134,16 +148,24 @@ class ReportSettingModel extends CI_Model {
 
     $fields['subject']                     =       $data['subject'];
     $fields['body']               =       $data['body'];
-    $fields['emailFrom']                =       $data['emailFrom'];
-    $fields['subscription']             =       $data['subscription'];
+    $fields['emailFrom']          =       $data['emailFrom'];
+    $fields['subscription']       =       $data['subscription'];
+    $fields['addDate']            =       date("Y-m-d H:i:s");
     
     $this->db->insert('reportsetting',$fields);
     $id = $this->db->insert_id();
-    foreach($data['facilityId'] as $value)
+    foreach($data['lounge'] as $value)
     {
+      $explode = explode("-",$value); 
+      $district = $explode[0];
+      $facility = $explode[1];
+      $lounge   = $explode[2];
+
       $fields2                   =       array();
       $fields2['reportsettingId']       =       $id;
-      $fields2['facilityId']            =       $value;
+      $fields2['districtId']            =       $district;
+      $fields2['facilityId']            =       $facility;
+      $fields2['loungeId']            =       $lounge;
       $this->db->insert('reportfacilities',$fields2);
     }
 
@@ -164,6 +186,7 @@ $emails = explode(",",$data['email']);
 
   // update staff data
   public function UpdateReport($data,$id){
+    //echo date("Y-m-d H:i:s"); die;
     $fields                       =       array();
     
 
@@ -171,6 +194,7 @@ $emails = explode(",",$data['email']);
     $fields['body']               =       $data['body'];
     $fields['emailFrom']          =       $data['emailFrom'];
     $fields['subscription']       =       $data['subscription'];
+    $fields['addDate']       =       date("Y-m-d H:i:s");
     $this->db->where('id',$id);
     $this->db->update('reportsetting',$fields);
 
@@ -181,11 +205,18 @@ $emails = explode(",",$data['email']);
     $this->db->delete('reportemail');
 
 
-    foreach($data['facilityId'] as $value)
+    foreach($data['lounge'] as $value)
     {
+      $explode = explode("-",$value); 
+      $district = $explode[0];
+      $facility = $explode[1];
+      $lounge   = $explode[2];
+
       $fields2                   =       array();
       $fields2['reportsettingId']       =       $id;
-      $fields2['facilityId']            =       $value;
+      $fields2['districtId']            =       $district;
+      $fields2['facilityId']            =       $facility;
+      $fields2['loungeId']            =       $lounge;
       $this->db->insert('reportfacilities',$fields2);
     }
 

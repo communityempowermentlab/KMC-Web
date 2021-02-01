@@ -71,7 +71,7 @@ class Cronjob extends CI_Controller {
         $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setWrapText(true);
       }
 
-      $objWorkSheet->getColumnDimension('A')->setWidth(5);
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
       $objWorkSheet->getColumnDimension('B')->setWidth(22);
       $objWorkSheet->getColumnDimension('C')->setWidth(17);
       $objWorkSheet->getColumnDimension('D')->setWidth(22);
@@ -89,7 +89,7 @@ class Cronjob extends CI_Controller {
       }
 
       $objWorkSheet->setCellValue('A4', 'Sr. No.');
-      $objWorkSheet->setCellValue('B4', 'Facility Name');
+      $objWorkSheet->setCellValue('B4', 'Lounge Name');
       $objWorkSheet->setCellValue('C4', 'Nurse Name');
       $objWorkSheet->setCellValue('D4', 'Checkin Date Time');
       $objWorkSheet->setCellValue('E4', 'Checkout Date Time');
@@ -100,22 +100,22 @@ class Cronjob extends CI_Controller {
       $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate." ".$timeNotes);
 
       $getReportSettings = $this->cmodel->getReportSettings(1);
-      $facilityArray = array_column($getReportSettings['facilities'], 'facilityId');
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
       
-      // Get all facilities
-      $getAllFacilities = $this->cmodel->getAllFacilities($facilityArray);
+      // Get all lounges
+      $getAllLounges = $this->cmodel->getAllLounges($loungeArray);
       $dataCount = 1;
       $a=5;
       
-      foreach($getAllFacilities as $key_facility => $getAllFacilitiesData){
+      foreach($getAllLounges as $key_lounge => $getAllLoungesData){
 
-          $facilityListArray    = [];
-          $facilityListArray[]  = $dataCount;
-          $facilityListArray[]  = $getAllFacilitiesData['FacilityName'];
+          $loungeListArray    = [];
+          $loungeListArray[]  = $dataCount;
+          $loungeListArray[]  = $getAllLoungesData['loungeName'];
 
-          $getNurseAttendanceList = $this->cmodel->getNurseAttendanceList($getAllFacilitiesData['loungeId']); 
+          $getNurseAttendanceList = $this->cmodel->getNurseAttendanceList($getAllLoungesData['loungeId']); 
 
-          $objWorkSheet->fromArray($facilityListArray, null, 'A'.$a);
+          $objWorkSheet->fromArray($loungeListArray, null, 'A'.$a);
           $innerRow = $a;
 
           $previousDate = date('Y-m-d',strtotime("-1 days"));

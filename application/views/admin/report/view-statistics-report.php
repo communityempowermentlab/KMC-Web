@@ -131,8 +131,7 @@
                                 ?>
                                 
                                   <?php foreach ($Getlounge as $key=> $value) {   
-
-                                    $CountingMother    = count($this->db->query("SELECT * FROM `motherRegistration` as mr inner join `babyRegistration` as br on mr.`motherId` = br.`babyId` inner join `babyAdmission` as ba on br.`babyId` = ba.`babyId` where ba.`loungeId`=".$value['loungeId']." AND mr.`type` != 2 and ba.`status` != 4 and (mr.`addDate` between '".$DateStart."' and '".$DateEnd."')")->result_array()); 
+                                    $CountingMother    = count($this->db->query("select * from motherRegistration as mr left join motherAdmission as ma on ma.`motherId`=mr.`motherId` where ma.`loungeId`=".$value['loungeId']." and (mr.`addDate` between '".$DateStart."' and '".$DateEnd."')")->result_array()); 
 
                                   ?>
                                    <tr> <td><b><?php echo $value['loungeName'].' Mother<br>'; ?>  
