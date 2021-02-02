@@ -44,12 +44,15 @@ class CoachManagenent extends Welcome {
       $data['title']          = 'Add Coach | '.PROJECT_NAME; 
       $data['fileName']       = 'coachList'; 
       $data['GetDistrict']   = $this->FacilityModel->selectquery(); 
+      $data['menuGroup']    = $this->CoachModel->GetDataOrderByAsc('manageMenuGroupSetting', array('status' => 1), 'groupName');
 
       if($this->input->post()){ 
-        $coach_name        = $this->input->post('coach_name');
-        $coach_mobile_number        = $this->input->post('coach_mobile_number');
-        $password             = $this->input->post('password');
-        $lounge             = $this->input->post('lounge');
+        $coach_name             = $this->input->post('coach_name');
+        $coach_mobile_number    = $this->input->post('coach_mobile_number');
+        $password               = $this->input->post('password');
+        $lounge                 = $this->input->post('lounge');
+        $menu_group             = $this->input->post('menu_group');
+        $dashboard_menu         = $this->input->post('dashboard_menu');
 
         $loginId = $this->session->userdata('adminData')['Id'];
         $ip = $this->input->ip_address();
@@ -83,6 +86,32 @@ class CoachManagenent extends Welcome {
                               'modifyDate'    => date('Y-m-d H:i:s')
                              );
           $this->CoachModel->insertData('coachDistrictFacilityLounge', $insertData2);
+        }
+
+        // insert menu group
+        foreach ($menu_group as $key => $group_value) {
+          $insertMenuData   = array( 
+                                  'employeeId'    => $id,
+                                  'userType'      => 2,
+                                  'groupId'       => $group_value,
+                                  'status'        => 1,
+                                  'addDate'       => date('Y-m-d H:i:s'),
+                                  'modifyDate'    => date('Y-m-d H:i:s')
+                             );
+          $this->CoachModel->insertData('employeeMenuGroup', $insertMenuData);
+        }
+
+        // insert dashboard menus
+        foreach ($dashboard_menu as $key => $dashboard_menu_value) {
+          $insertDashboardMenuData   = array( 
+                                  'employeeId'    => $id,
+                                  'userType'      => 2,
+                                  'menuId'        => $dashboard_menu_value,
+                                  'status'        => 1,
+                                  'addDate'       => date('Y-m-d H:i:s'),
+                                  'modifyDate'    => date('Y-m-d H:i:s')
+                             );
+          $this->CoachModel->insertData('employeeDashboardMenuSettings', $insertDashboardMenuData);
         }
 
 
@@ -166,7 +195,22 @@ class CoachManagenent extends Welcome {
       $data['title']          = 'Edit Coach | '.PROJECT_NAME;
       $data['GetDistrict']   = $this->FacilityModel->selectquery(); 
       $data['GetCoachData'] = $this->CoachModel->GetDataById('coachMaster', array('id' => $id));
-      $data['menuGroup']    = $this->CoachModel->GetDataOrderByAsc('manageMenuGroupSetting', array('status' => 1), 'groupName');
+      
+      $data['menuGroup'] = $this->CoachModel->GetDataOrderByAsc('manageMenuGroupSetting', array('status' => 1), 'groupName');
+      $GetEmployeeMenuGroup = $this->CoachModel->GetData('employeeMenuGroup', array('employeeId' => $id, 'userType'=>2, 'status' => 1));
+      $GetEmployeeDashboardMenu = $this->CoachModel->GetData('employeeDashboardMenuSettings', array('employeeId' => $id, 'userType'=>2, 'status' => 1));
+      $key_arr = array();
+      $dashboard_menu_arr = array();
+      $data['key_arr'] = $key_arr;
+      foreach ($GetEmployeeMenuGroup as $key => $value) {
+        $data['key_arr'][] = $value['groupId'];
+      }
+
+      $data['dashboard_menu_arr'] = $dashboard_menu_arr;
+      foreach ($GetEmployeeDashboardMenu as $key => $dashboard_value) {
+        $data['dashboard_menu_arr'][] = $dashboard_value['menuId'];
+      }
+
       $GetGroup = $this->CoachModel->GetData('coachDistrictFacilityLounge', array('masterId' => $id, 'status' => 1));
       $key_arr = array();
       $data['dis_arr'] = $key_arr;
@@ -187,11 +231,13 @@ class CoachManagenent extends Welcome {
       } 
        if($this->input->post()){ 
         $id = $this->uri->segment(3);
-        $coach_name        = $this->input->post('coach_name');
-        $coach_mobile_number        = $this->input->post('coach_mobile_number');
+        $coach_name           = $this->input->post('coach_name');
+        $coach_mobile_number  = $this->input->post('coach_mobile_number');
         $password             = $this->input->post('password');
-        $lounge             = $this->input->post('lounge');
-        $status             = $this->input->post('status');
+        $lounge               = $this->input->post('lounge');
+        $status               = $this->input->post('status');
+        $menu_group           = $this->input->post('menu_group');
+        $dashboard_menu       = $this->input->post('dashboard_menu');
 
         $loginId = $this->session->userdata('adminData')['Id'];
         $ip = $this->input->ip_address();
@@ -238,6 +284,36 @@ class CoachManagenent extends Welcome {
                               'modifyDate'    => date('Y-m-d H:i:s')
                              );
           $this->CoachModel->insertData('coachDistrictFacilityLounge', $insertData2);
+        }
+
+        // insert menu group
+        $this ->db->where(array('employeeId'=>$id,'userType'=>2));
+        $this ->db->delete('employeeMenuGroup');
+        foreach ($menu_group as $key => $value) {
+          $insertMenuData   = array( 
+                                  'employeeId'    => $id,
+                                  'userType'      => 2,
+                                  'groupId'       => $value,
+                                  'status'        => 1,
+                                  'addDate'       => date('Y-m-d H:i:s'),
+                                  'modifyDate'    => date('Y-m-d H:i:s')
+                             );
+          $this->CoachModel->insertData('employeeMenuGroup', $insertMenuData);
+        }
+
+        // insert dashboard menus
+        $this ->db->where(array('employeeId'=>$id,'userType'=>2));
+        $this ->db->delete('employeeDashboardMenuSettings');
+        foreach ($dashboard_menu as $key => $dashboard_menu_value) {
+          $insertDashboardMenuData   = array( 
+                                  'employeeId'    => $id,
+                                  'userType'      => 2,
+                                  'menuId'        => $dashboard_menu_value,
+                                  'status'        => 1,
+                                  'addDate'       => date('Y-m-d H:i:s'),
+                                  'modifyDate'    => date('Y-m-d H:i:s')
+                             );
+          $this->CoachModel->insertData('employeeDashboardMenuSettings', $insertDashboardMenuData);
         }
 
 

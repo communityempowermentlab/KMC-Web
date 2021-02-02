@@ -1932,16 +1932,19 @@ class ApiModel extends CI_Model
             $checkDataForAllUpdate = 1;  // check for all data synced or not
             foreach ($request['counsellingData'] as $key => $request) {
 
-                $arrayName['babyId']                = $request['babyId'];
-                $arrayName['loungeId']              = $request['loungeId'];
-                $arrayName['counsellingType']       = $request['counsellingType'];
-                $arrayName['posterId']              = $request['posterId'];
-                $arrayName['duration']              = $request['duration'];
-                $arrayName['addDate']               = $request['addDate'];
-                $arrayName['modifyDate']            = $request['addDate'];
+                $checkExist = $this->db->get_where('babyCounsellingPosterLog',array('babyId'=>$request['babyId'],'loungeId'=>$request['loungeId'],'counsellingType'=>$request['counsellingType'],'posterId'=>$request['posterId'],'duration'=>$request['duration'],'addDate'=>$request['addDate']))->row_array();
+                if(empty($checkExist)){
+                    $arrayName['babyId']                = $request['babyId'];
+                    $arrayName['loungeId']              = $request['loungeId'];
+                    $arrayName['counsellingType']       = $request['counsellingType'];
+                    $arrayName['posterId']              = $request['posterId'];
+                    $arrayName['duration']              = $request['duration'];
+                    $arrayName['addDate']               = $request['addDate'];
+                    $arrayName['modifyDate']            = $request['addDate'];
 
-                $inserted = $this->db->insert('babyCounsellingPosterLog', $arrayName);
-                $lastID   = $this->db->insert_id();
+                    $inserted = $this->db->insert('babyCounsellingPosterLog', $arrayName);
+                    $lastID   = $this->db->insert_id();
+                }
             }
 
             generateServerResponse('1','S');           

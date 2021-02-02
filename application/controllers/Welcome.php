@@ -132,22 +132,22 @@ class Welcome extends CI_Controller {
     $secretKey = "6LfdpcYUAAAAADRv4qggKBFscozrHLGVfd8SRxGt";
     $ip = $_SERVER['REMOTE_ADDR'];
     // post request to server
-    $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
-    $response = file_get_contents($url);
-    $responseKeys = json_decode($response,true);
+    //$url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
+    //$response = file_get_contents($url);
+    //$responseKeys = json_decode($response,true);
     // should return JSON with success as true
     // if($responseKeys["success"]) {
-      $admin          = $this->UserModel->login($email, base64_encode($password));
-          
-      if (!empty($admin)){
+      $admin          = $this->UserModel->login($email, $password);
+      
+      if (!empty($admin['id'])){
    
         $adminData = array(
           'is_logged_in'  => true,
-          'Type'      => '1',
+          'Type'      => $admin['type'],
           'Id'        => $admin['id'],
           'Name'      => ucwords($admin['name']),
-          'Email'     => $admin['email']
-           
+          'Email'     => $admin['email'],
+          'Mobile'    => $admin['mobile']
         );
         $this->session->set_userdata('adminData', $adminData);
 
@@ -255,7 +255,7 @@ class Welcome extends CI_Controller {
 
     $this->session->unset_userdata('adminData');
     $this->session->set_flashdata('login_message', generateAdminAlert('S', 8));
-    redirect(base_url()."Admin/Login");
-    
+    //redirect(base_url()."Admin/Login");
+    redirect(base_url());
   }
 } 

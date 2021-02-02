@@ -9,8 +9,14 @@ class UserModel extends CI_Model {
   public function login($username,$password) {
       
     $this->db->select("id, name,email,profileImage");
-    $query = $this->db->get_where('adminMaster', array(EMAIL => $username,PASSWORD=>$password));
-    return $query->row_array();
+    $query = $this->db->get_where('adminMaster', array(EMAIL => $username,PASSWORD=>base64_encode($password)))->row_array();
+    $query['type'] = 1;
+    if(empty($query['id'])){
+      $this->db->select("id, name,email,mobile,profileImage");
+      $query = $this->db->get_where('coachMaster', array('mobile' => $username,'password'=>md5($password)))->row_array();
+      $query['type'] = 2;
+    }
+    return $query;
 
   }
 
@@ -261,8 +267,13 @@ class UserModel extends CI_Model {
   }
 
 
-  public function getEmployeeMenu($empId){
-    $getGroupId = $this->db->get_where('employeeMenuGroup',array('employeeId'=>$empId, 'status' => 1))->result_array(); 
+  public function getEmployeeMenu($empId,$userType = false){
+    if(!empty($userType)){
+      $userType = $userType;
+    }else{
+      $userType = "1";
+    }
+    $getGroupId = $this->db->get_where('employeeMenuGroup',array('employeeId'=>$empId, 'userType'=>$userType, 'status' => 1))->result_array(); 
     $get_menu_data = array();
     foreach ($getGroupId  as $key => $value) {
       $getMenuId = $this->db->get_where('headingControlSystem',array('menuGroupId'=>$value['groupId'], 'status' => 1))->result_array();

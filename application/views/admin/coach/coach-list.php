@@ -84,7 +84,7 @@
                                     </td>
                                     <td><a href="<?php echo base_url(); ?>coachM/updateCoach/<?php echo $value['id']; ?>" title="Edit EMployee Information" class="btn btn-info btn-sm">View/Edit</a></td>
                                     
-                                    <td><a class="tooltip" href="<?php echo base_url(); ?>coachM/viewCoachLog/<?php echo $value['id']; ?>"><?php echo $last_updated; ?><span class="tooltiptext"><?php echo date("m/d/y, h:i A",strtotime($value['modifyDate'])) ?></span></a></td>
+                                    <td><a class="tooltip nonclick_link"><?php echo $last_updated; ?><span class="tooltiptext"><?php echo date("m/d/y, h:i A",strtotime($value['modifyDate'])) ?></span></a></td>
                                     
                                   </tr>
                                 <?php $counter ++ ; } } else {

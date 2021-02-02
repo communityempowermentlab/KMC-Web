@@ -319,52 +319,60 @@
             </li>
           </ul>
         <?php } else {
+          $userPermittedMenuData = array();
           $userPermittedMenuData = $this->session->userdata('userPermission');
         ?>
           <ul class="nav navbar-nav" id="main-menu-navigation" data-menu="menu-navigation" data-icon-style="filled">
-            <?php if(in_array(1, $userPermittedMenuData())){ ?>
-              <li class="<?php echo ($index =='index'  ? 'active' : ''); ?>" data-menu=""><a class="dropdown-toggle nav-link" href="<?php echo base_url(); ?>admin/dashboard"><i class="fa fa-desktop" aria-hidden="true"></i><span data-i18n="Dashboard">Dashboard</span></a>
-              
+            <?php if(in_array(1, $userPermittedMenuData)){ ?>
+              <li class="<?php echo ($index =='index'  ? 'active' : ''); ?>" data-menu=""><a class="dropdown-toggle nav-link" href="<?php echo base_url(); ?>admin/dashboard"><i class="menu-livicon" data-icon="desktop"></i><span data-i18n="Dashboard">Dashboard</span></a>
               </li>
             <?php } ?>
 
-            <?php if(in_array(2, $userPermittedMenuData())){ ?>
-              <li class="dropdown nav-item" data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i class="fa fa-handshake-o" aria-hidden="true"></i><span>Facilities</span></a>
+            <?php if(in_array(2, $userPermittedMenuData)){ ?>
+              <li class="dropdown nav-item" data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i class="menu-livicon" data-icon="users"></i><span>Facilities</span></a>
                 <ul class="dropdown-menu">
                   <?php if(in_array(3, $userPermittedMenuData)){ ?>
                     <li data-menu="" class="<?php echo (($index=='facilities')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/facility/manageFacility'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Facilities</a>
                     </li>
                   <?php } ?>
+
                   <?php if(in_array(6, $userPermittedMenuData)){ ?>
-                    <li data-menu="" class="<?php echo (($index=='lounge')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/loungeM/manageLounge'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Lounges</a>
+                    <li class="dropdown dropdown-submenu" data-menu="dropdown-submenu"><a class="dropdown-item align-items-center dropdown-toggle" href="#" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Lounges</a>
+                      <ul class="dropdown-menu">
+                        <li data-menu="" class="<?php echo (($index=='lounge') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/loungeM/manageLounge'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Lounges Information</a>
+                        </li>
+                        <li data-menu="" class="<?php echo (($index=='temporaryLounge') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('loungeM/temporaryLounge'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Amenities Information</a>
+                        </li>
+                      </ul>
                     </li>
                   <?php } ?>
+
                   <?php if(in_array(9, $userPermittedMenuData)){ ?>
-                    <li data-menu="" class="<?php echo (($index=='staff')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/staffM/manageStaff'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Staff</a>
+                    <li class="dropdown dropdown-submenu" data-menu="dropdown-submenu"><a class="dropdown-item align-items-center dropdown-toggle" href="#" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Staff</a>
+                      <ul class="dropdown-menu">
+                        <li data-menu="" class="<?php echo (($index=='staff') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/staffM/manageStaff'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Approved Staff</a>
+                        </li>
+                        <li data-menu="" class="<?php echo (($index=='temporaryStaff') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('staffM/temporaryStaff'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Not Approved Staff</a>
+                        </li>
+                      </ul>
+                    </li>
+                  <?php } ?>  
+
+                  <?php if(in_array(14, $userPermittedMenuData)){ ?>
+                    <li data-menu="" class="<?php echo (($index=='coachM')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/coachM/coachList'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Coaches</a>
                     </li>
                   <?php } ?>
+
                   <?php if(in_array(12, $userPermittedMenuData)){ ?>
                     <li data-menu="" class="<?php echo (($index=='enquiryM')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/enquiryM/enquiryList'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Enquiries</a>
                     </li>
                   <?php } ?>
-                  <?php if(in_array(14, $userPermittedMenuData)){ ?>
-                    <!-- <li data-menu="" class="<?php echo (($index=='manageVideo')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/videoM/manageVideo'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Videos</a>
-                    </li> -->
-                  <?php } ?>
+                  
                   <?php if(in_array(17, $userPermittedMenuData)){ ?>
-                    <li class="dropdown dropdown-submenu" data-menu="dropdown-submenu"><a class="dropdown-item align-items-center dropdown-toggle" href="#" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Location</a>
-                      <ul class="dropdown-menu">
-                        <?php if(in_array(18, $userPermittedMenuData)){ ?>
-                          <li data-menu="" class="<?php echo (($index=='manageState') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/Location/manageState'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>States</a>
-                          </li>
-                        <?php } ?>
-                        <?php if(in_array(19, $userPermittedMenuData)){ ?>
-                          <li data-menu="" class="<?php echo (($index=='manageRevenue') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/Location/manageRevenue'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Revenue Districts</a>
-                          </li>
-                        <?php } ?>
-                      </ul>
+                    <li data-menu="" class="<?php echo (($index=='manageRevenue')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('Location/manageRevenue'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Revenue Districts (U.P)</a>
                     </li>
                   <?php } ?>
+
                   <?php if(in_array(20, $userPermittedMenuData)){ ?>
                     <li data-menu="" class="<?php echo (($index=='employee') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/employeeM/manageEmployee'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>CEL Employees</a>
                     </li>
@@ -373,49 +381,104 @@
               </li>
             <?php } ?>
 
-            <li data-menu=""><a class="dropdown-toggle nav-link" href="<?php echo base_url(); ?>motherM/registeredMother/all/all"><i class="fa fa-female" aria-hidden="true"></i><span data-i18n="Dashboard">Mothers</span></a>
-            </li>
-            <li class="<?php echo ($index =='Baby'  ? 'active' : ''); ?>" data-menu=""><a class="dropdown-toggle nav-link" href="<?php echo base_url(); ?>babyM/registeredBaby/1/all"><i class="fa fa-child" aria-hidden="true"></i><span data-i18n="Dashboard">Infants</span></a>
-            </li>
-            <li data-menu=""><a class="dropdown-toggle nav-link" href="<?php echo base_url(); ?>admin/dashboard"><i class="fa fa-desktop" aria-hidden="true"></i><span data-i18n="Dashboard">Reports</span></a>
-            </li>
-            <li class="dropdown nav-item" data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i class="fa fa-pie-chart" aria-hidden="true"></i><span>Communication</span></a>
-              <ul class="dropdown-menu">
-                <li data-menu=""><a class="dropdown-item align-items-center" href="chart-apex.html" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>SMS</a>
-                </li>
-                <li data-menu=""><a class="dropdown-item align-items-center" href="chart-chartjs.html" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Notification</a>
-                </li>
-              </ul>
-            </li>
+            <?php if(in_array(23, $userPermittedMenuData)){ ?>
+              <li class="<?php echo ($index =='Mother'  ? 'active' : ''); ?>" data-menu=""><a class="dropdown-toggle nav-link" href="<?php echo base_url(); ?>motherM/registeredMother/all/all"><i class="menu-livicon" data-icon="user"></i><span data-i18n="Dashboard">Mothers</span></a>
+              </li>
+            <?php } ?>
+
+            <?php if(in_array(24, $userPermittedMenuData)){ ?>
+              <li class="<?php echo ($index =='Baby'  ? 'active' : ''); ?>" data-menu=""><a class="dropdown-toggle nav-link" href="<?php echo base_url(); ?>babyM/registeredBaby/1/all"><i class="menu-livicon" data-icon="user"></i><span data-i18n="Dashboard">Infants</span></a>
+              </li>
+            <?php } ?>
+
+            <?php if(in_array(25, $userPermittedMenuData)){ ?>
+              <li class="dropdown nav-item" data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i class="menu-livicon" data-icon="report"></i><span>Reports</span></a>
+                <ul class="dropdown-menu">
+                  <?php if(in_array(46, $userPermittedMenuData)){ ?>
+                    <li data-menu="" class="<?php echo (($index=='report2') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/GenerateReportM/manageGeneralReport'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Generate Reports</a>
+                    </li>
+                  <?php } ?>
+                </ul>
+              </li>
+            <?php } ?>
+
+            <?php if(in_array(48, $userPermittedMenuData)){ ?>
+              <li class="dropdown nav-item" data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i class="menu-livicon" data-icon="counselling"></i><span>Counselling</span></a>
+                <ul class="dropdown-menu">
+                  <?php if(in_array(49, $userPermittedMenuData)){ ?>
+                    <li data-menu="" class="<?php echo (($index=='manageCounsellingVideos')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/counsellingM/manageCounsellingVideos'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Counselling Videos</a>
+                    </li>
+                  <?php } ?>
+                  <?php if(in_array(50, $userPermittedMenuData)){ ?>
+                    <li data-menu="" class="<?php echo (($index=='manageApplicationVideos')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/counsellingM/manageApplicationVideos'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Application Training Videos</a>
+                    </li>
+                  <?php } ?>
+                  <?php if(in_array(51, $userPermittedMenuData)){ ?>
+                    <li data-menu="" class="<?php echo (($index=='manageCounsellingPoster')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/counsellingM/manageCounsellingPoster'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Counselling Poster</a>
+                    </li>
+                  <?php } ?>
+                </ul>
+              </li>
+            <?php } ?>
+
+            <?php if(in_array(26, $userPermittedMenuData)){ ?>
+              <li class="dropdown nav-item" data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i class="menu-livicon" data-icon="communication"></i><span>Communication</span></a>
+                <ul class="dropdown-menu">
+                  <?php if(in_array(27, $userPermittedMenuData)){ ?>
+                    <li data-menu=""><a class="dropdown-item align-items-center" href="chart-apex.html" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>SMS</a>
+                    </li>
+                  <?php } ?>
+
+                  <?php if(in_array(28, $userPermittedMenuData)){ ?>
+                    <li data-menu=""><a class="dropdown-item align-items-center" href="chart-chartjs.html" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Notification</a>
+                    </li>
+                  <?php } ?>
+                </ul>
+              </li>
+            <?php } ?>
+
             <?php if(in_array(29, $userPermittedMenuData)){ ?>
-              <li class="dropdown nav-item" data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i class="fa fa-folder-o" aria-hidden="true"></i><span>Miscellaneous</span></a>
+              <li class="dropdown nav-item" data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i class="menu-livicon" data-icon="gear"></i><span>Miscellaneous</span></a>
                 <ul class="dropdown-menu">
                   <?php if(in_array(30, $userPermittedMenuData)){ ?>
                     <li data-menu="" class="<?php echo (($index=='manageNBCU')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/Miscellaneous/manageNBCU'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Newborn Care Unit Type</a>
                     </li>
                   <?php } ?>
+
                   <?php if(in_array(33, $userPermittedMenuData)){ ?>
                     <li data-menu="" class="<?php echo (($index=='managementType')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/Miscellaneous/managementType'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Management Type</a>
                     </li>
                   <?php } ?>
+
                   <?php if(in_array(36, $userPermittedMenuData)){ ?>
                     <li data-menu="" class="<?php echo (($index=='FacilityType')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/facility/facilityType/'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Facility Type</a>
                     </li>
                   <?php } ?>
+
                   <?php if(in_array(39, $userPermittedMenuData)){ ?>
                     <li data-menu="" class="<?php echo (($index=='StaffType')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo base_url('staffM/staffType/');?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Staff Type</a>
                     </li>
                   <?php } ?>
-                  <?php if(in_array(42, $userPermittedMenuData)){ ?>
-                    <li data-menu="" class="<?php echo (($index=='videoType')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo base_url('videoM/videoType');?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Video Type</a>
-                    </li>
-                  <?php } ?>
+
                   <?php if(in_array(45, $userPermittedMenuData)){ ?>
                     <li data-menu="" class="<?php echo (($index=='manageTemplate')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/staffM/manageTemplate/'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>SMS Template</a>
                     </li>
                   <?php } ?>
-                  
-                  
+
+                  <?php if(in_array(52, $userPermittedMenuData)){ ?>
+                    <li data-menu="" class="<?php echo (($index=='Sitemap')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/Miscellaneous/manageSitemap'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Sitemap</a>
+                    </li>
+                  <?php } ?>
+
+                  <?php if(in_array(42, $userPermittedMenuData)){ ?>
+                    <li data-menu="" class="<?php echo (($index=='MenuGroup')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/Miscellaneous/viewMenuGroup'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Menu Group</a>
+                    </li>
+                  <?php } ?>
+
+                  <?php if(in_array(47, $userPermittedMenuData)){ ?>
+                    <li data-menu="" class="<?php echo (($index=='Setting')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/Miscellaneous/manageSetting/1'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Settings</a>
+                    </li>
+                  <?php } ?>
                 </ul>
               </li>
             <?php } ?>

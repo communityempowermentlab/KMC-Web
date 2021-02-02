@@ -115,16 +115,16 @@
                             <div class="card-body">
                                 
                                 <div class="divider mt-0">
-                                    <div class="divider-text text-uppercase text-muted"><small>login with
-                                            email</small>
+                                    <div class="divider-text text-uppercase text-muted">
+                                        <small>login with email/mobile</small>
                                     </div>
                                 </div>
                                 <?php echo $this->session->flashdata('login_message'); ?>
                                 <form action="<?php echo site_url().'Welcome/doLogin'; ?>" method="post" id="loginForm">
                                     <div class="form-group mb-50">
                                         <div class="controls">
-                                            <label class="text-bold-600" for="email_address">Email address</label>
-                                            <input type="email" class="form-control" id="email_address" placeholder="Email address" name="email">
+                                            <label class="text-bold-600" for="email_address">Email Id / Mobile No.</label>
+                                            <input type="text" class="form-control" id="email_address" placeholder="Email Id / Mobile No." name="email">
                                             <span id="email_address_error" class="error_style"></span>
                                         </div>
                                     </div>

@@ -161,13 +161,18 @@ public function captcha(){
   public function dashboard(){ 
     $this->is_not_logged_in(); 
     $adminData = $this->session->userdata('adminData'); 
-
+    $dashboardMenuSettings = array();
     if($adminData['Type']=='2'){
-      $getMenus = $this->UserModel->getEmployeeMenu($adminData['Id']);
+      $getMenus = $this->UserModel->getEmployeeMenu($adminData['Id'],$adminData['Type']);
       $this->session->set_userdata('userPermission', $getMenus);
+
+      $dashboardMenuSettings = $this->db->get_where('employeeDashboardMenuSettings',array('employeeId'=>$adminData['Id'],'userType'=>$adminData['Type'],'status'=>1))->result_array();
+      $dashboardMenuSettings = array_column($dashboardMenuSettings, 'menuId');
     }
 
     $data['getDashboardData'] = $this->UserModel->getDashboardData();
+    $data['dashboardMenuSettings'] = $dashboardMenuSettings;
+    $data['sessionData'] = $adminData;
 
     $data['index']         = 'index';
     $data['index2']        = '';
@@ -176,7 +181,7 @@ public function captcha(){
     $data['LatestMother']  = $this->FacilityModel->getLatestMother();
     $data['totalLounges']  = $this->DashboardDataModel->getAllLonges();
     $this->load->view('admin/include/header-new',$data);
-    $this->load->view('admin/dashboard-new');
+    $this->load->view('admin/dashboard-new',$data);
     $this->load->view('admin/include/footer-new');
     $this->load->view('admin/include/chart-footer');
   }

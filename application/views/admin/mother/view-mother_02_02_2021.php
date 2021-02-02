@@ -72,11 +72,8 @@
                         <nav>
                             <div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
                                 <a class="nav-item nav-link active" id="nav-registration-tab" data-toggle="tab" href="#nav-registration" role="tab" aria-controls="nav-registration" aria-selected="true">Registration</a>
-                                
-
                               <?php if ($Type['type'] == '1' || $Type['type'] == '3') { ?>
-                                <a class="nav-item nav-link" id="nav-basic-tab" data-toggle="tab" href="#nav-basic" role="tab" aria-controls="nav-basic" aria-selected="true">Basic Information</a>
-                                <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Contact Information</a> 
+                                <!-- <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Contact Details</a> -->
                                 <!-- <a class="nav-item nav-link" id="nav-past-tab" data-toggle="tab" href="#nav-past" role="tab" aria-controls="nav-past" aria-selected="false">Mother Past Information</a> -->
                                 <a class="nav-item nav-link" id="nav-assessment-tab" data-toggle="tab" href="#nav-assessment" role="tab" aria-controls="nav-assessment" aria-selected="false">Mother Assessment</a>
                                 <a class="nav-item nav-link" id="nav-comment-tab" data-toggle="tab" href="#nav-comment" role="tab" aria-controls="nav-comment" aria-selected="false">Comments</a>
@@ -240,224 +237,7 @@
 
               
                             </div>
-
-
-
-                            <div class="tab-pane fade show" id="nav-basic" role="tabpanel" aria-labelledby="nav-basic-tab">
-                                <div class="col-12">
-                                  <h5 class="float-left mb-2 mt-1 pr-1">Mother Basic Information</h5>
-                                </div>
-
-              
-                                  <div class="row col-12">
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Mother's Name </label>
-                                          <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherName']) ? 'UNKNOWN' : $motherData['motherName'];?>" readonly placeholder="Mother Name">
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                    
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Father Name </label>
-                                          <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['fatherName']) ? 'N/A' : $motherData['fatherName'];?>" readonly >
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Mother's Aadhar Number </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['motherAadharNumber']) ? 'N/A' : $motherData['motherAadharNumber'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                  </div>
-
-                                  <div class="row col-12">
-                                      
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Father's Aadhar Number </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['fatherAadharNumber']) ? 'N/A' : $motherData['fatherAadharNumber'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>MCTS Number </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['motherMCTSNumber']) ? 'N/A' : $motherData['motherMCTSNumber'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Mother's Weight ( in Kgs) </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['motherWeight']) ? 'N/A' : $motherData['motherWeight'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                  </div>
-
-                                  <div class="row col-12">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Mother DOB (dd-mm-yyyy) </label>
-                                          <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherDOB']) ? 'N/A' : date("d-m-Y",strtotime($motherData['motherDOB'])); ?>" readonly placeholder="Mother DOB (dd-mm-yyyy)">
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Mother's Age (in case DOB not known) </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['motherAge']) ? 'N/A' : $motherData['motherAge'];?>"readonly>
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Age at Marriage(in Year) </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['ageAtMarriage']) ? 'N/A' : $motherData['ageAtMarriage'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                  </div>
-                                  <div class="row col-12">
-                                      
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Mother's Education </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['motherEducation']) ? 'N/A' : $motherData['motherEducation'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Religion </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['motherReligion']) ? 'N/A' : $motherData['motherReligion'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Caste </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['motherCaste']) ? 'N/A' : $motherData['motherCaste'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                  </div>
-                                  <div class="row col-12">
-                                      
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Have you ever had multiple births? </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['multipleBirth']) ? 'N/A' : $motherData['multipleBirth'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Total Pregnancies(Gravida) </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['gravida']) ? 'N/A' : $motherData['gravida'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>No. of births?(Para) </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['para']) ? 'N/A' : $motherData['para'];?>"readonly>
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                  </div>
-                                  <div class="row col-12">
-                                      
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>No. of miscarriage or abortion</label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['abortion']) ? 'N/A' : $motherData['abortion'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Total no. of children who are currently alive?(Live) </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['live']) ? 'N/A' : $motherData['live'];?>"readonly>
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Birth Spacing </label>
-                                          <div class="controls">
-                                            
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['birthSpacing']) ? 'N/A' :  $motherData['birthSpacing'];?>"readonly >
-                                            
-                                          </div>
-                                        </div>
-                                      </div>
-                                  </div>
-
-                                
-
-              
-                            </div>
-
-
-
-
-
-
-                            <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+                            <!-- <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
                                 <div class="col-12">
                                   <h5 class="float-left mb-2 mt-1 pr-1">Contact Details</h5>
                                 </div>
@@ -713,7 +493,7 @@
                                   <h5 class="float-left mb-2 mt-1 pr-1">Delivery Address</h5>
                                 </div>
 
-                                <!-- <div class="row col-12">
+                                <div class="row col-12">
                                     <div class="col-md-4">
                                       <div class="form-group">
                                         <label>Nurse </label>
@@ -742,9 +522,9 @@
                                         </div>
                                       </div>
                                     </div>
-                                </div> -->
+                                </div>
 
-                                <!-- <div class="row col-12">
+                                <div class="row col-12">
                                     <div class="col-md-4">
                                       <div class="form-group">
                                         <label>Asha Number </label>
@@ -769,7 +549,7 @@
                                         </div>
                                       </div>
                                     </div>
-                                </div> -->
+                                </div>
 
                                 <div class="row col-12">
                                     <div class="col-md-4">
@@ -820,8 +600,7 @@
                                       </div>
                                     </div>
                                 </div>
-                            </div>
-                            
+                            </div> -->
                             <div class="tab-pane fade" id="nav-past" role="tabpanel" aria-labelledby="nav-past-tab">
                                 <div class="col-12">
                                   <h5 class="float-left mb-2 mt-1 pr-1">Past History and ANC Period</h5>
