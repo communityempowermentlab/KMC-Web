@@ -4,6 +4,7 @@ require_once(APPPATH.'controllers/Welcome.php');
 class LoungeManagenent extends Welcome {
   public function __construct() {
     parent::__construct();
+    $this->load->model('UserModel');
     $this->load->model('LoungeModel');  
     $this->load->model('FacilityModel');  
     $this->is_not_logged_in(); 
@@ -19,17 +20,6 @@ class LoungeManagenent extends Welcome {
     $data['index2']         = '';
     $data['fileName']       = 'Lounge_List';
     $data['title']          = 'Lounges | '.PROJECT_NAME; 
-    // $facility_id            = $this->uri->segment(3, 0); 
-    // $data['facility_id']    = $facility_id;
-    // if(!empty($_GET['district']) && !empty($_GET['keyword'])){ 
-    //   $data['GetLounge'] = $this->LoungeModel->GetLoungeByKeywordDistrict($_GET['district'], $_GET['keyword']);
-    // } else if(!empty($_GET['keyword'])){ 
-    //   $data['GetLounge'] = $this->LoungeModel->GetLoungeByKeyword($_GET['keyword']);
-    // } else if(!empty($_GET['district'])){ 
-    //   $data['GetLounge'] = $this->LoungeModel->GetLoungeByDistrict($_GET['district']);
-    // } else {
-    //   $data['GetLounge']      = $this->LoungeModel->lounge(); 
-    // }
 
     if($_GET){
       $data['GetLounge'] = $this->LoungeModel->GetActiveLoungeBySearch($_GET['district'], $_GET['facilityname'], $_GET['keyword']);

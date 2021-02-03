@@ -46,7 +46,7 @@
                     </div>
                     <div class="col-md-9">
                       <div class="controls">
-                        <input type="text" class="form-control" name="name" id="group_name" placeholder="NBCU Name" required="" data-validation-required-message="This field is required">
+                        <input type="text" class="form-control" name="name" id="group_name" placeholder="Group Name" required="" data-validation-required-message="This field is required">
                       </div>
                     </div>
                   </div>

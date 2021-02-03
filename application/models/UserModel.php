@@ -288,13 +288,61 @@ class UserModel extends CI_Model {
     return $get_menu_data;
   }
 
+  public function getCoachFacilities(){
+    $adminData = $this->session->userdata('adminData'); 
+    $coachFacilityArray = array();
+    $coachLoungeArray = array();
+    if($adminData['Type'] == 2){
+      $getCoachFacilityLoungeList = $this->db->get_where('coachDistrictFacilityLounge',array('masterId'=>$adminData['Id'],'status'=>1))->result_array();
+      $coachFacilityArray  = array_column($getCoachFacilityLoungeList, 'facilityId');
+      $coachLoungeArray  = array_column($getCoachFacilityLoungeList, 'loungeId');
+    }
+
+    $response['coachFacilityArray'] = $coachFacilityArray;
+    $response['coachFacilityArrayString'] = "(".implode(",", $coachFacilityArray).")";
+    $response['coachLoungeArray'] = $coachLoungeArray;
+    $response['coachLoungeArrayString'] = "(".implode(",", $coachLoungeArray).")";
+    return $response;
+  }
 
   public function getDashboardData(){
+    $adminData = $this->session->userdata('adminData'); 
+    $coachFacilityArray = array();
+    $coachLoungeArray = array();
+    if($adminData['Type'] == 2){
+      $getCoachFacilityLoungeList = $this->db->get_where('coachDistrictFacilityLounge',array('masterId'=>$adminData['Id'],'status'=>1))->result_array();
+      $coachFacilityArray  = array_column($getCoachFacilityLoungeList, 'facilityId');
+      $coachLoungeArray  = array_column($getCoachFacilityLoungeList, 'loungeId');
+    }
+
+    // facility count
+    if(!empty($coachFacilityArray)){
+      $this->db->where_in('facilitylist.FacilityID',$coachFacilityArray);
+    }
     $facility = $this->db->get_where('facilitylist',array('status!='=>3))->num_rows();
+
+    // lounge count
+    if(!empty($coachLoungeArray)){
+      $this->db->where_in('loungeMaster.loungeId',$coachLoungeArray);
+    }
     $lounge = $this->db->get_where('loungeMaster',array('status!='=>3))->num_rows();
+
+    // staff count
+    if(!empty($coachFacilityArray)){
+      $this->db->where_in('staffMaster.facilityId',$coachFacilityArray);
+    }
     $staff = $this->db->get_where('staffMaster',array('status!='=>3))->num_rows();
+    
+    // employee count
     $cel_emp = $this->db->get_where('employeesData',array('status!='=>3))->num_rows();
+
+    // enquiry count
+    if(!empty($coachLoungeArray)){
+      $this->db->where_in('stuckData.loungeId',$coachLoungeArray);
+    }
     $total_enquiry = $this->db->get_where('stuckData',array('status!='=>3))->num_rows();
+
+    // video count
     $total_video = $this->db->get_where('counsellingMaster',array('status!='=>3))->num_rows();
 
     $date = date('Y-m-d H:i:s', strtotime('-10 days'));

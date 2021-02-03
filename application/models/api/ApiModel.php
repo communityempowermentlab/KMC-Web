@@ -1958,5 +1958,14 @@ class ApiModel extends CI_Model
         return $this->db->get_where('babyAdmission',array('loungeId'=>$data['loungeId'],'babyFileId'=>$data['registrationNumber']))->num_rows();
     }
 
+    // baby counselling posters
+    public function GetBabyCounsellingPoster($data){
+        $this->db->select('babyCounsellingPosterLog.*,counsellingMaster.videoTitle,counsellingMaster.posterType,babyAdmission.babyId as admissionBabyId');
+        $this->db->join('counsellingMaster','counsellingMaster.id=babyCounsellingPosterLog.posterId');
+        $this->db->join('babyAdmission','babyAdmission.babyId=babyCounsellingPosterLog.babyId');
+        $this->db->where(array('counsellingMaster.videoType'=>3,'counsellingMaster.status'=>1,'babyAdmission.status'=>1));
+        return $this->db->get_where('babyCounsellingPosterLog',array('babyCounsellingPosterLog.loungeId'=>$data['loungeId']))->result_array();
+    }
+
 }
 

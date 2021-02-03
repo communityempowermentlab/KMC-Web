@@ -46,7 +46,7 @@
                     </div>
                     <div class="col-md-9">
                       <div class="controls">
-                        <input type="text" class="form-control" name="name" id="group_name" placeholder="NBCU Name" required="" data-validation-required-message="This field is required" value="<?= $get_group['groupName']; ?>">
+                        <input type="text" class="form-control" name="name" id="group_name" placeholder="Group Name" required="" data-validation-required-message="This field is required" value="<?= $get_group['groupName']; ?>">
                       </div>
                     </div>
                   </div>
@@ -88,7 +88,7 @@
                                                 <div class="col-sm-4 pl-0">
                                                   <fieldset>
                                                     <div class="checkbox">
-                                                      <input type="checkbox" class="checkbox-input set_heads" name="view_head[]" id="view_head_<?= $value['id']; ?>" value="<?php echo $value['id']; ?>" data-id="<?= $value['id']; ?>" title="Permission" onclick="getMenuChildEdit(<?php echo $value['id']; ?>, '<?php echo base_url('Miscellaneous/getMenuChild');?>');">
+                                                      <input type="checkbox" class="checkbox-input set_heads" name="view_head[]" id="view_head_<?= $value['id']; ?>" value="<?php echo $value['id']; ?>" data-id="<?= $value['id']; ?>" title="Permission" onclick="getMenuChild(<?php echo $value['id']; ?>, '<?php echo base_url('Miscellaneous/getMenuChild');?>');">
                                                       <input type="hidden" name="head_id[]" id="head_id_<?= $i; ?>" value="<?= $value['id']; ?>-off" data-id="<?= $i; ?>"  class="id_heads">
                                                       <label for="view_head_<?= $value['id']; ?>"><?= $value['levelName']; ?></label>
                                                     </div>
@@ -107,7 +107,7 @@
                                                 <div class="col-sm-12 divPadding panel mg">
                                                     <div class="col-sm-4">
                                                         <div class="col-sm-1 divPadding">
-                                                            <input type="checkbox" name="view_head[]" id="view_head_<?= $value['id']; ?>" value="<?php echo $value['id']; ?>" data-id="<?= $value['id']; ?>" title="Permission" class="set_heads" data-value="<?= $value['id']; ?>" onclick="getMenuChildEdit(<?php echo $value['id']; ?>, '<?php echo base_url('Miscellaneous/getMenuChild');?>');">
+                                                            <input type="checkbox" name="view_head[]" id="view_head_<?= $value['id']; ?>" value="<?php echo $value['id']; ?>" data-id="<?= $value['id']; ?>" title="Permission" class="set_heads" data-value="<?= $value['id']; ?>" onclick="getMenuChild(<?php echo $value['id']; ?>, '<?php echo base_url('Miscellaneous/getMenuChild');?>');">
                                                             <input type="hidden" name="head_id[]" id="head_id_<?= $i; ?>" value="<?= $value['id']; ?>-off" data-id="<?= $i; ?>"  class="id_heads">
                                                         </div>
                                                         <div class="col-sm-11 divPadding">
@@ -173,6 +173,11 @@
                     }
                 }
             });
+        }
+        else
+        {
+            $('#child_div_'+id).addClass('hide');
+            $('#child_div_'+id).html('');
         }
         
     }

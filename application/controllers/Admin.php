@@ -165,9 +165,6 @@ public function captcha(){
     if($adminData['Type']=='2'){
       $getMenus = $this->UserModel->getEmployeeMenu($adminData['Id'],$adminData['Type']);
       $this->session->set_userdata('userPermission', $getMenus);
-
-      $dashboardMenuSettings = $this->db->get_where('employeeDashboardMenuSettings',array('employeeId'=>$adminData['Id'],'userType'=>$adminData['Type'],'status'=>1))->result_array();
-      $dashboardMenuSettings = array_column($dashboardMenuSettings, 'menuId');
     }
 
     $data['getDashboardData'] = $this->UserModel->getDashboardData();

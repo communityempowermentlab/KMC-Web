@@ -114,68 +114,7 @@
                     </div>
                   </div>
               </div>
-
-              <!-- Dashboard menus -->
-              <br>
-              <div class="col-12">
-                <h5 class="float-left pr-1">Dashboard Menus Privilege</h5>
-              </div>
-
-              <div class="row col-12">
-                <div class="col-md-2">
-                  <div class="form-group" id="passwordDiv">
-                    <div class="controls">
-                      <input type="checkbox" name="dashboard_menu[]" value="1"> <label>Total Facilities</label>
-                      <span class="custom-error" id="err_menu_group"></span>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group" id="passwordDiv">
-                    <div class="controls">
-                      <input type="checkbox" name="dashboard_menu[]" value="2"> <label>Total Lounges</label>
-                      <span class="custom-error" id="err_menu_group"></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row col-12">
-                <div class="col-md-2">
-                  <div class="form-group" id="passwordDiv">
-                    <div class="controls">
-                      <input type="checkbox" name="dashboard_menu[]" value="3"> <label>Total Registered Staff</label>
-                      <span class="custom-error" id="err_menu_group"></span>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group" id="passwordDiv">
-                    <div class="controls">
-                      <input type="checkbox" name="dashboard_menu[]" value="4"> <label>Total Enquiries</label>
-                      <span class="custom-error" id="err_menu_group"></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row col-12">
-                <div class="col-md-2">
-                  <div class="form-group" id="passwordDiv">
-                    <div class="controls">
-                      <input type="checkbox" name="dashboard_menu[]" value="5"> <label>Total Videos</label>
-                      <span class="custom-error" id="err_menu_group"></span>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group" id="passwordDiv">
-                    <div class="controls">
-                      <input type="checkbox" name="dashboard_menu[]" value="6"> <label>Total CEL Employees</label>
-                      <span class="custom-error" id="err_menu_group"></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+              
               <!-- Header menus -->
               <br>
               <div class="col-12">

@@ -7,7 +7,13 @@ class LoungeModel extends CI_Model {
 
   // get data from loungeMaster via facilityId
   public function lounge(){
-    return $this->db->query("SELECT * From loungeMaster ORDER BY loungeId desc")->result_array();
+    $getCoachLounge = $this->UserModel->getCoachFacilities();
+    $where_lounge = "";
+    if(!empty($getCoachLounge['coachLoungeArray'])){ 
+      $where_lounge = 'where loungeId in '.$getCoachLounge['coachLoungeArrayString'].'';
+    }
+
+    return $this->db->query("SELECT * From loungeMaster ".$where_lounge." ORDER BY loungeId desc")->result_array();
   }
 
   public function GetLoungeByDistrict($district){
@@ -23,6 +29,10 @@ class LoungeModel extends CI_Model {
   }
 
   public function GetActiveLoungeBySearch($district, $facilityname, $keyword){
+
+    $getCoachLounge = $this->UserModel->getCoachFacilities();
+    $where_lounge = "";
+
     $where = "";$where1 = "";$where2 = "";$where3 = "";$and_cond = "";
     if(!empty($district)){
       $where1 = "facilitylist.`PRIDistrictCode` = ".$district."";
@@ -34,13 +44,17 @@ class LoungeModel extends CI_Model {
     }
     if(!empty($keyword)){
       $where3 = $and_cond." (loungeMaster.`loungeName` Like '%{$keyword}%' OR loungeMaster.`loungeContactNumber` Like '%{$keyword}%' OR facilitylist.`FacilityName` Like '%{$keyword}%')";
+      $and_cond = "AND";
+    }
+    if(!empty($getCoachLounge['coachLoungeArray'])){ 
+      $where_lounge = $and_cond.' loungeMaster.loungeId in '.$getCoachLounge['coachLoungeArrayString'].'';
     }
 
-    if(!empty($where1) || !empty($where2) || !empty($where3)){
+    if(!empty($where1) || !empty($where2) || !empty($where3) || !empty($where_lounge)){
       $where = "where";
     }
 
-    return $this->db->query("SELECT loungeMaster.* From loungeMaster inner join facilitylist on loungeMaster.`facilityId` = facilitylist.`FacilityID` $where $where1 $where2 $where3 ORDER BY loungeMaster.loungeId desc")->result_array();
+    return $this->db->query("SELECT loungeMaster.* From loungeMaster inner join facilitylist on loungeMaster.`facilityId` = facilitylist.`FacilityID` $where $where1 $where2 $where3 $where_lounge ORDER BY loungeMaster.loungeId desc")->result_array();
   }
 
   // update lounge data via loungeId

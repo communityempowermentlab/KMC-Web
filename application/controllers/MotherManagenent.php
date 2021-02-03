@@ -4,6 +4,7 @@ require_once(APPPATH.'controllers/Welcome.php');
 class MotherManagenent extends Welcome {
   public function __construct() {
       parent::__construct();
+      $this->load->model('UserModel');
       $this->load->model('MotherModel');  
       $this->load->model('FacilityModel');  
       $this->load->model('LoungeModel'); 
@@ -84,13 +85,13 @@ class MotherManagenent extends Welcome {
     } else {
       if($type != ''){
         $AllRecord = $this->MotherModel->getAllMotherList($limit,$offset);
-      } else { 
+      } else {
         $AllRecord = $this->MotherModel->getAllMothers($loungeId,$limit,$offset);
       }
     }  
 
     $GetDistrict = $this->FacilityModel->selectquery(); 
-      
+    
     $data = array(
                 'totalResult' => $totalRecords,
                 'results'     => $AllRecord,

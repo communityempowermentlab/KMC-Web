@@ -42,10 +42,14 @@ class FacilityModel extends CI_Model {
   }
 
   public function GetFacilities($type =''){
+    $getCoachFacilities = $this->UserModel->getCoachFacilities();
     #type 2 for facility type;  
     if($type !='2'){ 
-
-      $qry = $this->db->query("SELECT `FT`.FacilityTypeName,`FM`.* FROM `facilitylist` as `FM` LEFT JOIN `facilityType` as `FT` ON FM.`FacilityType` = FT.`id` ORDER BY `FM`.FacilityID desc")->result_array();
+      $where_facility = "";
+      if(!empty($getCoachFacilities['coachFacilityArray'])){ 
+        $where_facility = 'where FM.FacilityID in '.$getCoachFacilities['coachFacilityArrayString'].' ';
+      } 
+      $qry = $this->db->query("SELECT `FT`.FacilityTypeName,`FM`.* FROM `facilitylist` as `FM` LEFT JOIN `facilityType` as `FT` ON FM.`FacilityType` = FT.`id` ".$where_facility." ORDER BY `FM`.FacilityID desc")->result_array();
       foreach($qry as $key => $fac_data)
         { 
           $this->db->select('loungeMaster.loungeName,loungeMaster.loungeId');
@@ -69,18 +73,36 @@ class FacilityModel extends CI_Model {
   }
 
   public function GetFacilitiesByDistrict($district){
-    $qry = $this->db->query("SELECT `FT`.FacilityTypeName,`FM`.* FROM `facilitylist` as `FM` LEFT JOIN `facilityType` as `FT` ON FM.`FacilityType` = FT.`id` WHERE FM.`PRIDistrictCode` = ".$district." ORDER BY `FM`.FacilityID desc")->result_array();
+    $getCoachFacilities = $this->UserModel->getCoachFacilities();
+    $where_facility = "";
+    if(!empty($getCoachFacilities['coachFacilityArray'])){ 
+      $where_facility = 'AND FM.FacilityID in '.$getCoachFacilities['coachFacilityArrayString'].' ';
+    }
+
+    $qry = $this->db->query("SELECT `FT`.FacilityTypeName,`FM`.* FROM `facilitylist` as `FM` LEFT JOIN `facilityType` as `FT` ON FM.`FacilityType` = FT.`id` WHERE FM.`PRIDistrictCode` = ".$district." ".$where_facility." ORDER BY `FM`.FacilityID desc")->result_array();
     return $qry;
   }
 
 
   public function GetFacilitiesByKeyword($keyword){
-    $qry = $this->db->query("SELECT `FT`.FacilityTypeName,`FM`.* FROM `facilitylist` as `FM` LEFT JOIN `facilityType` as `FT` ON FM.`FacilityTypeID` = FT.`id` WHERE FT.`facilityTypeName` Like '%{$keyword}%' OR FM.`FacilityName` Like '%{$keyword}%' OR FM.`CMSOrMOICName` Like '%{$keyword}%' OR FM.`CMSOrMOICMoblie` Like '%{$keyword}%' ORDER BY `FM`.FacilityID desc")->result_array();
+    $getCoachFacilities = $this->UserModel->getCoachFacilities();
+    $where_facility = "";
+    if(!empty($getCoachFacilities['coachFacilityArray'])){ 
+      $where_facility = 'AND FM.FacilityID in '.$getCoachFacilities['coachFacilityArrayString'].' ';
+    }
+
+    $qry = $this->db->query("SELECT `FT`.FacilityTypeName,`FM`.* FROM `facilitylist` as `FM` LEFT JOIN `facilityType` as `FT` ON FM.`FacilityTypeID` = FT.`id` WHERE (FT.`facilityTypeName` Like '%{$keyword}%' OR FM.`FacilityName` Like '%{$keyword}%' OR FM.`CMSOrMOICName` Like '%{$keyword}%' OR FM.`CMSOrMOICMoblie` Like '%{$keyword}%') ".$where_facility." ORDER BY `FM`.FacilityID desc")->result_array();
     return $qry;
   }
 
   public function GetFacilitiesByKeywordDistrict($district, $keyword){
-    $qry = $this->db->query("SELECT `FT`.FacilityTypeName,`FM`.* FROM `facilitylist` as `FM` LEFT JOIN `facilityType` as `FT` ON FM.`FacilityTypeID` = FT.`id` WHERE FM.`PRIDistrictCode` = ".$district." AND (FT.`facilityTypeName` Like '%{$keyword}%' OR FM.`FacilityName` Like '%{$keyword}%' OR FM.`CMSOrMOICName` Like '%{$keyword}%' OR FM.`CMSOrMOICMoblie` Like '%{$keyword}%') ORDER BY `FM`.FacilityID desc")->result_array();
+    $getCoachFacilities = $this->UserModel->getCoachFacilities();
+    $where_facility = "";
+    if(!empty($getCoachFacilities['coachFacilityArray'])){ 
+      $where_facility = 'AND FM.FacilityID in '.$getCoachFacilities['coachFacilityArrayString'].' ';
+    }
+
+    $qry = $this->db->query("SELECT `FT`.FacilityTypeName,`FM`.* FROM `facilitylist` as `FM` LEFT JOIN `facilityType` as `FT` ON FM.`FacilityTypeID` = FT.`id` WHERE FM.`PRIDistrictCode` = ".$district." AND (FT.`facilityTypeName` Like '%{$keyword}%' OR FM.`FacilityName` Like '%{$keyword}%' OR FM.`CMSOrMOICName` Like '%{$keyword}%' OR FM.`CMSOrMOICMoblie` Like '%{$keyword}%') ".$where_facility." ORDER BY `FM`.FacilityID desc")->result_array();
     return $qry;
   }
 

@@ -990,17 +990,17 @@ class MiscellaneousManagenent extends Welcome {
                 $loginId = $this->session->userdata('adminData')['Id'];
                 $ip = $this->input->ip_address(); 
 
-                $group_heading_array = array(
-                  'manageMenuGroupId'       => $insertData,
-                  'groupName'               => $name,
-                  'menuIds'                 => $string_version,
-                  'status'                  => $status,
-                  'addedBy'                 => $loginId,
-                  'ipAddress'               => $ip,
-                  'addDate'                 => $date_time
-                );
+                // $group_heading_array = array(
+                //   'manageMenuGroupId'       => $insertData,
+                //   'groupName'               => $name,
+                //   'menuIds'                 => $string_version,
+                //   'status'                  => $status,
+                //   'addedBy'                 => $loginId,
+                //   'ipAddress'               => $ip,
+                //   'addDate'                 => $date_time
+                // );
                     
-                $this->MiscellaneousModel->insertGroup('manageMenuGroupSettingLog', $group_heading_array); 
+                // $this->MiscellaneousModel->insertGroup('manageMenuGroupSettingLog', $group_heading_array); 
 
                 $message = '<div class="alert border-success alert-dismissible mb-2" role="alert">
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">

@@ -151,6 +151,18 @@ class Welcome extends CI_Controller {
         );
         $this->session->set_userdata('adminData', $adminData);
 
+        // maintain login history
+        if($admin['type'] == 2){
+          $updateArr = array( 'employeeId'  => $admin['id'],
+                              'userType'    => 2,
+                              'ipAddress'   => $this->input->ip_address(),
+                              'type'        => 1,
+                              'loginTime'   => date('Y-m-d H:i:s'),
+                              'status'      => 1
+                             );
+          $this->db->insert('employeeLoginMaster', $updateArr);
+        }
+
         $message = 'Welcome <strong>'.ucwords($admin['username']).'</strong>.You have successfully logged in.';
         $this->session->set_flashdata('login_message', getCustomAlert('S', $message));
 
@@ -240,7 +252,7 @@ class Welcome extends CI_Controller {
   } 
 
 
-  // logout admin and redirect to index page
+  // logout employee and redirect to index page
   public function employeeLogout() {
     $employeeId = $this->session->userdata('adminData')['Id'];
 
@@ -250,12 +262,12 @@ class Welcome extends CI_Controller {
                             'status'      => 1
                            );  
 
-    $this->db->where(array('employeeId' => $employeeId, 'type' => 1));
+    $this->db->where(array('employeeId' => $employeeId, 'type' => 1,'userType'=>2));
     $this->db->update('employeeLoginMaster',$updateArr); 
 
     $this->session->unset_userdata('adminData');
+    $this->session->unset_userdata('userPermission');
     $this->session->set_flashdata('login_message', generateAdminAlert('S', 8));
-    //redirect(base_url()."Admin/Login");
     redirect(base_url());
   }
 } 

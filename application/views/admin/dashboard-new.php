@@ -14,102 +14,116 @@
       <!-- Statistics Cards Starts -->
       <div class="col-12">
         <div class="row">
-          
-          <div class="col-sm-2 col-12 dashboard-users-success">
-            <a href="<?php echo base_url('facility/manageFacility'); ?>">
-              <div class="card text-center">
-                <div class="card-content">
-                  <div class="card-body py-1">
-                    <div class="badge-circle badge-circle-lg badge-circle-light-success mx-auto mb-50">
-                      <i class="bx bxs-bank font-medium-5"></i>
+          <?php 
+          $userPermittedMenuData = array();
+          $userPermittedMenuData = $this->session->userdata('userPermission');
+          if(($sessionData['Type']==1) || in_array(53, $userPermittedMenuData)){ ?>
+            <div class="col-sm-2 col-12 dashboard-users-success">
+              <a href="<?php echo base_url('facility/manageFacility'); ?>">
+                <div class="card text-center">
+                  <div class="card-content">
+                    <div class="card-body py-1">
+                      <div class="badge-circle badge-circle-lg badge-circle-light-success mx-auto mb-50">
+                        <i class="bx bxs-bank font-medium-5"></i>
+                      </div>
+                      <div class="text-muted line-ellipsis">Total Facilities</div>
+                      <h3 class="mb-0"><?php echo $getDashboardData['facility_count']; ?></h3>
                     </div>
-                    <div class="text-muted line-ellipsis">Total Facilities</div>
-                    <h3 class="mb-0"><?php echo $getDashboardData['facility_count']; ?></h3>
                   </div>
                 </div>
-              </div>
-            </a>
-          </div>
+              </a>
+            </div>
+          <?php } ?>
 
-          <div class="col-sm-2 col-12 dashboard-users-danger">
-            <a href="<?php echo base_url('loungeM/manageLounge'); ?>">
-              <div class="card text-center">
-                <div class="card-content">
-                  <div class="card-body py-1">
-                    <div class="badge-circle badge-circle-lg badge-circle-light-danger mx-auto mb-50">
-                      <i class="bx bxs-institution font-medium-5"></i>
+          <?php if(($sessionData['Type']==1) || in_array(54, $userPermittedMenuData)){ ?>
+            <div class="col-sm-2 col-12 dashboard-users-danger">
+              <a href="<?php echo base_url('loungeM/manageLounge'); ?>">
+                <div class="card text-center">
+                  <div class="card-content">
+                    <div class="card-body py-1">
+                      <div class="badge-circle badge-circle-lg badge-circle-light-danger mx-auto mb-50">
+                        <i class="bx bxs-institution font-medium-5"></i>
+                      </div>
+                      <div class="text-muted line-ellipsis">Total Lounges</div>
+                      <h3 class="mb-0"><?php echo $getDashboardData['lounge_count']; ?></h3>
                     </div>
-                    <div class="text-muted line-ellipsis">Total Lounges</div>
-                    <h3 class="mb-0"><?php echo $getDashboardData['lounge_count']; ?></h3>
                   </div>
                 </div>
-              </div>
-            </a>
-          </div>
+              </a>
+            </div>
+          <?php } ?>
 
-          <div class="col-sm-2 col-12 dashboard-users-success">
-            <a href="<?php echo base_url('staffM/manageStaff'); ?>">
-              <div class="card text-center">
-                <div class="card-content">
-                  <div class="card-body py-1">
-                    <div class="badge-circle badge-circle-lg badge-circle-light-success mx-auto mb-50">
-                      <i class="bx bx-user font-medium-5"></i>
+          <?php if(($sessionData['Type']==1) || in_array(55, $userPermittedMenuData)){ ?>
+            <div class="col-sm-2 col-12 dashboard-users-success">
+              <a href="<?php echo base_url('staffM/manageStaff'); ?>">
+                <div class="card text-center">
+                  <div class="card-content">
+                    <div class="card-body py-1">
+                      <div class="badge-circle badge-circle-lg badge-circle-light-success mx-auto mb-50">
+                        <i class="bx bx-user font-medium-5"></i>
+                      </div>
+                      <div class="text-muted line-ellipsis">Total Registered Staff</div>
+                      <h3 class="mb-0"><?php echo $getDashboardData['staff_count']; ?></h3>
                     </div>
-                    <div class="text-muted line-ellipsis">Total Registered Staff</div>
-                    <h3 class="mb-0"><?php echo $getDashboardData['staff_count']; ?></h3>
                   </div>
                 </div>
-              </div>
-            </a>
-          </div>
+              </a>
+            </div>
+          <?php } ?>
 
-          <div class="col-sm-2 col-12 dashboard-users-danger">
-            <a href="<?php echo base_url('enquiryM/enquiryList'); ?>">
-              <div class="card text-center">
-                <div class="card-content">
-                  <div class="card-body py-1">
-                    <div class="badge-circle badge-circle-lg badge-circle-light-danger mx-auto mb-50">
-                      <i class="bx bx-mail-send font-medium-5"></i>
+          <?php if(($sessionData['Type']==1) || in_array(56, $userPermittedMenuData)){ ?>
+            <div class="col-sm-2 col-12 dashboard-users-danger">
+              <a href="<?php echo base_url('enquiryM/enquiryList'); ?>">
+                <div class="card text-center">
+                  <div class="card-content">
+                    <div class="card-body py-1">
+                      <div class="badge-circle badge-circle-lg badge-circle-light-danger mx-auto mb-50">
+                        <i class="bx bx-mail-send font-medium-5"></i>
+                      </div>
+                      <div class="text-muted line-ellipsis">Total Enquiries</div>
+                      <h3 class="mb-0"><?php echo $getDashboardData['total_enquiry']; ?></h3>
                     </div>
-                    <div class="text-muted line-ellipsis">Total Enquiries</div>
-                    <h3 class="mb-0"><?php echo $getDashboardData['total_enquiry']; ?></h3>
                   </div>
                 </div>
-              </div>
-            </a>
-          </div>
+              </a>
+            </div>
+          <?php } ?>
 
-          <div class="col-sm-2 col-12 dashboard-users-success">
-            <a href="<?php echo base_url('videoM/manageVideo'); ?>">
-              <div class="card text-center">
-                <div class="card-content">
-                  <div class="card-body py-1">
-                    <div class="badge-circle badge-circle-lg badge-circle-light-success mx-auto mb-50">
-                      <i class="bx bx-video font-medium-5"></i>
+          <?php if(($sessionData['Type']==1) || in_array(57, $userPermittedMenuData)){ ?>
+            <div class="col-sm-2 col-12 dashboard-users-success">
+              <a href="<?php echo base_url('videoM/manageVideo'); ?>">
+                <div class="card text-center">
+                  <div class="card-content">
+                    <div class="card-body py-1">
+                      <div class="badge-circle badge-circle-lg badge-circle-light-success mx-auto mb-50">
+                        <i class="bx bx-video font-medium-5"></i>
+                      </div>
+                      <div class="text-muted line-ellipsis">Total Videos</div>
+                      <h3 class="mb-0"><?php echo $getDashboardData['total_video']; ?></h3>
                     </div>
-                    <div class="text-muted line-ellipsis">Total Videos</div>
-                    <h3 class="mb-0"><?php echo $getDashboardData['total_video']; ?></h3>
                   </div>
                 </div>
-              </div>
-            </a>
-          </div>
+              </a>
+            </div>
+          <?php } ?>
 
-          <div class="col-sm-2 col-12 dashboard-users-danger">
-            <a href="<?php echo base_url('employeeM/manageEmployee'); ?>">
-              <div class="card text-center">
-                <div class="card-content">
-                  <div class="card-body py-1">
-                    <div class="badge-circle badge-circle-lg badge-circle-light-danger mx-auto mb-50">
-                      <i class="bx bx-group font-medium-5"></i>
+          <?php if(($sessionData['Type']==1) || in_array(58, $userPermittedMenuData)){ ?>
+            <div class="col-sm-2 col-12 dashboard-users-danger">
+              <a href="<?php echo base_url('employeeM/manageEmployee'); ?>">
+                <div class="card text-center">
+                  <div class="card-content">
+                    <div class="card-body py-1">
+                      <div class="badge-circle badge-circle-lg badge-circle-light-danger mx-auto mb-50">
+                        <i class="bx bx-group font-medium-5"></i>
+                      </div>
+                      <div class="text-muted line-ellipsis">Total CEL Employees</div>
+                      <h3 class="mb-0"><?php echo $getDashboardData['cel_emp_count']; ?></h3>
                     </div>
-                    <div class="text-muted line-ellipsis">Total CEL Employees</div>
-                    <h3 class="mb-0"><?php echo $getDashboardData['cel_emp_count']; ?></h3>
                   </div>
                 </div>
-              </div>
-            </a>
-          </div>
+              </a>
+            </div>
+          <?php } ?>
 
         </div>
       </div>
@@ -118,7 +132,7 @@
   </div>
   </div>
   <!-- *********************************** -->
-
+  <?php if($sessionData['Type'] == 1){ ?>
   <div class="row">
     <!-- Greetings Content Starts -->
     <div class="col-xl-4 col-md-6 col-12 dashboard-greetings">
@@ -323,6 +337,7 @@
       </div>
     </div>
   </div>
+  <?php } ?>
 </section>
 <!-- Dashboard Ecommerce ends -->
 
