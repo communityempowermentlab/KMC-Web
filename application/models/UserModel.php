@@ -292,12 +292,16 @@ class UserModel extends CI_Model {
     $adminData = $this->session->userdata('adminData'); 
     $coachFacilityArray = array();
     $coachLoungeArray = array();
+    $coachDistrictArray = array();
     if($adminData['Type'] == 2){
       $getCoachFacilityLoungeList = $this->db->get_where('coachDistrictFacilityLounge',array('masterId'=>$adminData['Id'],'status'=>1))->result_array();
+      $coachDistrictArray  = array_unique(array_column($getCoachFacilityLoungeList, 'districtId'));
       $coachFacilityArray  = array_column($getCoachFacilityLoungeList, 'facilityId');
       $coachLoungeArray  = array_column($getCoachFacilityLoungeList, 'loungeId');
     }
 
+    $response['coachDistrictArray'] = $coachDistrictArray;
+    $response['coachDistrictArrayString'] = "(".implode(",", $coachDistrictArray).")";
     $response['coachFacilityArray'] = $coachFacilityArray;
     $response['coachFacilityArrayString'] = "(".implode(",", $coachFacilityArray).")";
     $response['coachLoungeArray'] = $coachLoungeArray;

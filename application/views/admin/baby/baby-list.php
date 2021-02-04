@@ -410,7 +410,7 @@
                             </table>
                             <?php if(!empty($totalResult)) { 
                               ($pageNo == '1') ?  $counter = '1' : $counter = ((($pageNo*DATA_PER_PAGE)-DATA_PER_PAGE) + 1);
-                              echo '<br>Showing '.$counter.' to '.((($pageNo*DATA_PER_PAGE)-DATA_PER_PAGE) + DATA_PER_PAGE).' of '.$totalResult.' entries';
+                              echo '<br>Showing '.$counter.' to '.(intval($counter)+intval(count($results))-1).' of '.$totalResult.' entries';
                            } ?>
                                       <ul class="pagination pull-right">
                                         <?php

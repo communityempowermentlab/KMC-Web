@@ -167,7 +167,14 @@ class FacilityModel extends CI_Model {
 
   // get distinct PRIDistrictCode & DistrictNameProperCase from revenuevillagewithblcoksandsubdistandgs
   public function selectquery(){
-    return $query=$this->db->query("SELECT DISTINCT PRIDistrictCode , DistrictNameProperCase FROM `revenuevillagewithblcoksandsubdistandgs` ORDER BY DistrictNameProperCase asc")->result_array();
+
+    $getCoachDistrict = $this->UserModel->getCoachFacilities();
+    $where_district = "";
+    if(!empty($getCoachDistrict['coachDistrictArray'])){ 
+      $where_district = 'where revenuevillagewithblcoksandsubdistandgs.PRIDistrictCode in '.$getCoachDistrict['coachDistrictArrayString'].'';
+    }
+
+    return $query=$this->db->query("SELECT DISTINCT PRIDistrictCode , DistrictNameProperCase FROM `revenuevillagewithblcoksandsubdistandgs` ".$where_district." ORDER BY DistrictNameProperCase asc")->result_array();
   } 
 
   public function selectDistrict($state){

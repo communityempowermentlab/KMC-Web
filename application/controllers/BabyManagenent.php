@@ -4,6 +4,7 @@ require_once(APPPATH.'controllers/Welcome.php');
 class BabyManagenent extends Welcome {
   public function __construct() {
       parent::__construct();
+      $this->load->model('UserModel');
       $this->load->model('BabyModel');  
       $this->load->model('FacilityModel');  
       $this->load->model('MotherModel'); 
@@ -29,7 +30,7 @@ class BabyManagenent extends Welcome {
         $pageNo        = '1';
        
 
-        if($this->input->get()) { 
+        if($this->input->get()) {
             if(!empty($this->input->get('fromDate'))){
               $startDate = explode(',',$this->input->get('fromDate')); 
               $fromDate = $startDate[0].$startDate[1];
@@ -56,13 +57,12 @@ class BabyManagenent extends Welcome {
             
             $config["base_url"] = base_url('babyM/registeredBaby/'.$this->uri->segment(3).'/all?fromDate='.$this->input->get('fromDate').'&toDate='.$this->input->get('toDate').'&district='.$district.'&keyword='.$keyword.'&facilityname='.$facilityname.'&loungeid='.$loungeid.'&nurseid='.$nurseid.'&babyStatus='.$babyStatus);
             
-          } else {
+          } else { 
             $fromDate = date('Y-m-d H:i:s', strtotime('1970-01-01 00:00:00')); 
             $toDate   = date('Y-m-d H:i:s', strtotime(date('Y-m-d').' 23:59:59')); 
               if($type == 'particularMother'){ 
                 $totalRecords = $this->MotherModel->GetAllBabiesViaMother('babyRegistration',$motherRegID);
               } else if($type == '1') { 
-
                 $totalRecords = $this->BabyModel->countAllBabies($loungeId,'current');
               } else if($type == '2') { 
                 $totalRecords = $this->BabyModel->countBabiesWhereStatus($loungeId,1,1,$fromDate,$toDate);

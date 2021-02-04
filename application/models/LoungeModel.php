@@ -553,26 +553,26 @@ class LoungeModel extends CI_Model {
 
 
   public function GetFacilityByDistrict($district){
-    $getLastCheckin = $this->db
-                                ->select('*')
-                                ->order_by("FacilityName", "asc")
-                                ->from('facilitylist')
-                                ->where(array('PRIDistrictCode' => $district, 'status' => 1))
-                                ->get()
-                                ->result_array();
-    return $getLastCheckin;
+    $getCoachFacility = $this->UserModel->getCoachFacilities();
+
+    $this->db->select('facilitylist.*');
+    if(!empty($getCoachFacility['coachFacilityArray'])){ 
+      $this->db->where_in('FacilityID',$getCoachFacility['coachFacilityArray']);
+    }
+    $this->db->order_by('FacilityName','asc');
+    return $getFacilityList = $this->db->get_where('facilitylist',array('PRIDistrictCode'=>$district,'status'=>1))->result_array();
   }
 
 
   public function GetLoungeByFAcility($facilityId){
-    $getLastCheckin = $this->db
-                                ->select('*')
-                                ->order_by("loungeName", "asc")
-                                ->from('loungeMaster')
-                                ->where(array('facilityId' => $facilityId, 'status' => 1))
-                                ->get()
-                                ->result_array();
-    return $getLastCheckin;
+    $getCoachLounge = $this->UserModel->getCoachFacilities();
+
+    $this->db->select('loungeMaster.*');
+    if(!empty($getCoachLounge['coachLoungeArray'])){ 
+      $this->db->where_in('loungeId',$getCoachLounge['coachLoungeArray']);
+    }
+    $this->db->order_by('loungeName','asc');
+    return $getLoungeList = $this->db->get_where('loungeMaster',array('facilityId'=>$facilityId,'status'=>1))->result_array();
   }
 
   public function GetNurseByFacility($facilityId){
@@ -588,11 +588,20 @@ class LoungeModel extends CI_Model {
 
   // get data from loungeMaster via facilityId
   public function temporaryLounge(){
-    return $this->db->query("SELECT * From temporaryLoungeMaster ORDER BY loungeId desc")->result_array();
+    $getCoachLounge = $this->UserModel->getCoachFacilities();
+    $where_lounge = "";
+    if(!empty($getCoachLounge['coachLoungeArray'])){ 
+      $where_lounge = 'where temporaryLoungeMaster.loungeId in '.$getCoachLounge['coachLoungeArrayString'].'';
+    }
+
+    return $this->db->query("SELECT temporaryLoungeMaster.* From temporaryLoungeMaster inner join facilitylist on temporaryLoungeMaster.`facilityId` = facilitylist.`FacilityID` inner join loungeMaster on temporaryLoungeMaster.`loungeId` = loungeMaster.`loungeId` ".$where_lounge." ORDER BY loungeId desc")->result_array();
   }
 
   // by search
   public function GetTempLoungeBySearch($district, $facilityname, $facility_status, $keyword){
+    $getCoachLounge = $this->UserModel->getCoachFacilities();
+    $where_lounge = "";
+
     $where1 = "";$where2 = "";$where3 = "";$where4 = "";$and_cond = "";
     if(!empty($district)){
       $where1 = "facilitylist.`PRIDistrictCode` = ".$district."";
@@ -611,9 +620,13 @@ class LoungeModel extends CI_Model {
     }
     if(!empty($keyword)){
       $where4 = $and_cond." (loungeMaster.`loungeName` Like '%{$keyword}%' OR loungeMaster.`loungeContactNumber` Like '%{$keyword}%' OR facilitylist.`FacilityName` Like '%{$keyword}%')";
+      $and_cond = "AND";
+    }
+    if(!empty($getCoachLounge['coachLoungeArray'])){ 
+      $where_lounge = $and_cond.' temporaryLoungeMaster.loungeId in '.$getCoachLounge['coachLoungeArrayString'].'';
     }
 
-    return $this->db->query("SELECT temporaryLoungeMaster.* From temporaryLoungeMaster inner join facilitylist on temporaryLoungeMaster.`facilityId` = facilitylist.`FacilityID` inner join loungeMaster on temporaryLoungeMaster.`loungeId` = loungeMaster.`loungeId` where $where1 $where2 $where3 $where4 ORDER BY temporaryLoungeMaster.loungeId desc")->result_array();
+    return $this->db->query("SELECT temporaryLoungeMaster.* From temporaryLoungeMaster inner join facilitylist on temporaryLoungeMaster.`facilityId` = facilitylist.`FacilityID` inner join loungeMaster on temporaryLoungeMaster.`loungeId` = loungeMaster.`loungeId` where $where1 $where2 $where3 $where4 $where_lounge ORDER BY temporaryLoungeMaster.loungeId desc")->result_array();
   }
 
   public function GetTempFacilitiesName($FacilityID){
