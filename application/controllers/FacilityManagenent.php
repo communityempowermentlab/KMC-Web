@@ -348,7 +348,7 @@ class FacilityManagenent extends Welcome {
     $id=$this->uri->segment(3);
     $data['index']         = 'facilities';
     $data['index2']        = '';
-    $data['title']         = 'Update Facility | '.PROJECT_NAME; 
+    $data['title']         = 'Facility Information | '.PROJECT_NAME; 
 
     $data['FacilitiesData'] = $this->FacilityModel->GetFacilitiesById('facilitylist',$id);
 

@@ -46,38 +46,69 @@
                             <table class="table table-striped dataex-html5-selectors-log">
                                 <thead>
                                     <tr>
-                                      <th>Sr.&nbsp;No.</th>
-                                      <th>Nurse</th>
-                                      <th>Shift</th>
-                                      <th>Daily&nbsp;Bedsheet&nbsp;Change</th>
-                                      <th>Sanitation</th>
-                                      
-                                      <th>Meals</th>
-                                      <th>Clean&nbsp;Water</th>
-                                      <th>Date&nbsp;&&nbsp;Time</th>
+                                      <th>Sr. No.</th>
+                                      <th>Date</th>
+                                      <th>Bedsheet</th>
+                                      <th>Lounge<br/>(1st)</th>
+                                      <th>Lounge<br/>(2nd)</th>
+                                      <th>Lounge<br/>(3rd)</th>
+                                      <th>Toilet/Washroom<br/>(1st)</th>
+                                      <th>Toilet/Washroom<br/>(2nd)</th>
+                                      <th>Toilet/Washroom<br/>(3rd)</th>
+                                      <th>Dining & Common Area(1st)</th>
+                                      <th>Dining & Common Area(2nd)</th>
+                                      <th>Dining & Common Area(3rd)</th>
+                                      <th>Meals Breakfast</th>
+                                      <th>Meals Lunch</th>
+                                      <th>Meals Dinner</th>
+                                      <th>Drinking Water<br/>(1st)</th>
+                                      <th>Drinking Water<br/>(2nd)</th>
+                                      <th>Drinking Water<br/>(3rd)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
 
-                                <?php 
-                                  $counter ="1";
-                                  foreach ($GetServices as $value ) {
-                                  $getStaffDetails = $this->db->query("SELECT * from staffMaster where StaffID=".$value['nurseId']."")->row_array();
-                                  $generated_on =     $this->load->FacilityModel->time_ago_in_php($value['addDate']);
+                                <?php
+
+                                $begin = new DateTime(date('Y-m-d',strtotime($GetLounge['addDate'])));
+                                $end = new DateTime('2021-02-06');
+                                $end = $end->modify('+1 day'); 
+
+                                $interval = DateInterval::createFromDateString('1 day');
+                                $period = new DatePeriod($begin, $interval, $end);
+                                $reverse = array_reverse(iterator_to_array($period));
+
+                                $count = 1;
+                                foreach ($reverse as $dt) { 
+                                  $serviceDate = $dt->format("Y-m-d");
+                                  $GetFirstShiftServices = $this->LoungeModel->GetLoungeServicesByDate($serviceDate,'1',$GetLounge['loungeId']); 
+                                  $GetSecondShiftServices = $this->LoungeModel->GetLoungeServicesByDate($serviceDate,'2',$GetLounge['loungeId']);
+                                  $GetThirdShiftServices = $this->LoungeModel->GetLoungeServicesByDate($serviceDate,'3',$GetLounge['loungeId']);
+
                                 ?>
-                                  <tr>
-                                     <td><?php echo $counter; ?></td>
-                                     <td><?php echo ucwords($getStaffDetails['name']); ?></td>
-                                     <td><?php if($value['shift'] == 1) { echo '8 AM - 2 PM'; } else if($value['shift'] == 2) { echo '2 PM - 8 PM'; } else { echo '8 PM - 8 AM'; } ?></td>
-                                     <td><?php echo $value['dailyBedsheetChange']; ?></td>
-                                     <td><b>Lounge</b> - <?php echo $value['loungeSanitation']; ?><br>
-                                     <b>Toilet</b> - <?php echo $value['toiletSanitation']; ?><br>
-                                     <b>Common Area</b> - <?php echo $value['commonAreaSanitation']; ?></td>
-                                     <td><?php echo $value['mealsProvision'];  ?></td>
-                                     <td><?php echo $value['cleanWaterAvailability']; ?></td>
-                                     <td><a class="tooltip nonclick_link"><?php echo $generated_on; ?><span class="tooltiptext"><?php echo date("m/d/y, h:i A",strtotime($value['addDate'])) ?></span></a></td>
-                                  </tr>  
-                                  <?php $counter ++ ; } ?>
+                                    
+                                    <tr>
+                                        <td><?php echo $count; ?></td>
+                                        <td><?php echo $dt->format("d-m-Y"); ?></td>
+                                        <td><?php echo ($GetFirstShiftServices['dailyBedsheetChange'] != "")?$GetFirstShiftServices['dailyBedsheetChange']:"-"; ?></td>
+                                        <td><?php echo ($GetFirstShiftServices['loungeSanitation'] != "")?$GetFirstShiftServices['loungeSanitation']:"-"; ?></td>
+                                        <td><?php echo ($GetSecondShiftServices['loungeSanitation'] != "")?$GetSecondShiftServices['loungeSanitation']:"-"; ?></td>
+                                        <td><?php echo ($GetThirdShiftServices['loungeSanitation'] != "")?$GetThirdShiftServices['loungeSanitation']:"-"; ?></td>
+                                        <td><?php echo ($GetFirstShiftServices['toiletSanitation'] != "")?$GetFirstShiftServices['toiletSanitation']:"-"; ?></td>
+                                        <td><?php echo ($GetSecondShiftServices['toiletSanitation'] != "")?$GetSecondShiftServices['toiletSanitation']:"-"; ?></td>
+                                        <td><?php echo ($GetThirdShiftServices['toiletSanitation'] != "")?$GetThirdShiftServices['toiletSanitation']:"-"; ?></td>
+                                        <td><?php echo ($GetFirstShiftServices['commonAreaSanitation'] != "")?$GetFirstShiftServices['commonAreaSanitation']:"-"; ?></td>
+                                        <td><?php echo ($GetSecondShiftServices['commonAreaSanitation'] != "")?$GetSecondShiftServices['commonAreaSanitation']:"-"; ?></td>
+                                        <td><?php echo ($GetThirdShiftServices['commonAreaSanitation'] != "")?$GetThirdShiftServices['commonAreaSanitation']:"-"; ?></td>
+                                        <td><?php echo ($GetFirstShiftServices['mealsProvision'] != "")?$GetFirstShiftServices['mealsProvision']:"-"; ?></td>
+                                        <td><?php echo ($GetSecondShiftServices['mealsProvision'] != "")?$GetSecondShiftServices['mealsProvision']:"-"; ?></td>
+                                        <td><?php echo ($GetThirdShiftServices['mealsProvision'] != "")?$GetThirdShiftServices['mealsProvision']:"-"; ?></td>
+                                        <td><?php echo ($GetFirstShiftServices['cleanWaterAvailability'] != "")?$GetFirstShiftServices['cleanWaterAvailability']:"-"; ?></td>
+                                        <td><?php echo ($GetSecondShiftServices['cleanWaterAvailability'] != "")?$GetSecondShiftServices['cleanWaterAvailability']:"-"; ?></td>
+                                        <td><?php echo ($GetThirdShiftServices['cleanWaterAvailability'] != "")?$GetThirdShiftServices['cleanWaterAvailability']:"-"; ?></td>
+                                    </tr>
+
+                                <?php $count++; } ?>
                                     
                                 </tbody>
                                 

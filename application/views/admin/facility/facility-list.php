@@ -5,6 +5,9 @@
     $district = '';
   }
 
+  $sessionData = $this->session->userdata('adminData'); 
+  $userPermittedMenuData = array();
+  $userPermittedMenuData = $this->session->userdata('userPermission');
 ?>
 
     <!-- BEGIN: Content-->
@@ -137,7 +140,19 @@
                                         <?php } else { echo 'N/A'; } ?>
                                         </td>
                                         <td>
-                                          <a href="<?php echo base_url(); ?>facility/updateFacility/<?php echo $value['FacilityID']; ?>" title="Edit Facility Information" class="btn btn-info btn-sm">View/Edit</a>
+                                          <a href="<?php echo base_url(); ?>facility/updateFacility/<?php echo $value['FacilityID']; ?>" title="Facility Information" class="btn btn-info btn-sm">
+                                            <?php if(($sessionData['Type']==1) || in_array(5, $userPermittedMenuData)){
+                                              echo VIEW_BUTTON;
+                                            }
+                                            if(($sessionData['Type']==1) || (in_array(5,$userPermittedMenuData) && in_array(59,$userPermittedMenuData)))
+                                            {
+                                              echo "/";
+                                            }
+                                            if(($sessionData['Type']==1) || in_array(59, $userPermittedMenuData)){
+                                              echo EDIT_BUTTON;
+                                            }
+                                            ?>
+                                          </a>
                                         </td>
                                     </tr>
 
@@ -154,9 +169,10 @@
     </div>
 </section>
 <!-- Column selectors with Export Options and print table -->
-
-<div class="add-new">
-  <a href="<?php echo base_url('facility/AddFacility/');?>" class="btn btn btn-danger align-items-center">
-      <i class="bx bx-plus"></i>&nbsp; Add New Facility
-  </a>
-</div>
+<?php if(($sessionData['Type']==1) || in_array(4, $userPermittedMenuData)){ ?>
+  <div class="add-new">
+    <a href="<?php echo base_url('facility/AddFacility/');?>" class="btn btn btn-danger align-items-center">
+        <i class="bx bx-plus"></i>&nbsp; Add New Facility
+    </a>
+  </div>
+<?php } ?>

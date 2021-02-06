@@ -5,16 +5,15 @@
     $district = '';
   }
 
-
-
-
-
   if(isset($_GET['facilityname']) && !empty($_GET['facilityname'])){
     $facilityname = $_GET['facilityname']; 
   } else {
     $facilityname = '';
   }
 
+  $sessionData = $this->session->userdata('adminData'); 
+  $userPermittedMenuData = array();
+  $userPermittedMenuData = $this->session->userdata('userPermission');
 ?>
 
     <!-- BEGIN: Content-->
@@ -23,11 +22,6 @@
     <div class="content-wrapper">
         
       <div class="content-body">
-
-
-
-
-
 
 <!-- Column selectors with Export Options and print table -->
 <section id="column-selectors">
@@ -188,7 +182,19 @@
                                               <span class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
                                               <div class="dropdown-menu dropdown-menu-right">
-                                                <a class="dropdown-item" href="<?php echo base_url(); ?>loungeM/updateLounge/<?php echo $value['loungeId']; ?>">Lounge View/Edit</a>
+                                                <a class="dropdown-item" href="<?php echo base_url(); ?>loungeM/updateLounge/<?php echo $value['loungeId']; ?>">Lounge 
+                                                  <?php if(($sessionData['Type']==1) || in_array(8, $userPermittedMenuData)){
+                                                    echo VIEW_BUTTON;
+                                                  }
+                                                  if(($sessionData['Type']==1) || (in_array(8,$userPermittedMenuData) && in_array(60,$userPermittedMenuData)))
+                                                  {
+                                                    echo "/";
+                                                  }
+                                                  if(($sessionData['Type']==1) || in_array(60, $userPermittedMenuData)){
+                                                    echo EDIT_BUTTON;
+                                                  }
+                                                  ?>
+                                                </a>
                                                 <a class="dropdown-item" href="<?php echo base_url(); ?>loungeM/loungeAmenities/<?php echo $value['loungeId']; ?>">Amenities For Lounge</a>
                                                 <a class="dropdown-item" href="<?php echo base_url(); ?>loungeM/loungeNurseCheckin/<?php echo $value['loungeId']; ?>">Nurse CheckIn/Checkout</a>
                                                 <a class="dropdown-item" href="<?php echo base_url(); ?>loungeM/loungeAssessment/<?php echo $value['loungeId']; ?>">Lounge Assessment</a>
@@ -251,12 +257,13 @@
     </div>
 </section>
 <!-- Column selectors with Export Options and print table -->
-
-<div class="add-new">
-  <a href="<?php echo base_url('loungeM/addLounge/');?>" class="btn btn btn-danger align-items-center">
-      <i class="bx bx-plus"></i>&nbsp; Add New Lounge
-  </a>
-</div>
+<?php if(($sessionData['Type']==1) || in_array(7, $userPermittedMenuData)){ ?>
+  <div class="add-new">
+    <a href="<?php echo base_url('loungeM/addLounge/');?>" class="btn btn btn-danger align-items-center">
+        <i class="bx bx-plus"></i>&nbsp; Add New Lounge
+    </a>
+  </div>
+<?php } ?>
 
 <script type="text/javascript">
 $( document ).ready(function() {

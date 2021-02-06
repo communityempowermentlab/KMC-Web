@@ -155,7 +155,7 @@ public function getLounge(){
     
     $data['index']         = 'lounge';
     $data['index2']        = '';
-    $data['title']         = 'Update Lounge | '.PROJECT_NAME; 
+    $data['title']         = 'Lounge Information | '.PROJECT_NAME; 
     
     $data['GetLounge']     = $this->LoungeModel->GetLoungeById($id); 
     $data['lastUpdate'] = $this->LoungeModel ->getLoungeLastUpdate($id, 1);
@@ -352,9 +352,9 @@ public function getLounge(){
     $data['index2']        = '';
     $data['title']         = 'Lounge Services | '.PROJECT_NAME; 
     $data['fileName']      = 'Lounge_List';
-    $data['GetServices'] = $this->LoungeModel->GetLoungeServices($id); 
+    //$data['GetServices'] = $this->LoungeModel->GetLoungeServices($id); 
     
-    $data['GetLounge'] = $this->LoungeModel->GetLoungeById($id); 
+    $data['GetLounge'] = $this->LoungeModel->GetLoungeById($id);
     $this->load->view('admin/include/header-new',$data);
     $this->load->view('admin/lounge/lounge-services');
     $this->load->view('admin/include/footer-new');
@@ -419,7 +419,7 @@ public function getLounge(){
     
     $data['index']         = 'temporaryLounge';
     $data['index2']        = '';
-    $data['title']         = 'Update Amenities Information | '.PROJECT_NAME; 
+    $data['title']         = 'Amenities Information | '.PROJECT_NAME; 
 
     // update temporary data
     if($this->input->post()){

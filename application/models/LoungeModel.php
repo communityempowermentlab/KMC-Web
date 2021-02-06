@@ -400,6 +400,12 @@ class LoungeModel extends CI_Model {
     return $this->db->get_where('loungeServices', array('loungeId'=>$loungeId))->result_array();
   }
 
+  public function GetLoungeServicesByDate($date,$shift,$loungeId){
+    $this->db->where('DATE(addDate)', $date);
+    $this->db->order_by("id", "desc");
+    return $this->db->get_where('loungeServices', array('shift'=>$shift,'loungeId'=>$loungeId))->row_array();
+  }
+
   public function GetLoungeLog($loungeId){
     $this->db->order_by("id", "desc");
     return $this->db->get_where('loungeMasterLog', array('loungeId'=>$loungeId))->result_array();

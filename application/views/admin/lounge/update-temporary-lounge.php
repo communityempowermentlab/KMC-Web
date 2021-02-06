@@ -9,16 +9,36 @@
       <div class="content-body">
 
   <?php 
+    $sessionData = $this->session->userdata('adminData'); 
+    $userPermittedMenuData = array();
+    $userPermittedMenuData = $this->session->userdata('userPermission');
+
     $Facility = $this->db->query("SELECT * FROM `facilitylist` where FacilityID='".$GetLounge['facilityId']."'")->row_array();
     $District = $this->db->query("SELECT * FROM `revenuevillagewithblcoksandsubdistandgs` where PRIDistrictCode='".$Facility['PRIDistrictCode']."'")->row_array();
     $Lounge = $this->db->query("SELECT * FROM `loungeMaster` where loungeId='".$GetLounge['loungeId']."'")->row_array();
 
-    if($GetLounge['status'] == 1){
-      $readonlyStatus = "";
-      $disableStatus = "";
-    }else{
+    // if($GetLounge['status'] == 1){
+    //   $readonlyStatus = "";
+    //   $disableStatus = "";
+    // }else{
+    //   $readonlyStatus = "readonly";
+    //   $disableStatus = "disabled";
+    // }
+
+    if(($sessionData['Type']==2) && (in_array(62, $userPermittedMenuData) && !in_array(63, $userPermittedMenuData)) || ($GetLounge['status'] != 1) ){
       $readonlyStatus = "readonly";
       $disableStatus = "disabled";
+      $buttonDisable = "display:none;";
+    }
+    elseif(($sessionData['Type']==1) && ($GetLounge['status'] != 1)){
+      $readonlyStatus = "readonly";
+      $disableStatus = "disabled";
+      $buttonDisable = "display:none;";
+    }
+    else{
+      $readonlyStatus = "";
+      $disableStatus = "";
+      $buttonDisable = "";
     }
   ?>
 
@@ -1068,7 +1088,7 @@
                       <div class="form-group">
                         <label>Verification Status <span class="red"></span></label>
                         <div class="controls">
-                          <select class="select2 form-control" <?php if($GetLounge['status'] == 2) { echo 'disabled'; } ?> name="verification_status" id="verification_status" required="" data-validation-required-message="This field is required" onchange="showReasonBox(this.value)">
+                          <select class="select2 form-control" name="verification_status" id="verification_status" required="" data-validation-required-message="This field is required" onchange="showReasonBox(this.value)" <?php echo $disableStatus; ?>>
                             <option value="1" <?php if($GetLounge['status'] == 1) { echo 'selected'; } ?>>Pending</option>
                             <option value="2" <?php if($GetLounge['status'] == 2) { echo 'selected'; } ?>>Approve</option>
                             <option value="3" <?php if($GetLounge['status'] == 3) { echo 'selected'; } ?>>Reject</option>
@@ -1087,9 +1107,9 @@
 
                   <div class="col-sm-4" id="reason_box" style="<?= $style; ?>">
                       <div class="form-group">
-                        <label>Reason <span class="red">*</span></label>
+                        <label>Reason <span class="red"></span></label>
                         <div class="controls">
-                          <textarea class="form-control" <?php if($GetLounge['status'] == 2) { echo 'disabled'; } ?> rows="3" name="reason" id="reason"><?= $GetLounge['reason'] ?></textarea>
+                          <textarea class="form-control" rows="3" name="reason" id="reason" <?php echo $disableStatus; ?>><?= $GetLounge['reason'] ?></textarea>
                           <span class="custom-error" id="err_reason"></span>
                         </div>
                       </div>
@@ -1099,7 +1119,7 @@
 
 
               
-              <button type="submit" id="submitButton" class="btn btn-primary <?php if($GetLounge['status'] == 2) { echo 'hidden'; } ?>">Submit</button>
+              <button type="submit" id="submitButton" class="btn btn-primary" style="<?php echo $buttonDisable; ?>">Submit</button>
             </form>
           </div>
         </div>

@@ -336,13 +336,17 @@
                     </li>
                   <?php } ?>
 
-                  <?php if(in_array(6, $userPermittedMenuData)){ ?>
+                  <?php if(in_array(6, $userPermittedMenuData) || in_array(61, $userPermittedMenuData)){ ?>
                     <li class="dropdown dropdown-submenu" data-menu="dropdown-submenu"><a class="dropdown-item align-items-center dropdown-toggle" href="#" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Lounges</a>
                       <ul class="dropdown-menu">
-                        <li data-menu="" class="<?php echo (($index=='lounge') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/loungeM/manageLounge'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Lounges Information</a>
-                        </li>
-                        <li data-menu="" class="<?php echo (($index=='temporaryLounge') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('loungeM/temporaryLounge'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Amenities Information</a>
-                        </li>
+                        <?php if(in_array(6, $userPermittedMenuData)){ ?>
+                          <li data-menu="" class="<?php echo (($index=='lounge') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/loungeM/manageLounge'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Lounges Information</a>
+                          </li>
+                        <?php } ?>
+                        <?php if(in_array(61, $userPermittedMenuData)){ ?>
+                          <li data-menu="" class="<?php echo (($index=='temporaryLounge') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('loungeM/temporaryLounge'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Amenities Information</a>
+                          </li>
+                        <?php } ?>
                       </ul>
                     </li>
                   <?php } ?>

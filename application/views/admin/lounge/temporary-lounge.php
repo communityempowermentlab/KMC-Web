@@ -1,3 +1,9 @@
+<?php
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
+?>
+
     <!-- BEGIN: Content-->
   <div class="app-content content">
     <div class="content-overlay"></div>
@@ -27,8 +33,6 @@
     $facility_status = '';
   }
 ?>
-
-
 
 <!-- Column selectors with Export Options and print table -->
 <section id="column-selectors">
@@ -171,7 +175,19 @@
                                               </span>
                                         <?php } ?> 
                                       </td>
-                                      <td> <a href="<?php echo base_url(); ?>loungeM/editTemporaryLounge/<?php echo $value['id']; ?>" class="btn btn-sm btn-info">View</a>
+                                      <td> <a href="<?php echo base_url(); ?>loungeM/editTemporaryLounge/<?php echo $value['id']; ?>" class="btn btn-sm btn-info">
+                                        <?php if(($sessionData['Type']==1) || in_array(62, $userPermittedMenuData)){
+                                          echo VIEW_BUTTON;
+                                        }
+                                        if(($sessionData['Type']==1) || (in_array(62,$userPermittedMenuData) && in_array(63,$userPermittedMenuData)))
+                                        {
+                                          echo "/";
+                                        }
+                                        if(($sessionData['Type']==1) || in_array(63, $userPermittedMenuData)){
+                                          echo EDIT_BUTTON;
+                                        }
+                                        ?>
+                                      </a>
                                       </td>
                                     </tr>
                                   <?php $counter ++ ; } ?>

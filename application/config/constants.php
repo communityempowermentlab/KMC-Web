@@ -211,6 +211,8 @@ define('PROJECT_NAME', 'KMC');
 define('PROJECTNAME', 'The Kangaroo Care Project');
 define('PACKAGE', 'com.kmc.android');
 define('RegistrationContent', 'Baby Via AdmissionId');
+define('VIEW_BUTTON', 'View');
+define('EDIT_BUTTON', 'Edit');
 define('DATA_PER_PAGE', '20');
 
 

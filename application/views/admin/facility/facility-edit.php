@@ -1,14 +1,27 @@
+<?php 
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
 
-
+if(($sessionData['Type']==2) && (in_array(5, $userPermittedMenuData) && !in_array(59, $userPermittedMenuData))){
+  $pageHeading = "View";
+  $inputDisable = "readonly";
+  $dropdownDisable = "disabled";
+  $buttonDisable = "display:none;";
+}else{
+  $pageHeading = "Update";
+  $inputDisable = "";
+  $dropdownDisable = "";
+  $buttonDisable = "";
+}
+?>
    
     <!-- BEGIN: Content-->
-  <div class="app-content content">
+<div class="app-content content">
     <div class="content-overlay"></div>
     <div class="content-wrapper">
         
       <div class="content-body">
-
-
 
 
 <!-- Input Validation start -->
@@ -18,14 +31,14 @@
       <div class="card">
         <div class="card-header">
           <div class="col-12">
-            <h5 class="content-header-title float-left pr-1 mb-0">Update Facility</h5>
+            <h5 class="content-header-title float-left pr-1 mb-0"><?php echo $pageHeading; ?> Facility Information</h5>
             <div class="breadcrumb-wrapper col-12">
               <ol class="breadcrumb p-0 mb-0 breadcrumb-white">
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>admin/dashboard"><i class="fa fa-home" aria-hidden="true"></i></a>
                 </li>
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>facility/manageFacility">Facilities</a>
                 </li>
-                <li class="breadcrumb-item active">Update Facility
+                <li class="breadcrumb-item active"><?php echo $pageHeading; ?> Facility Information
                 </li>
               </ol>
             </div>
@@ -45,7 +58,7 @@
                       <label>Facility Name <span class="red">*</span></label></label> 
                       <div class="controls">
                         <input type="text" name="facility_name" class="form-control" required="" 
-                          data-validation-required-message="This field is required" placeholder="Facility Name" value="<?php echo $FacilitiesData['FacilityName']; ?>">
+                          data-validation-required-message="This field is required" placeholder="Facility Name" value="<?php echo $FacilitiesData['FacilityName']; ?>" <?php echo $inputDisable; ?>>
                       </div>
                     </div>
                   </div>
@@ -53,7 +66,7 @@
                     <div class="form-group">
                       <label>Facility Type <span class="red">*</span></label></label>
                       <div class="controls">
-                        <select class="select2 form-control" name="facility_type" required="" data-validation-required-message="This field is required" onchange="hideBlock(this.value)">
+                        <select class="select2 form-control" name="facility_type" required="" data-validation-required-message="This field is required" onchange="hideBlock(this.value)" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Facility Type</option>
                           <?php foreach ($GetFacilities as $key => $value) {?>
                             <option value ="<?php echo $value['id']?>" <?php echo $value['id'] == $FacilitiesData['FacilityTypeID'] ? "selected" : ''; ?>><?php echo $value['facilityTypeName']; ?></option>
@@ -66,7 +79,7 @@
                     <div class="form-group">
                       <label>Newborn Care Unit Type <span class="red">*</span></label></label>
                       <div class="controls">
-                        <select class="select2 form-control" name="newborn_caring_type" required="" data-validation-required-message="This field is required">
+                        <select class="select2 form-control" name="newborn_caring_type" required="" data-validation-required-message="This field is required" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Newborn Care Unit Type</option>
                           <?php foreach ($NewBorn as $key => $value) {?>
                             <option value ="<?php echo $value['id']?>" <?php echo $value['id'] == $FacilitiesData['NCUType'] ? "selected" : ''; ?>><?php echo $value['name']; ?></option>
@@ -83,7 +96,7 @@
                     <div class="form-group">
                       <label>Management Type</label>
                       <div class="controls">
-                        <select class="select2 form-control" name="facility_mange_type" >
+                        <select class="select2 form-control" name="facility_mange_type" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Management Type</option>
                           <?php foreach ($Management as $key => $value) {?>
                             <option value ="<?php echo $value['id']?>" <?php echo $value['id'] == $FacilitiesData['FacilityManagement'] ? "selected" : ''; ?>><?php echo $value['name']; ?></option>
@@ -96,7 +109,7 @@
                     <div class="form-group">
                       <label>Govt OR Non Govt</label>
                       <div class="controls">
-                        <select class="select2 form-control" name="governmentOrNot">
+                        <select class="select2 form-control" name="governmentOrNot" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Govt OR Non Govt</option>
                           <?php foreach ($GovtORNot as $key => $value) {?>
                             <option value ="<?php echo $value['id']; ?>" <?php echo $value['id'] == $FacilitiesData['GOVT_NonGOVT'] ? "selected" : ''; ?>><?php echo $value['name']; ?></option>
@@ -110,7 +123,7 @@
                       <label>KMC Unit Start</label>
                       <div class="controls">
                         <fieldset class="form-group position-relative has-icon-left">
-                          <input type="text" class="form-control pickadate-months-year" placeholder="Select Start Date" name="kmcunitstart" value="<?php if($FacilitiesData['KMCUnitStartedOn'] != Null) { echo date("d F, Y", strtotime($FacilitiesData['KMCUnitStartedOn'])); }  ?>">
+                          <input type="text" class="form-control pickadate-months-year" placeholder="Select Start Date" name="kmcunitstart" value="<?php if($FacilitiesData['KMCUnitStartedOn'] != Null) { echo date("d F, Y", strtotime($FacilitiesData['KMCUnitStartedOn'])); }  ?>" <?php echo $dropdownDisable; ?>>
                           <div class="form-control-position calendar-position">
                             <i class="fa fa-calendar" aria-hidden="true"></i>
                           </div>
@@ -126,7 +139,7 @@
                     <label>KMC Unit Close</label>
                     <div class="controls">
                       <fieldset class="form-group position-relative has-icon-left">
-                        <input type="text" class="form-control pickadate-months-year" placeholder="Select Close Date" name="kmcunitclose" value="<?php if($FacilitiesData['KMCUnitClosedOn'] != Null) { echo date("d F, Y", strtotime($FacilitiesData['KMCUnitClosedOn'])); } ?>">
+                        <input type="text" class="form-control pickadate-months-year" placeholder="Select Close Date" name="kmcunitclose" value="<?php if($FacilitiesData['KMCUnitClosedOn'] != Null) { echo date("d F, Y", strtotime($FacilitiesData['KMCUnitClosedOn'])); } ?>" <?php echo $dropdownDisable; ?>>
                         <div class="form-control-position calendar-position">
                           <i class="fa fa-calendar" aria-hidden="true"></i>
                         </div>
@@ -138,7 +151,7 @@
                     <div class="form-group">
                       <label>Status <span class="red">*</span></label>
                       <div class="controls">
-                        <select class="select2 form-control" required="" data-validation-required-message="This field is required" name="status">
+                        <select class="select2 form-control" required="" data-validation-required-message="This field is required" name="status" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Status</option>
                           <option value="1" <?php if($FacilitiesData['Status'] == 1) { echo 'selected'; } ?>>Active</option>
                           <option value="2" <?php if($FacilitiesData['Status'] == 2) { echo 'selected'; } ?>>Deactive</option>
@@ -168,7 +181,7 @@
                     <div class="form-group">
                       <label>State <span class="red">*</span></label></label>
                       <div class="controls">
-                        <select class="select2 form-control" id="state_name" required="" data-validation-required-message="This field is required" name="state_name" onchange="getDistrict(this.value, '<?php echo base_url('Admin/getDistrict/')?>', '<?php echo base_url('Admin/getVillageByDistrict')?>')">
+                        <select class="select2 form-control" id="state_name" required="" data-validation-required-message="This field is required" name="state_name" onchange="getDistrict(this.value, '<?php echo base_url('Admin/getDistrict/')?>', '<?php echo base_url('Admin/getVillageByDistrict')?>')" <?php echo $dropdownDisable; ?>>
                           <option value="">Select State</option>
                           <?php
                             foreach ($selectState as $key => $value) {?>
@@ -182,7 +195,7 @@
                     <div class="form-group">
                       <label>District <span class="red">*</span></label></label>
                       <div class="controls">
-                        <select class="select2 form-control" id="district_name" name="district_name" required="" data-validation-required-message="This field is required"  onchange="getBlock(this.value, '<?php echo base_url('Admin/getBlock/')?>')">
+                        <select class="select2 form-control" id="district_name" name="district_name" required="" data-validation-required-message="This field is required"  onchange="getBlock(this.value, '<?php echo base_url('Admin/getBlock/')?>')" <?php echo $dropdownDisable; ?>>
                           <option value="">Select District</option>
                           <?php
                             foreach ($selectDistrict as $key => $value) {?>
@@ -196,7 +209,7 @@
                     <div class="form-group">
                       <label>Block </label>
                       <div class="controls">
-                        <select class="select2 form-control" id="block_name" name="block_name" onchange="getVillageIfBlock(this.value, '<?php echo base_url('Admin/getVillage/')?>')">
+                        <select class="select2 form-control" id="block_name" name="block_name" onchange="getVillageIfBlock(this.value, '<?php echo base_url('Admin/getVillage/')?>')" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Block</option>
                           <?php
                             foreach ($selectBlock as $key => $value) {?>
@@ -214,7 +227,7 @@
                     <div class="form-group">
                       <label>Village/Town/City </label>
                       <div class="controls">
-                        <select class="select2 form-control" id="vill_town_city" name="vill_town_city">
+                        <select class="select2 form-control" id="vill_town_city" name="vill_town_city" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Village/Town/City</option>
                           <?php
                             foreach ($selectVillage as $key => $value) {?>
@@ -228,7 +241,7 @@
                     <div class="form-group">
                       <label>Facility Postal Address <span class="red">*</span></label>
                       <div class="controls">
-                        <textarea class="form-control" id="horizontalTextarea" rows="3" placeholder="Facility Postal Address" required="" data-validation-required-message="This field is required" name="facility_address"><?php echo $FacilitiesData['Address'] ?></textarea>
+                        <textarea class="form-control" id="horizontalTextarea" rows="3" placeholder="Facility Postal Address" required="" data-validation-required-message="This field is required" name="facility_address" <?php echo $inputDisable; ?>><?php echo $FacilitiesData['Address'] ?></textarea>
                       </div>
                     </div>
                   </div>
@@ -243,7 +256,7 @@
                     <div class="form-group">
                       <label>CMS/MOIC Name </label>
                       <div class="controls">
-                        <input type="text" class="form-control" name="cms_moic_name" placeholder="CMS/MOIC Name" value="<?php echo $FacilitiesData['CMSOrMOICName']; ?>">
+                        <input type="text" class="form-control" name="cms_moic_name" placeholder="CMS/MOIC Name" value="<?php echo $FacilitiesData['CMSOrMOICName']; ?>" <?php echo $inputDisable; ?>>
                       </div>
                     </div>
                   </div>
@@ -252,13 +265,13 @@
                       <label>CMS/MOIC Phone Number</label>
                       <div class="controls">
                         <input type="text" class="form-control" name="phone_cms_moic_name" placeholder="CMS/MOIC Phone Number" data-validation-regex-regex="([^a-z]*[A-Z]*)*" data-validation-containsnumber-regex="([^0-9]*[0-9]+)+"
-                        maxlength="10" minlength="10" value="<?php echo $FacilitiesData['CMSOrMOICMoblie']; ?>">
+                        maxlength="10" minlength="10" value="<?php echo $FacilitiesData['CMSOrMOICMoblie']; ?>" <?php echo $inputDisable; ?>>
                       </div>
                     </div>
                   </div>
               </div>
               
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary" style="<?php echo $buttonDisable; ?>">Submit</button>
             </form>
           </div>
         </div>

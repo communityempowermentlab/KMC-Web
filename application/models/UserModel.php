@@ -296,7 +296,7 @@ class UserModel extends CI_Model {
     if($adminData['Type'] == 2){
       $getCoachFacilityLoungeList = $this->db->get_where('coachDistrictFacilityLounge',array('masterId'=>$adminData['Id'],'status'=>1))->result_array();
       $coachDistrictArray  = array_unique(array_column($getCoachFacilityLoungeList, 'districtId'));
-      $coachFacilityArray  = array_column($getCoachFacilityLoungeList, 'facilityId');
+      $coachFacilityArray  = array_unique(array_column($getCoachFacilityLoungeList, 'facilityId'));
       $coachLoungeArray  = array_column($getCoachFacilityLoungeList, 'loungeId');
     }
 
