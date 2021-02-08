@@ -658,28 +658,28 @@ class ApiModel extends CI_Model
     {
         if ($resquest['timestamp'] != '')
         {
-
+            $timestampDate = "'".$resquest['timestamp']."'";
             $stateData = $this
                ->db
-               ->query("SELECT DISTINCT StateCode, StateNameProperCase, STATUS FROM `revenuevillagewithblcoksandsubdistandgs` Where modifyDate >= '".$resquest['timestamp']."'")
+               ->query("SELECT DISTINCT StateCode, StateNameProperCase, STATUS FROM `revenuevillagewithblcoksandsubdistandgs` Where modifyDate >= ".$timestampDate." ")
                  ->result_array();
 
 
             $districtData = $this
                 ->db
-                ->query("SELECT DISTINCT StateCode, StateNameProperCase, PRIDistrictCode , DistrictNameProperCase, UrbanRural, STATUS FROM `revenuevillagewithblcoksandsubdistandgs` Where modifyDate >= '".$resquest['timestamp']."'")
+                ->query("SELECT DISTINCT StateCode, StateNameProperCase, PRIDistrictCode , DistrictNameProperCase, UrbanRural, STATUS FROM `revenuevillagewithblcoksandsubdistandgs` Where modifyDate >= ".$timestampDate."")
                 ->result_array();
 
 
             $blockData = $this
                 ->db
-                ->query("SELECT DISTINCT PRIDistrictCode , DistrictNameProperCase, BlockPRICode , BlockPRINameProperCase, UrbanRural, STATUS FROM `revenuevillagewithblcoksandsubdistandgs` Where modifyDate >= '".$resquest['timestamp']."'")
+                ->query("SELECT DISTINCT PRIDistrictCode , DistrictNameProperCase, BlockPRICode , BlockPRINameProperCase, UrbanRural, STATUS FROM `revenuevillagewithblcoksandsubdistandgs` Where modifyDate >= ".$timestampDate."")
                 ->result_array();
 
 
             $villageData = $this
                 ->db
-                ->query("SELECT DISTINCT BlockPRICode , BlockPRINameProperCase, GPPRICode, GPNameProperCase, UrbanRural, STATUS FROM `revenuevillagewithblcoksandsubdistandgs` Where modifyDate >= '".$resquest['timestamp']."'")
+                ->query("SELECT DISTINCT BlockPRICode , BlockPRINameProperCase, GPPRICode, GPNameProperCase, UrbanRural, STATUS FROM `revenuevillagewithblcoksandsubdistandgs` Where modifyDate >= ".$timestampDate."")
                 ->result_array();
 
         }

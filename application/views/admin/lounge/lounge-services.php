@@ -71,7 +71,7 @@
                                 <?php
 
                                 $begin = new DateTime(date('Y-m-d',strtotime($GetLounge['addDate'])));
-                                $end = new DateTime('2021-02-06');
+                                $end = new DateTime(date('Y-m-d'));
                                 $end = $end->modify('+1 day'); 
 
                                 $interval = DateInterval::createFromDateString('1 day');
@@ -85,12 +85,23 @@
                                   $GetSecondShiftServices = $this->LoungeModel->GetLoungeServicesByDate($serviceDate,'2',$GetLounge['loungeId']);
                                   $GetThirdShiftServices = $this->LoungeModel->GetLoungeServicesByDate($serviceDate,'3',$GetLounge['loungeId']);
 
+                                  $dailyBedsheetChange = "-";
+                                  if(!empty($GetFirstShiftServices['dailyBedsheetChange'])){
+                                    $dailyBedsheetChange = $GetFirstShiftServices['dailyBedsheetChange'];
+                                    if(empty($dailyBedsheetChange)){
+                                      $dailyBedsheetChange = $GetSecondShiftServices['dailyBedsheetChange'];
+                                      if(empty($dailyBedsheetChange)){
+                                        $dailyBedsheetChange = $GetThirdShiftServices['dailyBedsheetChange'];
+                                      }
+                                    }
+                                  }
+
                                 ?>
                                     
                                     <tr>
                                         <td><?php echo $count; ?></td>
-                                        <td><?php echo $dt->format("d-m-Y"); ?></td>
-                                        <td><?php echo ($GetFirstShiftServices['dailyBedsheetChange'] != "")?$GetFirstShiftServices['dailyBedsheetChange']:"-"; ?></td>
+                                        <td style="min-width: 100px;"><?php echo $dt->format("d-m-Y"); ?></td>
+                                        <td><?php echo $dailyBedsheetChange; ?></td>
                                         <td><?php echo ($GetFirstShiftServices['loungeSanitation'] != "")?$GetFirstShiftServices['loungeSanitation']:"-"; ?></td>
                                         <td><?php echo ($GetSecondShiftServices['loungeSanitation'] != "")?$GetSecondShiftServices['loungeSanitation']:"-"; ?></td>
                                         <td><?php echo ($GetThirdShiftServices['loungeSanitation'] != "")?$GetThirdShiftServices['loungeSanitation']:"-"; ?></td>

@@ -11,7 +11,7 @@ class FacilityModel extends CI_Model {
 	public function getFacility($request)
 	{
 		$where = ($request['districtId'] !='' ) ? 'and FL.`PRIDistrictCode` = '.$request['districtId'].'' : '' ;
-		$timestamp = ($request['timestamp'] !='' ) ? 'and FL.`ModifyDate` >= '.$request['timestamp'].'' : '' ;
+		$timestamp = ($request['timestamp'] !='' ) ? 'and FL.`ModifyDate` >= "'.$request['timestamp'].'"' : '' ;
 
 		/*echo $where; exit;*/
 

@@ -1,4 +1,8 @@
-
+<?php 
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
+?>
 
     <!-- BEGIN: Content-->
   <div class="app-content content">
@@ -213,7 +217,19 @@
                                           </span>
                                       <?php } ?>
                                     </td>
-                                    <td><a href="<?php echo base_url(); ?>staffM/updateStaff/<?php echo $value['staffId']; ?>" title="Edit Staff Information" class="btn btn-info btn-sm">View/Edit</a></td>
+                                    <td><a href="<?php echo base_url(); ?>staffM/updateStaff/<?php echo $value['staffId']; ?>" title="Edit Staff Information" class="btn btn-info btn-sm">
+                                      <?php if(($sessionData['Type']==1) || in_array(11, $userPermittedMenuData)){
+                                        echo VIEW_BUTTON;
+                                      }
+                                      if(($sessionData['Type']==1) || (in_array(11,$userPermittedMenuData) && in_array(64,$userPermittedMenuData)))
+                                      {
+                                        echo "/";
+                                      }
+                                      if(($sessionData['Type']==1) || in_array(64, $userPermittedMenuData)){
+                                        echo EDIT_BUTTON;
+                                      }
+                                      ?>
+                                    </a></td>
                                     <!-- <td style="width:70px;height:50px;">
                                       <?php  if(empty($value['profilePicture'])) {
                                           if($GetStaffName['staffTypeNameEnglish'] == 'Nurse') {
@@ -243,9 +259,9 @@
                                 
                             </table>
                             <?php if(!empty($totalResult)) { 
-                    ($pageNo == '1') ?  $counter = '1' : $counter = ((($pageNo*DATA_PER_PAGE)-DATA_PER_PAGE) + 1);
-                    echo '<br>Showing '.$counter.' to '.((($pageNo*DATA_PER_PAGE)-DATA_PER_PAGE) + DATA_PER_PAGE).' of '.count($totalResult).' entries';
-                 } ?>
+                            ($pageNo == '1') ?  $counter = '1' : $counter = ((($pageNo*DATA_PER_PAGE)-DATA_PER_PAGE) + 1);
+                            echo '<br>Showing '.$counter.' to '.(intval($counter)+intval(count($results))-1).' of '.$totalResult.' entries';
+                            } ?>
                             <ul class="pagination pull-right">
                               <?php
                               if(!empty($links)){
@@ -264,8 +280,10 @@
 </section>
 <!-- Column selectors with Export Options and print table -->
 
-<div class="add-new">
-  <a href="<?php echo base_url('staffM/addStaff/');?>" class="btn btn btn-danger align-items-center">
-      <i class="bx bx-plus"></i>&nbsp; Add New Staff
-  </a>
-</div>
+<?php if(($sessionData['Type']==1) || in_array(10, $userPermittedMenuData)){ ?>
+  <div class="add-new">
+    <a href="<?php echo base_url('staffM/addStaff/');?>" class="btn btn btn-danger align-items-center">
+        <i class="bx bx-plus"></i>&nbsp; Add New Staff
+    </a>
+  </div>
+<?php } ?>

@@ -1,16 +1,15 @@
+<?php 
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
+?>
 
-
-    <!-- BEGIN: Content-->
-  <div class="app-content content">
+<!-- BEGIN: Content-->
+<div class="app-content content">
     <div class="content-overlay"></div>
     <div class="content-wrapper">
         
       <div class="content-body">
-
-
-
-
-
 
 <!-- Column selectors with Export Options and print table -->
 <section id="column-selectors">
@@ -88,7 +87,19 @@
                                               </span>
                                         <?php } ?> 
                                       </td>
-                                      <td> <a href="<?php echo base_url(); ?>staffM/editTemporaryStaff/<?php echo $value['staffId']; ?>" class="btn btn-sm btn-info">View</a>
+                                      <td> <a href="<?php echo base_url(); ?>staffM/editTemporaryStaff/<?php echo $value['staffId']; ?>" class="btn btn-sm btn-info">
+                                        <?php if(($sessionData['Type']==1) || in_array(66, $userPermittedMenuData)){
+                                          echo VIEW_BUTTON;
+                                        }
+                                        if(($sessionData['Type']==1) || (in_array(66,$userPermittedMenuData) && in_array(67,$userPermittedMenuData)))
+                                        {
+                                          echo "/";
+                                        }
+                                        if(($sessionData['Type']==1) || in_array(67, $userPermittedMenuData)){
+                                          echo EDIT_BUTTON;
+                                        }
+                                        ?>
+                                      </a>
                                       </td>
                                       <td><a class="tooltip nonclick_link"><?php echo $added_on; ?><span class="tooltiptext"><?php echo date("m/d/y, h:i A",strtotime($value['addDate'])) ?></span></a>
                                       </td>

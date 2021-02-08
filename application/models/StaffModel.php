@@ -16,19 +16,25 @@ class StaffModel extends CI_Model {
 
   // get staff data via facilityId
   public function getStaffData($type,$limit='',$offset='',$facility_id){ 
+    $getCoachFacilities = $this->UserModel->getCoachFacilities();
+    $where_facility = "";
+    if(!empty($getCoachFacilities['coachFacilityArray'])){ 
+      $where_facility = 'where facilityId in '.$getCoachFacilities['coachFacilityArrayString'].' ';
+    }
+
     if($facility_id == 'all'){
       if ($type == '1') { 
         $this->db->select('*');
-        $result = $this->db->query("SELECT * FROM staffMaster order by staffId desc")->result_array();
+        $result = $this->db->query("SELECT * FROM staffMaster ".$where_facility." order by staffId desc")->num_rows();
         return $result;
        
       } else { 
-        return $this->db->query("SELECT * FROM staffMaster order by staffId desc LIMIT ".$offset.", ".$limit."")->result_array();
+        return $this->db->query("SELECT * FROM staffMaster ".$where_facility." order by staffId desc LIMIT ".$offset.", ".$limit."")->result_array();
       } 
     } else {
       if ($type == '1') { 
         $this->db->select('*');
-        $result = $this->db->get_where('staffMaster', array('facilityId'=>$facility_id))->result_array(); 
+        $result = $this->db->get_where('staffMaster', array('facilityId'=>$facility_id))->num_rows(); 
         return $result;
        
       } else { 
@@ -39,10 +45,16 @@ class StaffModel extends CI_Model {
 
   // get staff data with search and limit
   public function getStaffDataWhereSearching($type,$keyword,$limit='',$offset=''){
+    $getCoachFacilities = $this->UserModel->getCoachFacilities();
+    $where_facility = "";
+    if(!empty($getCoachFacilities['coachFacilityArray'])){ 
+      $where_facility = 'and (sm.facilityId in '.$getCoachFacilities['coachFacilityArrayString'].')';
+    }
+
     if ($type == '1') {
-      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`staffType` where (sm.`name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%')")->num_rows(); 
+      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`staffType` where (sm.`name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%') ".$where_facility." ")->num_rows(); 
     } else {
-      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`StaffType` where (sm.`Name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%') LIMIT ".$offset.", ".$limit."")->result_array();
+      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`StaffType` where (sm.`Name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%') ".$where_facility." LIMIT ".$offset.", ".$limit."")->result_array();
        
     }       
   } 
@@ -59,11 +71,17 @@ class StaffModel extends CI_Model {
 
 
   public function getStaffDataWhereDistrict($type,$district,$limit='',$offset=''){
+    $getCoachFacilities = $this->UserModel->getCoachFacilities();
+    $where_facility = "";
+    if(!empty($getCoachFacilities['coachFacilityArray'])){ 
+      $where_facility = 'and (sm.facilityId in '.$getCoachFacilities['coachFacilityArrayString'].')';
+    }
+
     if ($type == '1') {
-     return  $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`staffType` where (fl.`PRIDistrictCode` = $district)")->num_rows(); 
+     return  $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`staffType` where (fl.`PRIDistrictCode` = $district) ".$where_facility." ")->num_rows(); 
       
     } else {
-      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`StaffType` where (fl.`PRIDistrictCode` = $district) LIMIT ".$offset.", ".$limit."")->result_array();
+      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`StaffType` where (fl.`PRIDistrictCode` = $district) ".$where_facility." LIMIT ".$offset.", ".$limit."")->result_array();
     }   
   }
 
@@ -78,11 +96,17 @@ class StaffModel extends CI_Model {
 
 
   public function getStaffDataWhereDistrictSearch($type,$keyword,$district,$limit='',$offset=''){
+    $getCoachFacilities = $this->UserModel->getCoachFacilities();
+    $where_facility = "";
+    if(!empty($getCoachFacilities['coachFacilityArray'])){ 
+      $where_facility = 'and (sm.facilityId in '.$getCoachFacilities['coachFacilityArrayString'].')';
+    }
+
     if ($type == '1') {
-     return  $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`staffType` where ((fl.`PRIDistrictCode` = $district) AND (sm.`name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%'))")->num_rows(); 
+     return  $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`staffType` where ((fl.`PRIDistrictCode` = $district) AND (sm.`name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%')) ".$where_facility." ")->num_rows(); 
       
     } else {
-      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`StaffType` where ((fl.`PRIDistrictCode` = $district) AND (sm.`name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%')) LIMIT ".$offset.", ".$limit."")->result_array();
+      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`StaffType` where ((fl.`PRIDistrictCode` = $district) AND (sm.`name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%')) ".$where_facility." LIMIT ".$offset.", ".$limit."")->result_array();
     }    
   }
 

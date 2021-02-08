@@ -16,10 +16,14 @@ class GetFacility extends CI_Controller
         $requestJson = json_decode($requestData, true);
 
         $data['districtId'] = trim($requestJson[APP_NAME]['districtId']);
-        $data['timestamp'] = trim($requestJson[APP_NAME]['timestamp']);
+        $data['timestamp'] = (isset($requestJson[APP_NAME]['timestamp'])) ? trim($requestJson[APP_NAME]['timestamp']):"";
 
-        $checkRequestKeys = array('districtId','timestamp');
-
+        if(isset($requestJson[APP_NAME]['timestamp'])){
+            $checkRequestKeys = array('districtId','timestamp');
+        }else{
+            $checkRequestKeys = array('districtId');
+        }
+        
         $resultJson = validateJson($requestJson, $checkRequestKeys);
         $headers = apache_request_headers();
 
@@ -62,7 +66,6 @@ class GetFacility extends CI_Controller
                 }
                 else
                 {
-
                     generateServerResponse('0', '101');
                 }
             }

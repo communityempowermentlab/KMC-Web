@@ -1,8 +1,33 @@
+<?php 
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
 
+if(($sessionData['Type']==2) && (in_array(66, $userPermittedMenuData) && !in_array(67, $userPermittedMenuData))){
+  $pageHeading = "View";
+  $inputDisable = "readonly";
+  $dropdownDisable = "disabled";
+  $buttonDisable = "display:none;";
+  $verifyButtonDisable = "disabled";
+}else{
+  $pageHeading = "Update";
+  $inputDisable = "";
+  $dropdownDisable = "";
+  
 
-   
-    <!-- BEGIN: Content-->
-  <div class="app-content content">
+  if($GetStaff['status'] == 2){
+    $verifyButtonDisable = "disabled";
+    $buttonDisable = "display:none;";
+  }else{
+    $verifyButtonDisable = "";
+    $buttonDisable = "";
+  }
+  
+}
+?>
+
+<!-- BEGIN: Content-->
+<div class="app-content content">
     <div class="content-overlay"></div>
     <div class="content-wrapper">
         
@@ -18,14 +43,14 @@
       <div class="card">
         <div class="card-header">
           <div class="col-12">
-            <h5 class="content-header-title float-left pr-1 mb-0"> Staff Details</h5>
+            <h5 class="content-header-title float-left pr-1 mb-0"><?php echo $pageHeading; ?> Staff Details</h5>
             <div class="breadcrumb-wrapper col-12">
               <ol class="breadcrumb p-0 mb-0 breadcrumb-white" style="max-width: max-content; float: left;">
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>admin/dashboard"><i class="fa fa-home" aria-hidden="true"></i></a>
                 </li>
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>staffM/temporaryStaff">Not Approved Staff</a>
                 </li>
-                <li class="breadcrumb-item active"> Staff Details
+                <li class="breadcrumb-item active"><?php echo $pageHeading; ?> Staff Details
                 </li>
               </ol>
               <p style="float: right; color: black;"> <b>Verified Mobile</b> : <?php if(!empty($GetStaff['verifiedMobile'])) { echo $GetStaff['verifiedMobile']; } else { echo "N/A"; } ?>
@@ -163,7 +188,7 @@
                     <label>Staff Photo </label>
                     <div class="controls">
                       <input type="hidden" name="prevFile" value="<?php echo $GetStaff['profilePicture']; ?>">
-                      <input type="file" class="form-control" name="image" id="fileupload" disabled="">
+                      <!-- <input type="file" class="form-control" name="image" id="fileupload" disabled=""> -->
                       <div id="dvPreview">
                         <?php if(!empty($GetStaff['profilePicture'])) { ?>
                           <img src="<?php echo base_url(); ?>assets/nurse/<?php echo $GetStaff['profilePicture']; ?>">
@@ -193,7 +218,7 @@
                       <div class="form-group">
                         <label>Verification Status</label>
                         <div class="controls">
-                          <select class="select2 form-control" name="verification_status" id="verification_status" data-validation-required-message="This field is required" <?php if($GetStaff['status'] == 2) { echo 'disabled'; } ?> onchange="showReasonBox(this.value)">
+                          <select class="select2 form-control" name="verification_status" id="verification_status" data-validation-required-message="This field is required" <?php echo $verifyButtonDisable; ?> onchange="showReasonBox(this.value)">
                             <option value="1" <?php if($GetStaff['status'] == 1) { echo 'selected'; } ?>>Pending</option>
                             <option value="2" <?php if($GetStaff['status'] == 2) { echo 'selected'; } ?>>Approved</option>
                             <option value="3" <?php if($GetStaff['status'] == 3) { echo 'selected'; } ?>>Rejected</option>
@@ -214,7 +239,7 @@
                       <div class="form-group">
                         <label>Reason <span class="red">*</span></label>
                         <div class="controls">
-                          <textarea class="form-control" rows="3" <?php if($GetStaff['status'] == 2) { echo 'disabled'; } ?>  name="reason" id="reason"><?= $GetStaff['reason'] ?></textarea>
+                          <textarea class="form-control" rows="3" <?php echo $verifyButtonDisable; ?>  name="reason" id="reason"><?= $GetStaff['reason'] ?></textarea>
                           <span class="custom-error" id="err_reason"></span>
                         </div>
                       </div>
@@ -224,7 +249,7 @@
 
           
               
-              <button type="submit" class="btn btn-primary <?php if($GetStaff['status'] == 2) { echo 'hidden'; } ?> ">Submit</button>
+              <button type="submit" class="btn btn-primary" style="<?php echo $buttonDisable; ?>">Submit</button>
             </form>
           </div>
         </div>

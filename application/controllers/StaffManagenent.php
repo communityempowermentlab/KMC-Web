@@ -48,7 +48,7 @@ class StaffManagenent extends Welcome {
       !empty($_GET['keyword']) ? $config["base_url"] = base_url('staffM/manageStaff/'.$facility_id.'?keyword=' . $_GET['keyword']) : $config["base_url"] = base_url('staffM/manageStaff/'.$facility_id);
       
         if(!empty($totalRecords)){ 
-          $config["total_rows"] = count($totalRecords);
+          $config["total_rows"] = $totalRecords;
           $config["per_page"] = $limit;
           $config['use_page_numbers'] = TRUE;
           $config['page_query_string'] = TRUE;
@@ -313,7 +313,7 @@ public function updateStaff(){
       $id = $this->uri->segment(3);
       $data['index']         = 'staff';
       $data['index2']        = '';
-      $data['title']         = 'Update Staff | '.PROJECT_NAME; 
+      $data['title']         = 'Staff Information | '.PROJECT_NAME; 
       // $facility_id = $this->uri->segment(3, 0); 
       // $data['facility_id']   = $facility_id;
       // $data['GetFacilities']  = $this->StaffModel->GetFacilities();
@@ -623,7 +623,7 @@ public function pointHistoryViaLounge(){
     $id = $this->uri->segment(3);
     $data['index']         = 'temporaryStaff';
     $data['index2']        = '';
-    $data['title']         = 'Update Temporary Staff | '.PROJECT_NAME; 
+    $data['title']         = 'Not Approved Staff Information | '.PROJECT_NAME; 
     // $facility_id = $this->uri->segment(3, 0); 
     // $data['facility_id']   = $facility_id;
     

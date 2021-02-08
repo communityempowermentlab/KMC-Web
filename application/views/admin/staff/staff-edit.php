@@ -1,15 +1,28 @@
+<?php 
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
 
+if(($sessionData['Type']==2) && (in_array(11, $userPermittedMenuData) && !in_array(64, $userPermittedMenuData))){
+  $pageHeading = "View";
+  $inputDisable = "readonly";
+  $dropdownDisable = "disabled";
+  $buttonDisable = "display:none;";
+}else{
+  $pageHeading = "Update";
+  $inputDisable = "";
+  $dropdownDisable = "";
+  $buttonDisable = "";
+}
+?>
 
    
-    <!-- BEGIN: Content-->
-  <div class="app-content content">
+<!-- BEGIN: Content-->
+<div class="app-content content">
     <div class="content-overlay"></div>
     <div class="content-wrapper">
         
       <div class="content-body">
-
-
-
 
 <!-- Input Validation start -->
 <section class="input-validation">
@@ -18,14 +31,14 @@
       <div class="card">
         <div class="card-header">
           <div class="col-12">
-            <h5 class="content-header-title float-left pr-1 mb-0">Edit Staff</h5>
+            <h5 class="content-header-title float-left pr-1 mb-0"><?php echo $pageHeading; ?> Staff</h5>
             <div class="breadcrumb-wrapper col-12">
               <ol class="breadcrumb p-0 mb-0 breadcrumb-white" style="max-width: max-content; float: left;">
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>admin/dashboard"><i class="fa fa-home" aria-hidden="true"></i></a>
                 </li>
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>staffM/manageStaff/">Staff</a>
                 </li>
-                <li class="breadcrumb-item active">Edit Staff
+                <li class="breadcrumb-item active"><?php echo $pageHeading; ?> Staff
                 </li>
               </ol>
               <p style="float: right; color: black;"> <b>Verified Mobile</b> : <?php if(!empty($GetStaff['verifiedMobile'])) { echo $GetStaff['verifiedMobile']; } else { echo "N/A"; } ?></p>
@@ -45,7 +58,7 @@
                     <div class="form-group">
                       <label>District <span class="red">*</span></label>
                       <div class="controls">
-                        <select class="select2 form-control" name="district_name" id="district_name" required="" data-validation-required-message="This field is required" onchange="getFacility(this.value, '<?php echo base_url('loungeM/getFacility/') ?>')">
+                        <select class="select2 form-control" name="district_name" id="district_name" required="" data-validation-required-message="This field is required" onchange="getFacility(this.value, '<?php echo base_url('loungeM/getFacility/') ?>')" <?php echo $dropdownDisable; ?>>
                           <option value="">Select District</option>
                           <?php
                             foreach ($GetDistrict as $key => $value) {?>
@@ -59,7 +72,7 @@
                     <div class="form-group">
                       <label>Facility <span class="red">*</span></label>
                       <div class="controls">
-                        <select class="select2 form-control" name="facilityname" id="facilityname" required="" data-validation-required-message="This field is required">
+                        <select class="select2 form-control" name="facilityname" id="facilityname" required="" data-validation-required-message="This field is required" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Facility</option>
                           <?php foreach ($GetFacilities as $key => $value) { ?>
                              <option value="<?= $value['FacilityID']; ?>" <?php if($value['FacilityID'] == $GetStaff['facilityId']) { echo 'selected'; } ?>><?= $value['FacilityName']; ?></option>
@@ -72,7 +85,7 @@
                     <div class="form-group">
                       <label>Staff Name <span class="red">*</span></label>
                       <div class="controls">
-                        <input type="text" class="form-control" data-validation-required-message="This field is required" name="Name" id="staff_name" placeholder="Staff Name" value="<?php echo $GetStaff['name'];?>">
+                        <input type="text" class="form-control" data-validation-required-message="This field is required" name="Name" id="staff_name" placeholder="Staff Name" value="<?php echo $GetStaff['name'];?>" <?php echo $inputDisable; ?>>
                       </div>
                     </div>
                   </div>
@@ -85,7 +98,7 @@
                     <div class="form-group">
                       <label>Staff Type <span class="red">*</span></label>
                       <div class="controls">
-                        <select class="select2 form-control" name="type" id="staff_type" required="" data-validation-required-message="This field is required" onchange="getStaffSubType('<?php echo base_url('Admin/getStaffTypeList')?>', this.value)">
+                        <select class="select2 form-control" name="type" id="staff_type" required="" data-validation-required-message="This field is required" onchange="getStaffSubType('<?php echo base_url('Admin/getStaffTypeList')?>', this.value)" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Staff Type</option>
                           <?php foreach ($GetStaffType as $key => $value) { ?>
                             <option value="<?php echo $value['staffTypeId'] ?>" <?php echo ($GetStaff['staffType']== $value['staffTypeId']?'selected':'')?>><?php echo $value['staffTypeNameEnglish'] ?></option>
@@ -98,7 +111,7 @@
                     <div class="form-group" id="tabDiv">
                       <label>Staff Sub Type</label>
                       <div class="controls">
-                        <select class="select2 form-control" name="sub_type" id="sub_staff_type" onchange="openOtherStaffSubType(this);">
+                        <select class="select2 form-control" name="sub_type" id="sub_staff_type" onchange="openOtherStaffSubType(this);" <?php echo $dropdownDisable; ?>>
                           <option value="0">Select Staff Sub Type</option>
                           <?php  $GetStaffSubType = $this->load->UserModel->GetStaffSubType($GetStaff['staffType']);?>
                             <?php foreach ($GetStaffSubType as $key => $value) {?> 
@@ -130,7 +143,7 @@
                     <div class="form-group">
                       <label>Other Sub Type</label>
                       <div class="controls">
-                        <input type="text" class="form-control" name="staff_sub_type_other" id="staff_sub_type_other" placeholder="Other Sub Type" value="<?php echo $GetStaff['staffSubTypeOther'];?>">
+                        <input type="text" class="form-control" name="staff_sub_type_other" id="staff_sub_type_other" placeholder="Other Sub Type" value="<?php echo $GetStaff['staffSubTypeOther'];?>" <?php echo $inputDisable; ?>>
                       </div>
                     </div>
                   </div>
@@ -140,7 +153,7 @@
                     <div class="form-group">
                       <label>Job Type</label>
                       <div class="controls">
-                        <select class="select2 form-control" name="job_type" id="job_type">
+                        <select class="select2 form-control" name="job_type" id="job_type" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Job Type</option>
                           <?php foreach ($GetJobType as $key => $value) { ?>
                             <option value="<?php echo $value['id'] ?>" <?php echo ($GetStaff['jobType']== $value['id']?'selected':'')?>><?php echo $value['name'] ?></option>
@@ -157,7 +170,7 @@
                   <div class="form-group">
                     <label>Job Type</label>
                     <div class="controls">
-                      <select class="select2 form-control" name="job_type1" id="job_type1">
+                      <select class="select2 form-control" name="job_type1" id="job_type1" <?php echo $dropdownDisable; ?>>
                         <option value="">Select Job Type</option>
                         <?php foreach ($GetJobType as $key => $value) { ?>
                           <option value="<?php echo $value['id'] ?>" <?php echo ($GetStaff['jobType']== $value['id']?'selected':'')?>><?php echo $value['name'] ?></option>
@@ -172,7 +185,7 @@
                     <label>Staff Mobile Number <span class="red">*</span></label>
                     <div class="controls">
                       <input type="text" class="form-control" required="" data-validation-regex-regex="([^a-z]*[A-Z]*)*" data-validation-containsnumber-regex="([^0-9]*[0-9]+)+" value="<?php echo $GetStaff['staffMobileNumber'];?>"
-                        maxlength="10" minlength="10" name="staff_contact_number" id="staff_contact_number" placeholder="Staff Mobile Number">
+                        maxlength="10" minlength="10" name="staff_contact_number" id="staff_contact_number" placeholder="Staff Mobile Number" <?php echo $inputDisable; ?>>
                     </div>
                   </div>
                 </div>
@@ -182,7 +195,7 @@
                     <label>Emergency Contact Number </label>
                     <div class="controls">
                       <input type="text" class="form-control" data-validation-regex-regex="([^a-z]*[A-Z]*)*" data-validation-containsnumber-regex="([^0-9]*[0-9]+)+" value="<?php echo $GetStaff['emergencyContactNumber'];?>"
-                        maxlength="10" minlength="10" name="emergency_contact_number" id="emergency_contact_number" placeholder="Emergency Contact Number">
+                        maxlength="10" minlength="10" name="emergency_contact_number" id="emergency_contact_number" placeholder="Emergency Contact Number" <?php echo $inputDisable; ?>>
                     </div>
                   </div>
                 </div>
@@ -196,7 +209,7 @@
                     <label>Staff Photo </label>
                     <div class="controls">
                       <input type="hidden" name="prevFile" value="<?php echo $GetStaff['profilePicture']; ?>">
-                      <input type="file" class="form-control" name="image" id="fileupload" >
+                      <input type="file" class="form-control" name="image" id="fileupload" style="<?php echo $buttonDisable; ?>">
                       <div id="dvPreview">
                         <?php if(!empty($GetStaff['profilePicture'])) { ?>
                           <img src="<?php echo base_url(); ?>assets/nurse/<?php echo $GetStaff['profilePicture']; ?>">
@@ -210,7 +223,7 @@
                   <div class="form-group">
                     <label>Staff Address </label>
                     <div class="controls">
-                      <textarea class="form-control" id="address" rows="3" placeholder="Staff Address" name="address"><?php echo $GetStaff['staffAddress'];?></textarea>
+                      <textarea class="form-control" id="address" rows="3" placeholder="Staff Address" name="address" <?php echo $inputDisable; ?>><?php echo $GetStaff['staffAddress'];?></textarea>
                     </div>
                   </div>
                 </div>
@@ -219,7 +232,7 @@
                   <div class="form-group">
                     <label>Status</label>
                     <div class="controls">
-                      <select class="select2 form-control" name="status" id="status" data-validation-required-message="This field is required">
+                      <select class="select2 form-control" name="status" id="status" data-validation-required-message="This field is required" <?php echo $dropdownDisable; ?>>
                         <option value="">Select Status</option>
                         <option value="1" <?php if($GetStaff['status'] == 1) { echo 'selected'; } ?>>Active</option>
                         <option value="2" <?php if($GetStaff['status'] == 2) { echo 'selected'; } ?>>Deactive</option>
@@ -232,7 +245,7 @@
 
           
               
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary" style="<?php echo $buttonDisable; ?>">Submit</button>
             </form>
           </div>
         </div>
