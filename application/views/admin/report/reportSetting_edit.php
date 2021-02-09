@@ -1,3 +1,20 @@
+<?php 
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
+
+if(($sessionData['Type']==2) && (in_array(70, $userPermittedMenuData) && !in_array(71, $userPermittedMenuData))){
+  $pageHeading = "View";
+  $inputDisable = "readonly";
+  $dropdownDisable = "disabled";
+  $buttonDisable = "display:none;";
+}else{
+  $pageHeading = "Update";
+  $inputDisable = "";
+  $dropdownDisable = "";
+  $buttonDisable = "";
+}
+?>
 
 <style>
 .switch {
@@ -80,14 +97,14 @@ input:checked + .slider:before {
       <div class="card">
         <div class="card-header">
           <div class="col-12">
-            <h5 class="content-header-title float-left pr-1 mb-0">Edit Report</h5>
+            <h5 class="content-header-title float-left pr-1 mb-0"><?php echo $pageHeading; ?> Report</h5>
             <div class="breadcrumb-wrapper col-12">
               <ol class="breadcrumb p-0 mb-0 breadcrumb-white" style="max-width: max-content; float: left;">
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>admin/dashboard"><i class="fa fa-home" aria-hidden="true"></i></a>
                 </li>
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>staffM/manageStaff/">Generate Report</a>
                 </li>
-                <li class="breadcrumb-item active">Edit Report
+                <li class="breadcrumb-item active"><?php echo $pageHeading; ?> Report
                 </li>
               </ol>
               
@@ -109,7 +126,7 @@ input:checked + .slider:before {
                     <div class="form-group">
                       <label>Subject <span class="red">*</span></label>
                       <div class="controls">
-                        <input type="text" class="form-control" required="" data-validation-required-message="This field is required" name="subject" id="subject" value="<?php echo $GetReport['subject']; ?>" placeholder="Subject">
+                        <input type="text" class="form-control" required="" data-validation-required-message="This field is required" name="subject" id="subject" value="<?php echo $GetReport['subject']; ?>" placeholder="Subject" <?php echo $inputDisable; ?>>
                       </div>
                     </div>
                   </div>
@@ -118,7 +135,7 @@ input:checked + .slider:before {
                   <div class="form-group">
                     <label>Body </label>
                     <div class="controls">
-                      <textarea class="form-control" id="body" rows="3" placeholder="Enter Body" name="body" required=""><?php echo $GetReport['body']; ?></textarea>
+                      <textarea class="form-control" id="body" rows="3" placeholder="Enter Body" name="body" required="" <?php echo $inputDisable; ?>><?php echo $GetReport['body']; ?></textarea>
                     </div>
                   </div>
                 </div>
@@ -146,7 +163,7 @@ input:checked + .slider:before {
                     <div class="form-group">
                       <label>District <span class="red">*</span></label>
                       <div class="controls">
-                        <select class="select2 form-control" multiple="multiple" name="district[]" id="district" onchange="getMultipleFacility('<?php echo base_url('coachM/getFacility/') ?>')">
+                        <select class="select2 form-control" multiple="multiple" name="district[]" id="district" onchange="getMultipleFacility('<?php echo base_url('coachM/getFacility/') ?>')" <?php echo $dropdownDisable; ?>>
                           <?php foreach ($GetDistrict as $key => $value) {?>
                             <option value ="<?php echo $value['PRIDistrictCode']?>" <?php if (in_array($value['PRIDistrictCode'], $dis_arr)) { echo 'selected'; } ?>><?php echo $value['DistrictNameProperCase'] ?></option>
                           <?php } ?>
@@ -159,9 +176,9 @@ input:checked + .slider:before {
                     <div class="form-group">
                       <label>Facility <span class="red">*</span></label>
                       <div class="controls">
-                        <select class="select2 form-control" multiple="multiple" name="facility[]" id="facility" onchange="getMultipleLounge('<?php echo base_url('coachM/getLounge/') ?>')">
+                        <select class="select2 form-control" multiple="multiple" name="facility[]" id="facility" onchange="getMultipleLounge('<?php echo base_url('coachM/getLounge/') ?>')" <?php echo $dropdownDisable; ?>>
                           <?php foreach ($dis_arr as $key => $value) {
-                            $getFacility = $this->LoungeModel->GetFacilityByDistrict($value); 
+                            $getFacility = $this->ReportSettingModel->GetFacilityByDistrict($value); 
         
                             $getDistrict = $this->FacilityModel->GetDistrictNameById('revenuevillagewithblcoksandsubdistandgs', $value); ?>
                             <optgroup label="<?= $getDistrict['DistrictNameProperCase'] ?>">
@@ -180,11 +197,11 @@ input:checked + .slider:before {
                     <div class="form-group">
                       <label>Lounge <span class="red">*</span></label>
                       <div class="controls">
-                        <select class="select2 form-control" multiple="multiple" name="lounge[]" id="lounge">
+                        <select class="select2 form-control" multiple="multiple" name="lounge[]" id="lounge" <?php echo $dropdownDisable; ?>>
                           <?php foreach ($fac_arr as $key => $value) {
                             $getFacility = $this->FacilityModel->GetFacilitiesById('facilitylist', $value); 
         
-                           $getLounge = $this->LoungeModel->GetLoungeByFAcility($value); ?>
+                           $getLounge = $this->ReportSettingModel->GetLoungeByFAcility($value); ?>
                             <optgroup label="<?= $getFacility['FacilityName'] ?>">
                               <?php foreach ($getLounge as $key2 => $value2) { ?>
                                 <option value="<?= $getFacility['PRIDistrictCode'] ?>-<?= $value ?>-<?= $value2['loungeId'] ?>" <?php if (in_array($value2['loungeId'], $lounge_arr)) { echo 'selected'; } ?>><?= $value2['loungeName']; ?></option>
@@ -206,7 +223,7 @@ input:checked + .slider:before {
                     <div class="form-group">
                       <label>Email To <span class="red">*</span></label>
                       <div class="controls">
-                        <textarea class="form-control" id="email" rows="3" placeholder="Email To" name="email" required=""><?php echo implode(",",$emails); ?></textarea>
+                        <textarea class="form-control" id="email" rows="3" placeholder="Email To" name="email" required="" <?php echo $inputDisable; ?>><?php echo implode(",",$emails); ?></textarea>
                       </div>
                     </div>
                   </div>
@@ -214,7 +231,7 @@ input:checked + .slider:before {
                     <div class="form-group" id="tabDiv">
                       <label>Email From</label>
                       <div class="controls">
-                        <input type="Email" class="form-control" name="emailFrom" id="emailFrom" placeholder="email From" value="<?php echo $GetReport['emailFrom']; ?>">
+                        <input type="Email" class="form-control" name="emailFrom" id="emailFrom" placeholder="email From" value="<?php echo $GetReport['emailFrom']; ?>" <?php echo $inputDisable; ?>>
                       </div>
                     </div>
                   </div>
@@ -224,30 +241,17 @@ input:checked + .slider:before {
                     <label>Subscribe </label>
                     <div class="controls">
                       <label class="switch">
-                        <input type="checkbox" <?php if($GetReport['subscription']=="Yes"){ ?> checked=""<?php } ?> name="subscription" value="Yes">
+                        <input type="checkbox" <?php if($GetReport['subscription']=="Yes"){ ?> checked=""<?php } ?> name="subscription" value="Yes" <?php echo $dropdownDisable; ?>>
                         <span class="slider round"></span>
                       </label>
                       
                     </div>
                   </div>
                 </div>
-
-
                   
-              </div>
-
-
-
-
-
-
-
-
-
-
-          
+              </div>          
               
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary" style="<?php echo $buttonDisable; ?>">Submit</button>
             </form>
           </div>
         </div>

@@ -176,7 +176,7 @@ public function updateReport(){
       $id = $this->uri->segment(3);
       $data['index']         = 'Report';
       $data['index2']        = '';
-      $data['title']         = 'Update Report | '.PROJECT_NAME; 
+      $data['title']         = 'Report Information | '.PROJECT_NAME; 
       // $facility_id = $this->uri->segment(3, 0); 
       // $data['facility_id']   = $facility_id;
       // $data['GetFacilities']  = $this->StaffModel->GetFacilities();
@@ -217,7 +217,7 @@ public function updateReport(){
       
       $data['GetStaffType']   = $this->ReportSettingModel->GetStaffType();
       $data['GetJobType']     = $this->ReportSettingModel->GetJobType();
-      $data['GetDistrict']    = $this->FacilityModel->selectquery(); 
+      $data['GetDistrict']    = $this->ReportSettingModel->getDistrict(); 
       $data['GetFacilities'] = $this->ReportSettingModel->GetFacilities();
       $this->load->view('admin/include/header-new',$data);
       $this->load->view('admin/report/reportSetting_edit');

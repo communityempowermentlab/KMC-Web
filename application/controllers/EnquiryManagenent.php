@@ -63,7 +63,7 @@ class EnquiryManagenent extends Welcome {
     $data['index']         = 'enquiryM';
     $data['index2']        = '';
     $data['fileName']      = 'viewEnquiry';
-    $data['title']         = 'Edit Enquiry | '.PROJECT_NAME; 
+    $data['title']         = 'Enquiry Information | '.PROJECT_NAME; 
     
     $data['GetData'] = $this->EnquiryModel->getData('stuckData', array('id'=>$id), $id); 
     if(!empty($data['GetData']['loungeId'])){

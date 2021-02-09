@@ -252,5 +252,23 @@ $emails = explode(",",$data['email']);
     }
   }
 
+  public function getDistrict(){
+    return $query=$this->db->query("SELECT DISTINCT PRIDistrictCode , DistrictNameProperCase FROM `revenuevillagewithblcoksandsubdistandgs` ORDER BY DistrictNameProperCase asc")->result_array();
+  }
+
+  public function GetFacilityByDistrict($district){
+
+    $this->db->select('facilitylist.*');
+    $this->db->order_by('FacilityName','asc');
+    return $getFacilityList = $this->db->get_where('facilitylist',array('PRIDistrictCode'=>$district,'status'=>1))->result_array();
+  }
+
+  public function GetLoungeByFAcility($facilityId){
+
+    $this->db->select('loungeMaster.*');
+    $this->db->order_by('loungeName','asc');
+    return $getLoungeList = $this->db->get_where('loungeMaster',array('facilityId'=>$facilityId,'status'=>1))->result_array();
+  }
+
 }
  ?>

@@ -1,4 +1,20 @@
+<?php 
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
 
+if(($sessionData['Type']==2) && (in_array(13, $userPermittedMenuData) && !in_array(68, $userPermittedMenuData))){
+  $pageHeading = "View";
+  $inputDisable = "readonly";
+  $dropdownDisable = "disabled";
+  $buttonDisable = "display:none;";
+}else{
+  $pageHeading = "Update";
+  $inputDisable = "";
+  $dropdownDisable = "";
+  $buttonDisable = "";
+}
+?>
 
    
     <!-- BEGIN: Content-->
@@ -21,14 +37,14 @@
       <div class="card">
         <div class="card-header">
           <div class="col-12">
-            <h5 class="content-header-title float-left pr-1 mb-0">Edit Enquiry</h5>
+            <h5 class="content-header-title float-left pr-1 mb-0"><?php echo $pageHeading; ?> Enquiry</h5>
             <div class="breadcrumb-wrapper col-12">
               <ol class="breadcrumb p-0 mb-0 breadcrumb-white" style="max-width: max-content; float: left;">
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>admin/dashboard"><i class="fa fa-home" aria-hidden="true"></i></a>
                 </li>
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>enquiryM/enquiryList">Enquiry</a>
                 </li>
-                <li class="breadcrumb-item active">Edit Enquiry
+                <li class="breadcrumb-item active"><?php echo $pageHeading; ?> Enquiry
                 </li>
               </ol>
               <p style="float: right; color: black;"> <b>Request Date</b> : <a class="tooltip nonclick_link"><?php echo $generated_on; ?><span class="tooltiptext"><?php echo date("m/d/y, h:i A",strtotime($GetData['addDate'])) ?></span></a> | <b>Response Date</b> : <?php if ($GetData['responseGivenBy'] != '') { ?> 
@@ -85,7 +101,7 @@
                     <div class="form-group">
                       <label>Location </label>
                       <div class="controls">
-                        <textarea class="form-control" rows="3" placeholder="Location"><?php echo $GetData['location']; ?></textarea>
+                        <textarea class="form-control" rows="3" placeholder="Location" readonly><?php echo $GetData['location']; ?></textarea>
                       </div>
                     </div>
                   </div>
@@ -93,7 +109,7 @@
                     <div class="form-group" id="tabDiv">
                       <label>Remark <span class="red">*</span></label>
                       <div class="controls">
-                        <textarea class="form-control" name="remark" rows="3" required="" data-validation-required-message="This field is required" placeholder="Remark"><?php echo $GetData['remark']; ?></textarea>
+                        <textarea class="form-control" name="remark" rows="3" required="" data-validation-required-message="This field is required" placeholder="Remark" <?php echo $inputDisable; ?>><?php echo $GetData['remark']; ?></textarea>
                       </div>
                     </div>
                   </div>
@@ -105,7 +121,7 @@
                     <div class="form-group">
                       <label>Status <span class="red">*</span></label>
                       <div class="controls">
-                        <select class="select2 form-control" name="status" id="status" required="" data-validation-required-message="This field is required">
+                        <select class="select2 form-control" name="status" id="status" required="" data-validation-required-message="This field is required" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Status</option>
                           <option value="1" <?php if($GetData['status'] == 1) { echo 'selected'; } ?>>Pending</option>
                           <option value="2" <?php if($GetData['status'] == 2) { echo 'selected'; } ?>>Closed</option>
@@ -117,9 +133,7 @@
                   
               </div>
 
-          
-              
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary" style="<?php echo $buttonDisable; ?>">Submit</button>
             </form>
           </div>
         </div>

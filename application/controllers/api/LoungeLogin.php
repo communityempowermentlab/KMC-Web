@@ -43,14 +43,27 @@ class LoungeLogin extends CI_Controller {
               if(!empty($headers['token']) && !empty($headers['package'])){
                 if($headers['token'] == $getLoungeData['token'] && ($headers['package'] == strtolower(md5(PACKAGE)) || $headers['package'] == strtoupper(md5(PACKAGE)))){
                             if ($resultJson == 1) { 
-                                $loungeDetail = $this->ApiModel->loungeLogin($data);
-                                    if($loungeDetail != 0){
-                                         $response['loungeDetails'] = $loungeDetail;
-                                        generateServerResponse('1','S', $response);
 
-                                    }else{
-                                        generateServerResponse('0','P');
-                                    }
+                                // validate staff available
+                                $getStaffAvailable = $this->db->get_where('staffMaster', array('facilityId' => $getLoungeData['facilityId'],'status' => '1'))->row_array();
+                                if(empty($getStaffAvailable)){
+                                    generateServerResponse('0', '232');
+                                }
+
+                                // validate lounge amenities
+                                $getAmenitiesAvailable = $this->db->get_where('loungeAmenities', array('loungeId' => $getLoungeData['loungeId']))->row_array();
+                                if(empty($getAmenitiesAvailable)){
+                                    generateServerResponse('0', '233');
+                                }
+
+                                $loungeDetail = $this->ApiModel->loungeLogin($data);
+                                if($loungeDetail != 0){
+                                     $response['loungeDetails'] = $loungeDetail;
+                                    generateServerResponse('1','S', $response);
+
+                                }else{
+                                    generateServerResponse('0','P');
+                                }
                             }else{
                                 
                                 generateServerResponse('0','101');              

@@ -1,4 +1,8 @@
-
+<?php 
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
+?>
 
     <!-- BEGIN: Content-->
   <div class="app-content content">
@@ -154,8 +158,23 @@
                                           </span>
                                       <?php } ?>
                                     </td>
-                                    <td><a href="<?php echo base_url(); ?>/GenerateReportM/updateReport/<?php echo $value['id']; ?>" title="View/Edit Report" class="btn btn-info btn-sm">View/Edit</a>
+                                    <td><a href="<?php echo base_url(); ?>/GenerateReportM/updateReport/<?php echo $value['id']; ?>" title="View/Edit Report" class="btn btn-info btn-sm">
+                                      <?php if(($sessionData['Type']==1) || in_array(70, $userPermittedMenuData)){
+                                        echo VIEW_BUTTON;
+                                      }
+                                      if(($sessionData['Type']==1) || (in_array(70,$userPermittedMenuData) && in_array(71,$userPermittedMenuData)))
+                                      {
+                                        echo "/";
+                                      }
+                                      if(($sessionData['Type']==1) || in_array(71, $userPermittedMenuData)){
+                                        echo EDIT_BUTTON;
+                                      }
+                                      ?>
+                                    </a>
+
+                                    <?php if(($sessionData['Type']==1) || in_array(72, $userPermittedMenuData)){ ?>
                                       <a href="<?php echo base_url(); ?>/GenerateReportM/dailyDownloadReport/<?php echo $value['id']; ?>" title="Reports" class="btn btn-primary btn-sm">Reports</a>
+                                    <?php } ?>
                                     </td>
                                    
                                     
@@ -195,8 +214,10 @@
 </section>
 <!-- Column selectors with Export Options and print table -->
 
-<div class="add-new">
-  <a href="<?php echo base_url('GenerateReportM/addGenerateReportM/');?>" class="btn btn btn-danger align-items-center">
-      <i class="bx bx-plus"></i>&nbsp; Add New Report
-  </a>
-</div>
+<?php if(($sessionData['Type']==1) || in_array(69, $userPermittedMenuData)){ ?>
+  <div class="add-new">
+    <a href="<?php echo base_url('GenerateReportM/addGenerateReportM/');?>" class="btn btn btn-danger align-items-center">
+        <i class="bx bx-plus"></i>&nbsp; Add New Report
+    </a>
+  </div>
+<?php } ?>

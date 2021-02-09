@@ -584,6 +584,8 @@ function messages($resMsg = '', $dynamicValue = '')
         '229' => 'Mother id not registered',
         '230' => 'Registration number already exist.',
         '231' => 'Registration number not exist.',
+        '232' => 'No Staff available in this facility.',
+        '233' => 'Lounge amenities data not available.',
         'E' => 'Data Not Found',
         'W' => 'Something Went Wrong',
         'S' => 'Success',

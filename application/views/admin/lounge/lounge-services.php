@@ -86,12 +86,13 @@
                                   $GetThirdShiftServices = $this->LoungeModel->GetLoungeServicesByDate($serviceDate,'3',$GetLounge['loungeId']);
 
                                   $dailyBedsheetChange = "-";
-                                  if(!empty($GetFirstShiftServices['dailyBedsheetChange'])){
-                                    $dailyBedsheetChange = $GetFirstShiftServices['dailyBedsheetChange'];
+                                  $dailyBedsheetChange = $GetFirstShiftServices['dailyBedsheetChange'];
+                                  if(empty($dailyBedsheetChange)){
+                                    $dailyBedsheetChange = $GetSecondShiftServices['dailyBedsheetChange'];
                                     if(empty($dailyBedsheetChange)){
-                                      $dailyBedsheetChange = $GetSecondShiftServices['dailyBedsheetChange'];
+                                      $dailyBedsheetChange = $GetThirdShiftServices['dailyBedsheetChange'];
                                       if(empty($dailyBedsheetChange)){
-                                        $dailyBedsheetChange = $GetThirdShiftServices['dailyBedsheetChange'];
+                                        $dailyBedsheetChange = "-";
                                       }
                                     }
                                   }

@@ -351,13 +351,17 @@
                     </li>
                   <?php } ?>
 
-                  <?php if(in_array(9, $userPermittedMenuData)){ ?>
+                  <?php if(in_array(9, $userPermittedMenuData) || in_array(65, $userPermittedMenuData)){ ?>
                     <li class="dropdown dropdown-submenu" data-menu="dropdown-submenu"><a class="dropdown-item align-items-center dropdown-toggle" href="#" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Staff</a>
                       <ul class="dropdown-menu">
-                        <li data-menu="" class="<?php echo (($index=='staff') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/staffM/manageStaff'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Approved Staff</a>
-                        </li>
-                        <li data-menu="" class="<?php echo (($index=='temporaryStaff') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('staffM/temporaryStaff'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Not Approved Staff</a>
-                        </li>
+                        <?php if(in_array(9, $userPermittedMenuData)){ ?>
+                          <li data-menu="" class="<?php echo (($index=='staff') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/staffM/manageStaff'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Approved Staff</a>
+                          </li>
+                        <?php } ?>
+                        <?php if(in_array(65, $userPermittedMenuData)){ ?>
+                          <li data-menu="" class="<?php echo (($index=='temporaryStaff') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('staffM/temporaryStaff'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Not Approved Staff</a>
+                          </li>
+                        <?php } ?>
                       </ul>
                     </li>
                   <?php } ?>  
