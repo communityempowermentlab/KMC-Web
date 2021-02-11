@@ -122,3 +122,13 @@ $route['GenerateReportM/(:any)'] = "GenerateReport/$1";
 $route['GenerateReportM/(:any)/(:any)'] = "GenerateReport/$1/$1";
 $route['GenerateReportM/(:any)/(:any)/(:any)'] = "GenerateReport/$1/$1/$1";
 $route['GenerateReportM'] = "GenerateReport/index";
+
+$route['MemoryM/(:any)'] = "MemoryManagenent/$1";
+$route['MemoryM/(:any)/(:any)'] = "MemoryManagenent/$1/$1";
+$route['MemoryM/(:any)/(:any)/(:any)'] = "MemoryManagenent/$1/$1/$1";
+$route['MemoryM'] = "MemoryManagenent/index";
+
+$route['ProfileM/(:any)'] = "ProfileManagement/$1";
+$route['ProfileM/(:any)/(:any)'] = "ProfileManagement/$1/$1";
+$route['ProfileM/(:any)/(:any)/(:any)'] = "ProfileManagement/$1/$1/$1";
+$route['ProfileM'] = "ProfileManagement/index";

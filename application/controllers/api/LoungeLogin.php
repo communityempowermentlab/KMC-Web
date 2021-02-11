@@ -45,16 +45,16 @@ class LoungeLogin extends CI_Controller {
                             if ($resultJson == 1) { 
 
                                 // validate staff available
-                                $getStaffAvailable = $this->db->get_where('staffMaster', array('facilityId' => $getLoungeData['facilityId'],'status' => '1'))->row_array();
-                                if(empty($getStaffAvailable)){
-                                    generateServerResponse('0', '232');
-                                }
+                                // $getStaffAvailable = $this->db->get_where('staffMaster', array('facilityId' => $getLoungeData['facilityId'],'status' => '1'))->row_array();
+                                // if(empty($getStaffAvailable)){
+                                //     generateServerResponse('0', '232');
+                                // }
 
                                 // validate lounge amenities
-                                $getAmenitiesAvailable = $this->db->get_where('loungeAmenities', array('loungeId' => $getLoungeData['loungeId']))->row_array();
-                                if(empty($getAmenitiesAvailable)){
-                                    generateServerResponse('0', '233');
-                                }
+                                // $getAmenitiesAvailable = $this->db->get_where('loungeAmenities', array('loungeId' => $getLoungeData['loungeId']))->row_array();
+                                // if(empty($getAmenitiesAvailable)){
+                                //     generateServerResponse('0', '233');
+                                // }
 
                                 $loungeDetail = $this->ApiModel->loungeLogin($data);
                                 if($loungeDetail != 0){

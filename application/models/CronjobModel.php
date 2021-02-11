@@ -55,5 +55,32 @@ class CronjobModel extends CI_Model {
     return $settingData;
   }
 
+  public function getBabyAdmissionData($loungeArray=false){
+    $this->db->select('babyAdmission.id as babyAdmissionId,babyAdmission.status as dischargeStatus,babyAdmission.babyFileId,babyAdmission.lengthValue as admissionHeight,babyAdmission.babyAdmissionWeight,babyRegistration.babyGender,babyRegistration.registrationDateTime,babyRegistration.motherId,babyRegistration.babyWeight,motherRegistration.motherName,loungeMaster.facilityId,loungeMaster.loungeName,facilitylist.FacilityName');
+    $this->db->join('babyRegistration','babyRegistration.babyId=babyAdmission.babyId');
+    $this->db->join('motherRegistration','motherRegistration.motherId=babyRegistration.motherId');
+    $this->db->join('loungeMaster','loungeMaster.loungeId=babyAdmission.loungeId');
+    $this->db->join('facilitylist','facilitylist.FacilityID=loungeMaster.facilityId');
+    if(!empty($loungeArray)){
+      $this->db->where_in('babyAdmission.loungeId',$loungeArray);
+    }
+    $this->db->order_by('babyAdmission.loungeId','asc');
+    $query = $this->db->get_where('babyAdmission')->result_array();
+    return $query;
+  }
+
+  public function getBabyDailyWeightData($admissionId,$weightDate){
+    $this->db->select('babyDailyWeight.id,babyDailyWeight.babyWeight,babyDailyWeight.weightDate');
+    $this->db->where('DATE(babyDailyWeight.weightDate)', $weightDate);
+    $query = $this->db->get_where('babyDailyWeight',array('babyDailyWeight.babyAdmissionId'=>$admissionId))->row_array();
+    return $query;
+  }
+
+  public function getBabyLastWeightData($admissionId){
+    $this->db->select('babyDailyWeight.id,babyDailyWeight.babyWeight,babyDailyWeight.weightDate');
+    $this->db->order_by('id', 'desc');
+    $query = $this->db->get_where('babyDailyWeight',array('babyDailyWeight.babyAdmissionId'=>$admissionId))->row_array();
+    return $query;
+  }
 }
 ?>

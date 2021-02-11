@@ -6,6 +6,7 @@ class CounsellingManagenent extends Welcome {
       parent::__construct();
       $this->load->model('CounsellingModel');  
       $this->load->model('FacilityModel');  
+      $this->is_not_logged_in(); 
     }
     /* Call Video Listing Page*/
     public function manageCounsellingVideos(){

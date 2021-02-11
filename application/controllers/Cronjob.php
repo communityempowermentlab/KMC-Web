@@ -49,6 +49,438 @@ class Cronjob extends CI_Controller {
         $this->load->library('excel');
     }
 
+    // Baby Weight Report
+    public function babyWeightReport(){
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->mergeCells('A1:G1');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+
+      for($col = ord('A'); $col <= ord('Z'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."3")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
+      $objWorkSheet->getColumnDimension('B')->setWidth(18);
+      $objWorkSheet->getColumnDimension('C')->setWidth(24);
+      $objWorkSheet->getColumnDimension('D')->setWidth(15);
+      $objWorkSheet->getColumnDimension('E')->setWidth(16);
+      $objWorkSheet->getColumnDimension('F')->setWidth(25);
+      $objWorkSheet->getColumnDimension('G')->setWidth(8);
+      $objWorkSheet->getColumnDimension('H')->setWidth(18);
+      $objWorkSheet->getColumnDimension('I')->setWidth(16);
+      $objWorkSheet->getColumnDimension('J')->setWidth(20);
+      $objWorkSheet->getColumnDimension('K')->setWidth(16);
+      $objWorkSheet->getColumnDimension('L')->setWidth(30);
+      $objWorkSheet->getColumnDimension('M')->setWidth(16);
+      $objWorkSheet->getColumnDimension('N')->setWidth(30);
+      $objWorkSheet->getColumnDimension('O')->setWidth(16);
+      $objWorkSheet->getColumnDimension('P')->setWidth(30);
+      $objWorkSheet->getColumnDimension('Q')->setWidth(16);
+      $objWorkSheet->getColumnDimension('R')->setWidth(30);
+      $objWorkSheet->getColumnDimension('S')->setWidth(16);
+      $objWorkSheet->getColumnDimension('T')->setWidth(30);
+      $objWorkSheet->getColumnDimension('U')->setWidth(16);
+      $objWorkSheet->getColumnDimension('V')->setWidth(30);
+      $objWorkSheet->getColumnDimension('W')->setWidth(10);
+      $objWorkSheet->getColumnDimension('X')->setWidth(16);
+      $objWorkSheet->getColumnDimension('Y')->setWidth(18);
+      $objWorkSheet->getColumnDimension('Z')->setWidth(20);
+
+      for($col = ord('A'); $col <= ord('Z'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->setCellValue('A3', 'Sr. No.');
+      $objWorkSheet->setCellValue('B3', 'Facility Name');
+      $objWorkSheet->setCellValue('C3', 'Lounge Name');
+      $objWorkSheet->setCellValue('D3', 'Reg. No.');
+      $objWorkSheet->setCellValue('E3', 'Mother Name');
+      $objWorkSheet->setCellValue('F3', 'Admission Date & Time');
+      $objWorkSheet->setCellValue('G3', 'Gender');
+      $objWorkSheet->setCellValue('H3', 'Admission Height(cm)');
+      $objWorkSheet->setCellValue('I3', 'Birth Weight(gm)');
+      $objWorkSheet->setCellValue('J3', 'Admission Weight(gm)');
+      $objWorkSheet->setCellValue('K3', 'Day 2 Weight(gm)');
+      $objWorkSheet->setCellValue('L3', 'Gain/Loss % (Day 2-Admission Weight)');
+      $objWorkSheet->setCellValue('M3', 'Day 3 Weight(gm)');
+      $objWorkSheet->setCellValue('N3', 'Gain/Loss % (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('O3', 'Day 4 Weight(gm)');
+      $objWorkSheet->setCellValue('P3', 'Gain/Loss % (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('Q3', 'Day 5 Weight(gm)');
+      $objWorkSheet->setCellValue('R3', 'Gain/Loss % (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('S3', 'Day 6 Weight(gm)');
+      $objWorkSheet->setCellValue('T3', 'Gain/Loss % (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('U3', 'Day 7 Weight(gm)');
+      $objWorkSheet->setCellValue('V3', 'Gain/Loss % (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('W3', 'Discharge');
+      $objWorkSheet->setCellValue('X3', 'Total duration');
+      $objWorkSheet->setCellValue('Y3', 'Overall Gain/Loss (%)');
+      $objWorkSheet->setCellValue('Z3', 'Remarks');
+
+      $objWorkSheet->setCellValue('A1', 'Weight Report');
+
+      $getReportSettings = $this->cmodel->getReportSettings(2);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+
+      // Get all baby
+      $getAllBabyAdmission = $this->cmodel->getBabyAdmissionData($loungeArray);
+      $dataCount = 1;
+      $a=4;
+
+      foreach($getAllBabyAdmission as $key_baby => $getAllBabyAdmissionData){
+
+          $babyListArray    = [];
+          $babyListArray[]  = $dataCount;
+          $babyListArray[]  = $getAllBabyAdmissionData['FacilityName'];
+          $babyListArray[]  = $getAllBabyAdmissionData['loungeName'];
+          $babyListArray[]  = $getAllBabyAdmissionData['babyFileId'];
+          $babyListArray[]  = $getAllBabyAdmissionData['motherName'];
+          $babyListArray[]  = date('jS M Y h:i A',strtotime($getAllBabyAdmissionData['registrationDateTime']));
+          $babyListArray[]  = ($getAllBabyAdmissionData['babyGender'] == "Male") ? "M":"F";
+          $babyListArray[]  = $getAllBabyAdmissionData['admissionHeight'];
+          $babyListArray[]  = $getAllBabyAdmissionData['babyWeight'];
+          $babyListArray[]  = $getAllBabyAdmissionData['babyAdmissionWeight'];
+
+
+          // Get baby weight dates
+          $secondWeightDate = date('Y-m-d', strtotime('+1 day', strtotime($getAllBabyAdmissionData['registrationDateTime'])));
+          $thirdWeightDate = date('Y-m-d', strtotime('+2 day', strtotime($getAllBabyAdmissionData['registrationDateTime'])));
+          $fourthWeightDate = date('Y-m-d', strtotime('+3 day', strtotime($getAllBabyAdmissionData['registrationDateTime'])));
+          $fifthWeightDate = date('Y-m-d', strtotime('+4 day', strtotime($getAllBabyAdmissionData['registrationDateTime'])));
+          $sixthWeightDate = date('Y-m-d', strtotime('+5 day', strtotime($getAllBabyAdmissionData['registrationDateTime'])));
+          $seventhWeightDate = date('Y-m-d', strtotime('+6 day', strtotime($getAllBabyAdmissionData['registrationDateTime'])));
+          
+          // Get baby weight 2
+          $getBabyWeight2 = $this->cmodel->getBabyDailyWeightData($getAllBabyAdmissionData['babyAdmissionId'],$secondWeightDate);
+          if(!empty($getBabyWeight2)){
+            $getBabyWeightValue2 = $getBabyWeight2['babyWeight'];
+            if(!empty($getAllBabyAdmissionData['babyAdmissionWeight'])){
+              $getWeightGainLoss2 = round(((intval($getBabyWeightValue2-$getAllBabyAdmissionData['babyAdmissionWeight']))*100)/$getAllBabyAdmissionData['babyAdmissionWeight'],1);
+            }else{
+              $getWeightGainLoss2 = "";
+            }
+            
+          }else{
+            $getBabyWeightValue2 = "";
+            $getWeightGainLoss2 = "";
+          }
+
+          // Get baby weight 3
+          $getBabyWeight3 = $this->cmodel->getBabyDailyWeightData($getAllBabyAdmissionData['babyAdmissionId'],$thirdWeightDate);
+          if(!empty($getBabyWeight3)){
+            $getBabyWeightValue3 = $getBabyWeight3['babyWeight'];
+
+            // previous weight
+            if(!empty($getBabyWeightValue2)){
+              $previousWeightValue3 = $getBabyWeightValue2;
+            }else{
+              $previousWeightValue3 = $getAllBabyAdmissionData['babyAdmissionWeight'];
+            }
+
+            if(!empty($previousWeightValue3)){
+              $getWeightGainLoss3 = round(((intval($getBabyWeightValue3-$previousWeightValue3))*100)/$previousWeightValue3,1);
+            }else{
+              $getWeightGainLoss3 = "";
+            }
+            
+          }else{
+            $getBabyWeightValue3 = "";
+            $getWeightGainLoss3 = "";
+          }
+
+          // Get baby weight 4
+          $getBabyWeight4 = $this->cmodel->getBabyDailyWeightData($getAllBabyAdmissionData['babyAdmissionId'],$fourthWeightDate);
+          if(!empty($getBabyWeight4)){
+            $getBabyWeightValue4 = $getBabyWeight4['babyWeight'];
+
+            // previous weight
+            if(!empty($getBabyWeightValue3)){
+              $previousWeightValue4 = $getBabyWeightValue3;
+            }else{
+              if(!empty($getBabyWeightValue2)){
+                $previousWeightValue4 = $getBabyWeightValue2;
+              }else{
+                $previousWeightValue4 = $getAllBabyAdmissionData['babyAdmissionWeight'];
+              }
+            }
+
+            if(!empty($previousWeightValue4)){
+              $getWeightGainLoss4 = round(((intval($getBabyWeightValue4-$previousWeightValue4))*100)/$previousWeightValue4,1);
+            }else{
+              $getWeightGainLoss4 = "";
+            }
+            
+          }else{
+            $getBabyWeightValue4 = "";
+            $getWeightGainLoss4 = "";
+          }
+
+          // Get baby weight 5
+          $getBabyWeight5 = $this->cmodel->getBabyDailyWeightData($getAllBabyAdmissionData['babyAdmissionId'],$fifthWeightDate);
+          if(!empty($getBabyWeight5)){
+            $getBabyWeightValue5 = $getBabyWeight5['babyWeight'];
+
+            // previous weight
+            if(!empty($getBabyWeightValue4)){
+              $previousWeightValue5 = $getBabyWeightValue4;
+            }else{
+              if(!empty($getBabyWeightValue3)){
+                $previousWeightValue5 = $getBabyWeightValue3;
+              }else{
+                if(!empty($getBabyWeightValue2)){
+                  $previousWeightValue5 = $getBabyWeightValue2;
+                }else{
+                  $previousWeightValue5 = $getAllBabyAdmissionData['babyAdmissionWeight'];
+                }
+              }
+            }
+
+            if(!empty($previousWeightValue5)){
+              $getWeightGainLoss5 = round(((intval($getBabyWeightValue5-$previousWeightValue5))*100)/$previousWeightValue5,1);
+            }else{
+              $getWeightGainLoss5 = "";
+            }
+            
+          }else{
+            $getBabyWeightValue5 = "";
+            $getWeightGainLoss5 = "";
+          }
+
+          // Get baby weight 6
+          $getBabyWeight6 = $this->cmodel->getBabyDailyWeightData($getAllBabyAdmissionData['babyAdmissionId'],$sixthWeightDate);
+          if(!empty($getBabyWeight6)){
+            $getBabyWeightValue6 = $getBabyWeight6['babyWeight'];
+
+            // previous weight
+            if(!empty($getBabyWeightValue5)){
+              $previousWeightValue6 = $getBabyWeightValue5;
+            }else{
+              if(!empty($getBabyWeightValue4)){
+                $previousWeightValue6 = $getBabyWeightValue4;
+              }else{
+                if(!empty($getBabyWeightValue3)){
+                  $previousWeightValue6 = $getBabyWeightValue3;
+                }else{
+                  if(!empty($getBabyWeightValue2)){
+                    $previousWeightValue6 = $getBabyWeightValue2;
+                  }else{
+                    $previousWeightValue6 = $getAllBabyAdmissionData['babyAdmissionWeight'];
+                  }
+                }
+              }
+            }
+
+            if(!empty($previousWeightValue6)){
+              $getWeightGainLoss6 = round(((intval($getBabyWeightValue6-$previousWeightValue6))*100)/$previousWeightValue6,1);
+            }else{
+              $getWeightGainLoss6 = "";
+            }
+            
+          }else{
+            $getBabyWeightValue6 = "";
+            $getWeightGainLoss6 = "";
+          }
+
+          // Get baby weight 7
+          $getBabyWeight7 = $this->cmodel->getBabyDailyWeightData($getAllBabyAdmissionData['babyAdmissionId'],$seventhWeightDate);
+          if(!empty($getBabyWeight7)){
+            $getBabyWeightValue7 = $getBabyWeight7['babyWeight'];
+
+            // previous weight
+            if(!empty($getBabyWeightValue6)){
+              $previousWeightValue7 = $getBabyWeightValue6;
+            }else{
+              if(!empty($getBabyWeightValue5)){
+                $previousWeightValue7 = $getBabyWeightValue5;
+              }else{
+                if(!empty($getBabyWeightValue4)){
+                  $previousWeightValue7 = $getBabyWeightValue4;
+                }else{
+                  if(!empty($getBabyWeightValue3)){
+                    $previousWeightValue7 = $getBabyWeightValue3;
+                  }else{
+                    if(!empty($getBabyWeightValue2)){
+                      $previousWeightValue7 = $getBabyWeightValue2;
+                    }else{
+                      $previousWeightValue7 = $getAllBabyAdmissionData['babyAdmissionWeight'];
+                    }
+                  }
+                }
+              }
+            }
+
+            if(!empty($previousWeightValue7)){
+              $getWeightGainLoss7 = round(((intval($getBabyWeightValue7-$previousWeightValue7))*100)/$previousWeightValue7,1);
+            }else{
+              $getWeightGainLoss7 = "";
+            }
+            
+          }else{
+            $getBabyWeightValue7 = "";
+            $getWeightGainLoss7 = "";
+          }
+
+          
+          // get last weight data
+          if(!empty($getBabyWeight7)){
+            $getLastWeightData = $getBabyWeight7;
+          }else{
+            if(!empty($getBabyWeight6)){
+              $getLastWeightData = $getBabyWeight6;
+            }else{
+              if(!empty($getBabyWeight5)){
+                $getLastWeightData = $getBabyWeight5;
+              }else{
+                if(!empty($getBabyWeight4)){
+                  $getLastWeightData = $getBabyWeight4;
+                }else{
+                  if(!empty($getBabyWeight3)){
+                    $getLastWeightData = $getBabyWeight3;
+                  }else{
+                    if(!empty($getBabyWeight2)){
+                      $getLastWeightData = $getBabyWeight2;
+                    }else{
+                      $getLastWeightData = "";
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          if(!empty($getLastWeightData)){
+            // total duration
+            $getLastWeightDate = strtotime($getLastWeightData['weightDate'].' 00:00:00');
+            $getAdmissionDate = strtotime($getAllBabyAdmissionData['registrationDateTime']);
+
+            $dateDifference = intval(($getLastWeightDate-$getAdmissionDate)/60);
+            $durationHours = intval($dateDifference/60);
+            $durationMinutes = $dateDifference%60;
+            $totalWeightingDuration = (($durationHours != "0" || $durationHours != "") ? ($durationHours."h "):"").$durationMinutes."m";
+
+            // last profit loss gain
+            $getLastWeight = $getLastWeightData['babyWeight'];
+            $getbabyAdmissionWeight = $getAllBabyAdmissionData['babyAdmissionWeight'];
+            if(!empty($getbabyAdmissionWeight)){
+              $getLastWeightGainLoss = round(((intval($getLastWeight-$getbabyAdmissionWeight))*100)/$getbabyAdmissionWeight,1);
+            }else{
+              $getLastWeightGainLoss = "";
+            }
+          }else{
+            $totalWeightingDuration = "";
+            $getLastWeightGainLoss = "";
+          }
+
+          
+          $babyListArray[]  = $getBabyWeightValue2;
+          $babyListArray[]  = ($getWeightGainLoss2 == "0") ? "0" :(($getWeightGainLoss2 != "") ? $getWeightGainLoss2 : "");
+          $babyListArray[]  = $getBabyWeightValue3;
+          $babyListArray[]  = ($getWeightGainLoss3 == "0") ? "0" :(($getWeightGainLoss3 != "") ? $getWeightGainLoss3 : "");
+          $babyListArray[]  = $getBabyWeightValue4;
+          $babyListArray[]  = ($getWeightGainLoss4 == "0") ? "0" :(($getWeightGainLoss4 != "") ? $getWeightGainLoss4 : "");
+          $babyListArray[]  = $getBabyWeightValue5;
+          $babyListArray[]  = ($getWeightGainLoss5 == "0") ? "0" :(($getWeightGainLoss5 != "") ? $getWeightGainLoss5 : "");
+          $babyListArray[]  = $getBabyWeightValue6;
+          $babyListArray[]  = ($getWeightGainLoss6 == "0") ? "0" :(($getWeightGainLoss6 != "") ? $getWeightGainLoss6 : "");
+          $babyListArray[]  = $getBabyWeightValue7;
+          $babyListArray[]  = ($getWeightGainLoss7 == "0") ? "0" :(($getWeightGainLoss7 != "") ? $getWeightGainLoss7 : "");
+          $babyListArray[]  = ($getAllBabyAdmissionData['dischargeStatus']== "2" || $getAllBabyAdmissionData['dischargeStatus']== "3") ? "Y":"N";
+          $babyListArray[]  = $totalWeightingDuration;
+          $babyListArray[]  = ($getLastWeightGainLoss == "0") ? "0" :(($getLastWeightGainLoss != "") ? $getLastWeightGainLoss : "");
+          $babyListArray[]  = "";
+
+          $objWorkSheet->fromArray($babyListArray, null, 'A'.$a);
+
+          $gainLossArray = array('2'=>$getWeightGainLoss2,'3'=>$getWeightGainLoss3,'4'=>$getWeightGainLoss4,'5'=>$getWeightGainLoss5,'6'=>$getWeightGainLoss6,'7'=>$getWeightGainLoss7);
+
+          // red color if percentage is loss
+          for ($profitRow=2; $profitRow<=7 ; $profitRow++) {
+            $gainLossRow = $gainLossArray[$profitRow];
+            $cellName = array('2'=>'L','3'=>'N','4'=>'P','5'=>'R','6'=>'T','7'=>'V');
+            
+            if($gainLossRow < 0){
+              $lossColorArray = array(
+              'font'  => array(
+                  'color' => array('rgb' => 'FF0000')
+              ));
+            }else{
+              $lossColorArray = array(
+              'font'  => array(
+                  'color' => array('rgb' => '000000')
+              ));
+            }
+
+            $objWorkSheet->getStyle($cellName[$profitRow].$a)->applyFromArray($lossColorArray);
+          }
+
+          // red color if last percentage is loss
+          if($getLastWeightGainLoss < 0){
+              $lastLossColorArray = array(
+              'font'  => array(
+                  'color' => array('rgb' => 'FF0000')
+              ));
+            }else{
+              $lastLossColorArray = array(
+              'font'  => array(
+                  'color' => array('rgb' => '000000')
+              ));
+            }
+
+            $objWorkSheet->getStyle('Y'.$a.'')->applyFromArray($lastLossColorArray);
+            /*********************/
+          
+
+          $styleArray = array(
+            'borders' => array(
+            'allborders' => array(
+            'style' => PHPExcel_Style_Border::BORDER_THIN
+            )
+            )
+          );
+
+          $objWorkSheet->getStyle('A1:Z'.$a.'')->applyFromArray($styleArray);
+
+          $a++;
+          $dataCount++;
+      }
+
+      $objWorkSheet->setTitle('Weight-Report');
+
+
+      $file = "Weight-Report-".date('d-m-Y');  
+      $filename=$file.'.xls';
+      header('Content-Type: application/vnd.ms-excel');
+      header('Content-Disposition: attachment;filename="'.$filename.'"');
+      header('Cache-Control: max-age=0');
+
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+      $objWriter->save('php://output');
+      $objWriter->save(str_replace(__FILE__,'assets/weightReports/'.$filename,__FILE__));
+      chmod('assets/weightReports/'.$filename, 0777);
+
+      // save file log
+      if(!empty($getReportSettings)){
+        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+        if(empty($checkFileExist)){
+          $logData['reportSettingId']      = $getReportSettings['id'];
+          $logData['fileName']             = $filename;
+          $logData['addDate']              = date('Y-m-d');
+          $this->db->insert('reportLogs',$logData);
+        }
+      }
+      
+    }
+
+    // Checkin Checkout Report
     public function sendNurseDutyReport(){
 
       $reportDate = date('jS F Y, l',strtotime("-1 days"));
@@ -135,7 +567,7 @@ class Cronjob extends CI_Controller {
                     $startLimitDate = strtotime($previousDate.' 7:30:00');
                     $endLimitDate = strtotime($currentDate.' 7:30:00');
                     //if(($checkinTimestamp >= $startLimitDate) && ($checkinTimestamp <= $endLimitDate)){
-                      $checkInTime = date('h:i A, jS F Y',strtotime($getNurseAttendanceListData['addDate']));
+                      $checkInTime = date('h:i A, jS M',strtotime($getNurseAttendanceListData['addDate']));
 
                       $splitDate = explode(" ",$getNurseAttendanceListData['addDate']);
                       $newTime = str_replace(":","",$splitDate[1]);
@@ -170,7 +602,7 @@ class Cronjob extends CI_Controller {
                     $startLimitDate = strtotime($previousDate.' 7:31:00');
                     $endLimitDate = strtotime($currentDate.' 8:30:00');
                     if(($checkoutTimestamp >= $startLimitDate) && ($checkoutTimestamp <= $endLimitDate)){
-                        $checkOutTime = date('h:i A, jS F Y',strtotime($getNurseAttendanceListData['modifyDate']));
+                        $checkOutTime = date('h:i A, jS M',strtotime($getNurseAttendanceListData['modifyDate']));
                         $checkoutTimeForDuration = strtotime($getNurseAttendanceListData['modifyDate']);
                     }else{
                         $checkOutTime = "";
@@ -262,13 +694,17 @@ class Cronjob extends CI_Controller {
       chmod('assets/checkinReports/'.$filename, 0777);
 
       // save file log
-      $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
-      if(empty($checkFileExist)){
-        $logData['reportSettingId']      = $getReportSettings['id'];
-        $logData['fileName']             = $filename;
-        $logData['addDate']              = date('Y-m-d',strtotime("-1 days"));
-        $this->db->insert('reportLogs',$logData);
+      if(!empty($getReportSettings)){
+        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+        if(empty($checkFileExist)){
+          $logData['reportSettingId']      = $getReportSettings['id'];
+          $logData['fileName']             = $filename;
+          $logData['addDate']              = date('Y-m-d',strtotime("-1 days"));
+          $this->db->insert('reportLogs',$logData);
+        }
       }
+
+      $this->babyWeightReport();
     }
 
 	
