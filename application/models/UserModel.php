@@ -375,6 +375,9 @@ class UserModel extends CI_Model {
         }
       }
     } 
+
+    $total_mothers = $this->db->get('motherRegistration')->num_rows();
+    $total_baby = $this->db->get('babyRegistration')->num_rows();
                   
     $result = array();
     $result['facility_count'] = $facility;
@@ -386,6 +389,8 @@ class UserModel extends CI_Model {
     $result['cel_emp_list']   = $res_arr_values;
     $result['total_enquiry']   = $total_enquiry;
     $result['total_video']   = $total_video;
+    $result['total_mothers']   = $total_mothers;
+    $result['total_baby']   = $total_baby;
 
     return $result;
   }

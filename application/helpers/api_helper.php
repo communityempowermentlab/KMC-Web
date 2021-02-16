@@ -586,6 +586,8 @@ function messages($resMsg = '', $dynamicValue = '')
         '231' => 'Registration number not exist.',
         '232' => 'No Staff available in this facility.',
         '233' => 'Lounge amenities data not available.',
+        '234' => 'Lounge already loggedin in another device.',
+        '235' => 'Invalid Poster Id.',
         'E' => 'Data Not Found',
         'W' => 'Something Went Wrong',
         'S' => 'Success',

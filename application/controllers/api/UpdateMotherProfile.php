@@ -161,6 +161,20 @@ header('content-type:application/json;charset=utf-8');
         $headers    = apache_request_headers();
         $loungeData = $this->db->get_where('loungeMaster', array('loungeId'=>$requestJson[APP_NAME]['loungeId'],'status'=>'1'));
         $getLoungeData = $loungeData->row_array();
+
+        // mother id validation
+        $validateMotherData = $this->db->get_where('motherRegistration', array('motherId' => $requestJson[APP_NAME]['motherId'],'status'=>1))->row_array();
+        if(empty($validateMotherData)){
+            generateServerResponse('0', '229');
+        }
+
+        // nurse id validation
+        $validateNurseData = $this->db->get_where('staffMaster', array('staffId' => $requestJson[APP_NAME]['staffId'],'status' => '1'))->row_array();
+        if(empty($validateNurseData)){
+            generateServerResponse('0', '227');
+        }
+        
+
         if($allEncrypt == $encryptData)
         {         
             if($loungeData->num_rows() != 0)

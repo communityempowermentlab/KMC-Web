@@ -41,6 +41,28 @@ class PostCounsellingPosterData extends CI_Controller {
             if($headers['package'] == strtolower(md5(PACKAGE)) || $headers['package'] == strtoupper(md5(PACKAGE)))
             { 
         		if ($resultJson == 1 && $resultJson2 == 1) {
+
+                    // validate data
+                    foreach($data['counsellingData'] as $key_poster => $counsellingDataList){
+                        // baby id validation
+                        $validateBabyData = $this->db->get_where('babyRegistration', array('babyId' => $counsellingDataList['babyId'],'status' => '1'))->row_array();
+                        if(empty($validateBabyData)){
+                            generateServerResponse('0', '228');
+                        }
+
+                        // lounge id validation
+                        $validateLoungeData = $this->db->get_where('loungeMaster', array('loungeId' => $counsellingDataList['loungeId'],'status' => '1'))->row_array();
+                        if(empty($validateLoungeData)){
+                            generateServerResponse('0', '211');
+                        }
+
+                        // poster id validation
+                        $validatePosterData = $this->db->get_where('counsellingMaster', array('id' => $counsellingDataList['posterId'],'videoType'=>3,'status' => '1'))->row_array();
+                        if(empty($validatePosterData)){
+                            generateServerResponse('0', '235');
+                        }
+                    }
+
         			$this->ApiModel->postCounsellingPosterData($data);
         		}else{
          		    generateServerResponse('0','101');				

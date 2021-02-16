@@ -57,12 +57,11 @@ class LoungeLogin extends CI_Controller {
                                 // }
 
                                 $loungeDetail = $this->ApiModel->loungeLogin($data);
-                                if($loungeDetail != 0){
-                                     $response['loungeDetails'] = $loungeDetail;
-                                    generateServerResponse('1','S', $response);
-
-                                }else{
+                                if($loungeDetail == "0"){
                                     generateServerResponse('0','P');
+                                }else{
+                                    $response['loungeDetails'] = $loungeDetail;
+                                    generateServerResponse('1','S', $response);
                                 }
                             }else{
                                 

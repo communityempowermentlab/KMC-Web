@@ -118,25 +118,31 @@ class ApiModel extends CI_Model
 
         if ($loungeData->num_rows() != 0)
         {
-            $loginMasterData = array();
-            $loginMasterData['loungeMasterId'] = $request['loungeId'];
-            $loginMasterData['deviceId'] = $request['deviceId'];
-            $loginMasterData['latitude'] = $request['latitude'];
-            $loginMasterData['longitude'] = $request['longitude'];
-            $loginMasterData['fcmId'] = $request['fcmId'];
-            $loginMasterData['loginTime'] = date('Y-m-d H:i:s');
+            $this->db->order_by('loginMaster.id','desc');
+            $checkAlreadyLogin = $this->db->get_where('loginMaster',array('loginMaster.loungeMasterId'=>$request['loungeId'],'type'=>1,'status'=>1))->row_array();
+            //if(empty($checkAlreadyLogin)){
+                $loginMasterData = array();
+                $loginMasterData['loungeMasterId'] = $request['loungeId'];
+                $loginMasterData['deviceId'] = $request['deviceId'];
+                $loginMasterData['latitude'] = $request['latitude'];
+                $loginMasterData['longitude'] = $request['longitude'];
+                $loginMasterData['fcmId'] = $request['fcmId'];
+                $loginMasterData['loginTime'] = date('Y-m-d H:i:s');
 
-            $this
-                ->db
-                ->insert('loginMaster', $loginMasterData);
-            $loginId = $this
-                ->db
-                ->insert_id();
-            $loungeDetail = $loungeData->row_array();
-            $array['loginId'] = $loginId;
-            $array['facilityId'] = $loungeDetail['facilityId'];
-            $array['facilityName'] = getSingleRowFromTable('facilityName', 'facilityId', $loungeDetail['facilityId'], 'facilitylist');
-            return $array;
+                $this
+                    ->db
+                    ->insert('loginMaster', $loginMasterData);
+                $loginId = $this
+                    ->db
+                    ->insert_id();
+                $loungeDetail = $loungeData->row_array();
+                $array['loginId'] = $loginId;
+                $array['facilityId'] = $loungeDetail['facilityId'];
+                $array['facilityName'] = getSingleRowFromTable('facilityName', 'facilityId', $loungeDetail['facilityId'], 'facilitylist');
+                return $array;
+            // }else{
+            //     return 1;
+            // }
         }
         else
         {
@@ -292,7 +298,7 @@ class ApiModel extends CI_Model
     {
         $this
             ->db
-            ->where('id', $request['loginId']);
+            ->where(array('loungeMasterId'=>$request['loungeId'],'type'=>1));
         $this
             ->db
             ->update('loginMaster', array(

@@ -1982,185 +1982,189 @@ class BabyModel extends CI_Model
             $checkDataForAllUpdate = 1; // check for all data synced or not
             foreach ($request['babyWeightData'] as $key => $request)
             {
-                $checkDuplicateData = $this
-                    ->db
-                    ->get_where('babyDailyWeight', array(
-                    'androidUuid' => $request['localId']
-                ))->num_rows();
+                $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => $request['babyId']))->row_array();
 
-                if ($checkDuplicateData == 0)
-                {
-                    $checkDataForAllUpdate = 2;
-                    //get last Baby AdmissionId
-
-                    $this
-                        ->db
-                        ->order_by('id', 'desc');
-
-                    $babyAdmisionLastId = $this
-                        ->db
-                        ->get_where('babyAdmission', array(
-                        'babyId' => $request['babyId']
-                    ))->row_array();
-
-                    $array = array();
-                    $array['androidUuid'] = $request['localId'];
-                    $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
-                    //$array['babyId'] = $request['babyId'];
-                    $array['babyWeight'] = $request['babyWeight'];
-                    //$array['loungeId'] = $request['loungeId'];
-                    $array['nurseId'] = $request['nurseId'];
-
-                    $array['weightDate'] = $request['weightDate'];
-
-                    if ($request['isDeviceAvailAndWorking'] == 'Yes')
-                    {
-                        $array['babyWeightImage'] = ($request['image']) ? saveDynamicImage($request['image'], babyWeightDirectory) : NULL;
-                        $array['isDeviceAvailAndWorking'] = $request['isDeviceAvailAndWorking'];
-                        $array['reasonIfNotWorking'] = NULL;
-                    }
-                    else
-                    {
-                        $array['babyWeightImage'] = NULL;
-                        $array['reasonIfNotWorking'] = $request['reason'];
-                        $array['isDeviceAvailAndWorking'] = $request['isDeviceAvailAndWorking'];
-                    }
-
-                    $array['addDate'] = $request['localDateTime'];
-                    $array['lastSyncedTime'] = date('Y-m-d H:i:s');
-                    $inserted = $this
-                        ->db
-                        ->insert('babyDailyWeight', $array);
-
-                    $lastID = $this
-                        ->db
-                        ->insert_id();
-                    $listID['id'] = $lastID;
-                    $listID['localId'] = $request['localId'];
-
-                    $param[] = $listID;
-                    
-                    $getMotherData = $this
-                        ->db
-                        ->query("select mr.`motherName` from motherRegistration as mr inner join babyRegistration as br on mr.`motherId`=br.`motherId` where br.`babyId`=" . $request['babyId'] . "")->row_array();
-
-                    // create timeline feed
-                    $paramArray = array();
-                    $paramArray['type'] = '2';
-                    //$paramArray['loungeId'] = $request['loungeId'];
-                    $paramArray['babyAdmissionId'] = $babyAdmisionLastId['id'];
-                    $paramArray['grantedForId'] = $lastID;
-
-                    if ($request['isDeviceAvailAndWorking'] == 'Yes')
-                    {
-                        $paramArray['feed'] = "B/O " . (!empty($getMotherData['motherName']) ? $getMotherData['motherName'] : 'UNKNOWN') . " current weight is " . $request['babyWeight'] . " gram.";
-                    }
-                    else
-                    {
-                        $paramArray['feed'] = "B/O " . (!empty($getMotherData['motherName']) ? $getMotherData['motherName'] : 'UNKNOWN') . " weight is not taken with reason " . $request['reason'] . ".";
-                    }
-                    $paramArray['status'] = '1';
-                    $paramArray['addDate'] = date('Y-m-d H:i:s');
-                    $paramArray['modifyDate'] = date('Y-m-d H:i:s');
-
-                    $this
-                        ->db
-                        ->insert('timeline', $paramArray);
-
-                    $this->BabyWeightPDF->WeightpdfGenerate($babyAdmisionLastId['id']);
-
-                    /*$this
-                        ->db
-                        ->order_by('id', 'desc');
-
-                    $PdfName = $this
-                        ->MotherBabyAdmissionModel
-                        ->babyWeightPdfFile($request['loungeId'], $babyAdmisionLastId['id']);
-
-                    $this
-                        ->db
-                        ->where('id', $babyAdmisionLastId['id']);
-
-                    $this
-                        ->db
-                        ->update('babyAdmission', array(
-                        'babyWeightPdfName' => $PdfName
-                    ));*/
-                }
-                else
-                {
-                    //get last Baby AdmissionId
-                    $this
-                        ->db
-                        ->order_by('id', 'desc');
-
-                    $babyAdmisionLastId = $this
-                        ->db
-                        ->get_where('babyAdmission', array(
-                        'babyId' => $request['babyId']
-                    ))->row_array();
-
-                    $array = array();
-                    $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
-                    //$array['babyId'] = $request['babyId'];
-                    $array['babyWeight'] = $request['babyWeight'];
-                    //$array['loungeId'] = $request['loungeId'];
-                    $array['nurseId'] = $request['nurseId'];
-                    $array['androidUuid'] = $request['localId'];
-
-                    $array['weightDate'] = $request['weightDate'];
-                    if ($request['isDeviceAvailAndWorking'] == 'Yes')
-                    {
-                        $array['babyWeightImage'] = ($request['image']) ? saveDynamicImage($request['image'], babyWeightDirectory) : NULL;
-                        $array['isDeviceAvailAndWorking'] = $request['isDeviceAvailAndWorking'];
-                        $array['reasonIfNotWorking'] = NULL;
-                    }
-                    else
-                    {
-                        $array['babyWeightImage'] = NULL;
-                        $array['reasonIfNotWorking'] = $request['reason'];
-                        $array['isDeviceAvailAndWorking'] = $request['isDeviceAvailAndWorking'];
-                    }
-
-                    $array['addDate'] = $request['localDateTime'];
-                    $array['lastSyncedTime'] = date('Y-m-d H:i:s');
-
-                    $this
-                        ->db
-                        ->where('androidUuid', $request['localId']);
-
-                    $this
-                        ->db
-                        ->update('babyDailyWeight', $array);
-
-                    $lastID = $this
+                if((!empty($validateBabyId)) && ($request['nurseId'] != "0") && ($request['nurseId'] != "")){
+                    $checkDuplicateData = $this
                         ->db
                         ->get_where('babyDailyWeight', array(
                         'androidUuid' => $request['localId']
-                    ))->row_array();
+                    ))->num_rows();
 
-                    $listID['id'] = $lastID['id'];
-                    $listID['localId'] = $request['localId'];
-                    $param[] = $listID;
+                    if ($checkDuplicateData == 0)
+                    {
+                        $checkDataForAllUpdate = 2;
+                        //get last Baby AdmissionId
 
-                    $this->BabyWeightPDF->WeightpdfGenerate($babyAdmisionLastId['id']);
+                        $this
+                            ->db
+                            ->order_by('id', 'desc');
 
-                    /*$this
-                        ->db
-                        ->order_by('id', 'desc');
+                        $babyAdmisionLastId = $this
+                            ->db
+                            ->get_where('babyAdmission', array(
+                            'babyId' => $request['babyId']
+                        ))->row_array();
 
-                    $PdfName = $this
-                        ->MotherBabyAdmissionModel
-                        ->babyWeightPdfFile($request['loungeId'], $babyAdmisionLastId['id']);
+                        $array = array();
+                        $array['androidUuid'] = $request['localId'];
+                        $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+                        //$array['babyId'] = $request['babyId'];
+                        $array['babyWeight'] = $request['babyWeight'];
+                        //$array['loungeId'] = $request['loungeId'];
+                        $array['nurseId'] = $request['nurseId'];
 
-                    $this
-                        ->db
-                        ->where('id', $babyAdmisionLastId['id']);
-                    $this
-                        ->db
-                        ->update('babyAdmission', array(
-                        'babyWeightPdfName' => $PdfName
-                    ));*/
+                        $array['weightDate'] = $request['weightDate'];
+
+                        if ($request['isDeviceAvailAndWorking'] == 'Yes')
+                        {
+                            $array['babyWeightImage'] = ($request['image']) ? saveDynamicImage($request['image'], babyWeightDirectory) : NULL;
+                            $array['isDeviceAvailAndWorking'] = $request['isDeviceAvailAndWorking'];
+                            $array['reasonIfNotWorking'] = NULL;
+                        }
+                        else
+                        {
+                            $array['babyWeightImage'] = NULL;
+                            $array['reasonIfNotWorking'] = $request['reason'];
+                            $array['isDeviceAvailAndWorking'] = $request['isDeviceAvailAndWorking'];
+                        }
+
+                        $array['addDate'] = $request['localDateTime'];
+                        $array['lastSyncedTime'] = date('Y-m-d H:i:s');
+                        $inserted = $this
+                            ->db
+                            ->insert('babyDailyWeight', $array);
+
+                        $lastID = $this
+                            ->db
+                            ->insert_id();
+                        $listID['id'] = $lastID;
+                        $listID['localId'] = $request['localId'];
+
+                        $param[] = $listID;
+                        
+                        $getMotherData = $this
+                            ->db
+                            ->query("select mr.`motherName` from motherRegistration as mr inner join babyRegistration as br on mr.`motherId`=br.`motherId` where br.`babyId`=" . $request['babyId'] . "")->row_array();
+
+                        // create timeline feed
+                        $paramArray = array();
+                        $paramArray['type'] = '2';
+                        //$paramArray['loungeId'] = $request['loungeId'];
+                        $paramArray['babyAdmissionId'] = $babyAdmisionLastId['id'];
+                        $paramArray['grantedForId'] = $lastID;
+
+                        if ($request['isDeviceAvailAndWorking'] == 'Yes')
+                        {
+                            $paramArray['feed'] = "B/O " . (!empty($getMotherData['motherName']) ? $getMotherData['motherName'] : 'UNKNOWN') . " current weight is " . $request['babyWeight'] . " gram.";
+                        }
+                        else
+                        {
+                            $paramArray['feed'] = "B/O " . (!empty($getMotherData['motherName']) ? $getMotherData['motherName'] : 'UNKNOWN') . " weight is not taken with reason " . $request['reason'] . ".";
+                        }
+                        $paramArray['status'] = '1';
+                        $paramArray['addDate'] = date('Y-m-d H:i:s');
+                        $paramArray['modifyDate'] = date('Y-m-d H:i:s');
+
+                        $this
+                            ->db
+                            ->insert('timeline', $paramArray);
+
+                        $this->BabyWeightPDF->WeightpdfGenerate($babyAdmisionLastId['id']);
+
+                        /*$this
+                            ->db
+                            ->order_by('id', 'desc');
+
+                        $PdfName = $this
+                            ->MotherBabyAdmissionModel
+                            ->babyWeightPdfFile($request['loungeId'], $babyAdmisionLastId['id']);
+
+                        $this
+                            ->db
+                            ->where('id', $babyAdmisionLastId['id']);
+
+                        $this
+                            ->db
+                            ->update('babyAdmission', array(
+                            'babyWeightPdfName' => $PdfName
+                        ));*/
+                    }
+                    else
+                    {
+                        //get last Baby AdmissionId
+                        $this
+                            ->db
+                            ->order_by('id', 'desc');
+
+                        $babyAdmisionLastId = $this
+                            ->db
+                            ->get_where('babyAdmission', array(
+                            'babyId' => $request['babyId']
+                        ))->row_array();
+
+                        $array = array();
+                        $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+                        //$array['babyId'] = $request['babyId'];
+                        $array['babyWeight'] = $request['babyWeight'];
+                        //$array['loungeId'] = $request['loungeId'];
+                        $array['nurseId'] = $request['nurseId'];
+                        $array['androidUuid'] = $request['localId'];
+
+                        $array['weightDate'] = $request['weightDate'];
+                        if ($request['isDeviceAvailAndWorking'] == 'Yes')
+                        {
+                            $array['babyWeightImage'] = ($request['image']) ? saveDynamicImage($request['image'], babyWeightDirectory) : NULL;
+                            $array['isDeviceAvailAndWorking'] = $request['isDeviceAvailAndWorking'];
+                            $array['reasonIfNotWorking'] = NULL;
+                        }
+                        else
+                        {
+                            $array['babyWeightImage'] = NULL;
+                            $array['reasonIfNotWorking'] = $request['reason'];
+                            $array['isDeviceAvailAndWorking'] = $request['isDeviceAvailAndWorking'];
+                        }
+
+                        $array['addDate'] = $request['localDateTime'];
+                        $array['lastSyncedTime'] = date('Y-m-d H:i:s');
+
+                        $this
+                            ->db
+                            ->where('androidUuid', $request['localId']);
+
+                        $this
+                            ->db
+                            ->update('babyDailyWeight', $array);
+
+                        $lastID = $this
+                            ->db
+                            ->get_where('babyDailyWeight', array(
+                            'androidUuid' => $request['localId']
+                        ))->row_array();
+
+                        $listID['id'] = $lastID['id'];
+                        $listID['localId'] = $request['localId'];
+                        $param[] = $listID;
+
+                        $this->BabyWeightPDF->WeightpdfGenerate($babyAdmisionLastId['id']);
+
+                        /*$this
+                            ->db
+                            ->order_by('id', 'desc');
+
+                        $PdfName = $this
+                            ->MotherBabyAdmissionModel
+                            ->babyWeightPdfFile($request['loungeId'], $babyAdmisionLastId['id']);
+
+                        $this
+                            ->db
+                            ->where('id', $babyAdmisionLastId['id']);
+                        $this
+                            ->db
+                            ->update('babyAdmission', array(
+                            'babyWeightPdfName' => $PdfName
+                        ));*/
+                    }
                 }
             }
             if ($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2)
@@ -2188,130 +2192,134 @@ class BabyModel extends CI_Model
             $checkDataForAllUpdate = 1; // check for all data synced or not
             foreach ($request['feedingData'] as $key => $request)
             {
-                $checkDuplicateData = $this
-                    ->db
-                    ->get_where('babyDailyNutrition', array(
-                    'androidUuid' => $request['localId']
-                ))->num_rows();
+                $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => $request['babyId']))->row_array();
 
-                $checkDataForAllUpdate = 2;
-                $array = array();
-                //$array['babyId'] = $request['babyId'];
-                //$array['loungeId'] = $request['loungeId'];
-                $array['nurseId'] = $request['nurseId'];
-                $array['androidUuid'] = ($request['localId'] != '') ? $request['localId'] : NULL;
-                $array['breastFeedDuration'] = NULL;
-                $array['milkQuantity'] = NULL;
-                $array['feedingType'] = $request['feedingType'];
-                $array['specify'] = NULL;
-
-                if ($request['feedingType'] == '1')
-                {
-                    $array['breastFeedDuration'] = NULL;
-                    $array['milkQuantity'] = NULL;
-                }
-                else
-                {
-                    $array['milkQuantity']  = $request['milkQuantity'];
-                }
-
-                if (isset($request['specify']))
-                {
-                    $array['specify'] = $request['specify'];
-                }
-
-                $array['breastFeedMethod']  = $request['breastFeedMethod'];
-                $array['fluid']             = $request['fluid'];
-
-                $array['feedTime'] = date("H:i", strtotime($request['feedTime']));
-                $array['feedDate'] = date("Y-m-d");
-                $array['addDate'] = $request['localDateTime'];
-                $array['lastSyncedTime']  = date('Y-m-d H:i:s');
-
-                if ($checkDuplicateData == 0)
-                {
-                    
-                    //get last Baby AdmissionId
-                    $this
-                        ->db
-                        ->order_by('id', 'desc');
-
-                    $babyAdmisionLastId = $this
-                        ->db
-                        ->get_where('babyAdmission', array(
-                        'babyId' => $request['babyId']
-                    ))->row_array();
-
-                    $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
-
-                    $inserted = $this
-                        ->db
-                        ->insert('babyDailyNutrition', $array);
-
-                    $lastID = $this
-                        ->db
-                        ->insert_id();
-
-                    $listID['id'] = $lastID;
-                    $listID['localId'] = $request['localId'];
-                    $param[] = $listID;
-                   
-                    $this->BabyFeedingPDF->FeedingpdfGenerate($babyAdmisionLastId['id']);
-
-                    /*$PdfName = $this->babyDailyFeedPDFFile($request['loungeId'], $babyAdmisionLastId['id']);
-                    $this
-                        ->db
-                        ->where('id', $babyAdmisionLastId['id']);
-                    $this
-                        ->db
-                        ->update('babyAdmission', array(
-                        'babyFeedingPdfName' => $PdfName
-                    ));*/
-                }
-                else
-                {
-                    $this
-                        ->db
-                        ->order_by('id', 'desc');
-                    $babyAdmisionLastId = $this
-                        ->db
-                        ->get_where('babyAdmission', array(
-                        'babyId' => $request['babyId']
-                    ))->row_array();
-                    $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
-
-                    $this
-                        ->db
-                        ->where('androidUuid', $request['localId']);
-                    $this
-                        ->db
-                        ->update('babyDailyNutrition', $array);
-                    $lastID = $this
+                if((!empty($validateBabyId)) && ($request['nurseId'] != "0") && ($request['nurseId'] != "")){
+                    $checkDuplicateData = $this
                         ->db
                         ->get_where('babyDailyNutrition', array(
                         'androidUuid' => $request['localId']
-                    ))->row_array();
-            
-                    $listID['id'] = $lastID['id'];
-                    $listID['localId'] = $request['localId'];
-                    $param[] = $listID;
+                    ))->num_rows();
 
-                    $this->BabyFeedingPDF->FeedingpdfGenerate($babyAdmisionLastId['id']);
+                    $checkDataForAllUpdate = 2;
+                    $array = array();
+                    //$array['babyId'] = $request['babyId'];
+                    //$array['loungeId'] = $request['loungeId'];
+                    $array['nurseId'] = $request['nurseId'];
+                    $array['androidUuid'] = ($request['localId'] != '') ? $request['localId'] : NULL;
+                    $array['breastFeedDuration'] = NULL;
+                    $array['milkQuantity'] = NULL;
+                    $array['feedingType'] = $request['feedingType'];
+                    $array['specify'] = NULL;
 
-                    /*$this
-                        ->db
-                        ->order_by('id', 'desc');
+                    if ($request['feedingType'] == '1')
+                    {
+                        $array['breastFeedDuration'] = NULL;
+                        $array['milkQuantity'] = NULL;
+                    }
+                    else
+                    {
+                        $array['milkQuantity']  = $request['milkQuantity'];
+                    }
 
-                    $PdfName = $this->babyDailyFeedPDFFile($request['loungeId'], $babyAdmisionLastId['id']);
-                    
-                    $this
-                        ->db
-                        ->where('id', $babyAdmisionLastId['id']);
-                    $this
-                        ->db
-                        ->update('babyAdmission', array(
-                        'babyFeedingPdfName' => $PdfName
-                    ));*/
+                    if (isset($request['specify']))
+                    {
+                        $array['specify'] = $request['specify'];
+                    }
+
+                    $array['breastFeedMethod']  = $request['breastFeedMethod'];
+                    $array['fluid']             = $request['fluid'];
+
+                    $array['feedTime'] = date("H:i", strtotime($request['feedTime']));
+                    $array['feedDate'] = date("Y-m-d");
+                    $array['addDate'] = $request['localDateTime'];
+                    $array['lastSyncedTime']  = date('Y-m-d H:i:s');
+
+                    if ($checkDuplicateData == 0)
+                    {
+                        
+                        //get last Baby AdmissionId
+                        $this
+                            ->db
+                            ->order_by('id', 'desc');
+
+                        $babyAdmisionLastId = $this
+                            ->db
+                            ->get_where('babyAdmission', array(
+                            'babyId' => $request['babyId']
+                        ))->row_array();
+
+                        $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+
+                        $inserted = $this
+                            ->db
+                            ->insert('babyDailyNutrition', $array);
+
+                        $lastID = $this
+                            ->db
+                            ->insert_id();
+
+                        $listID['id'] = $lastID;
+                        $listID['localId'] = $request['localId'];
+                        $param[] = $listID;
+                       
+                        $this->BabyFeedingPDF->FeedingpdfGenerate($babyAdmisionLastId['id']);
+
+                        /*$PdfName = $this->babyDailyFeedPDFFile($request['loungeId'], $babyAdmisionLastId['id']);
+                        $this
+                            ->db
+                            ->where('id', $babyAdmisionLastId['id']);
+                        $this
+                            ->db
+                            ->update('babyAdmission', array(
+                            'babyFeedingPdfName' => $PdfName
+                        ));*/
+                    }
+                    else
+                    {
+                        $this
+                            ->db
+                            ->order_by('id', 'desc');
+                        $babyAdmisionLastId = $this
+                            ->db
+                            ->get_where('babyAdmission', array(
+                            'babyId' => $request['babyId']
+                        ))->row_array();
+                        $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+
+                        $this
+                            ->db
+                            ->where('androidUuid', $request['localId']);
+                        $this
+                            ->db
+                            ->update('babyDailyNutrition', $array);
+                        $lastID = $this
+                            ->db
+                            ->get_where('babyDailyNutrition', array(
+                            'androidUuid' => $request['localId']
+                        ))->row_array();
+                
+                        $listID['id'] = $lastID['id'];
+                        $listID['localId'] = $request['localId'];
+                        $param[] = $listID;
+
+                        $this->BabyFeedingPDF->FeedingpdfGenerate($babyAdmisionLastId['id']);
+
+                        /*$this
+                            ->db
+                            ->order_by('id', 'desc');
+
+                        $PdfName = $this->babyDailyFeedPDFFile($request['loungeId'], $babyAdmisionLastId['id']);
+                        
+                        $this
+                            ->db
+                            ->where('id', $babyAdmisionLastId['id']);
+                        $this
+                            ->db
+                            ->update('babyAdmission', array(
+                            'babyFeedingPdfName' => $PdfName
+                        ));*/
+                    }
                 }
             }
 
@@ -2346,147 +2354,170 @@ class BabyModel extends CI_Model
                     'androidUuid' => $request['localId']
                 ))->num_rows();
 
-                if ($checkDuplicateData == 0)
-                {
-                    $checkDataForAllUpdate = 2;
-                    $Start = $request['startTime'];
-                    $End = $request['endTime'];
-                    $array = array();
-                    $array['androidUuid'] = $request['localId'];
-                    //$array['babyId'] = $request['babyId'];
-                    $array['nurseId'] = $request['nurseId'];
+                $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => $request['babyId']))->row_array();
 
-                    //$array['loungeId'] = $request['loungeId'];
-                    $array['startTime'] = $request['startTime'];
-                    $array['provider']  = $request['provider'];
-                    $array['endDate']   =  $request['endDate'];
-                    $array['endTime'] = $request['endTime'];
-                    $array['startDate'] = date("Y-m-d", strtotime($request['startDate']));
-                    $array['addDate'] = $request['localDateTime'];
-                    $array['lastSyncedTime'] = date('Y-m-d H:i:s');
-
-                    //get last Baby AdmissionId
-                    $this
-                        ->db
-                        ->order_by('id', 'desc');
-
-                    $babyAdmisionLastId = $this
-                        ->db
-                        ->get_where('babyAdmission', array(
-                        'babyId' => $request['babyId']
-                    ))->row_array();
-
-                    $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
-
-                    $inserted = $this
-                        ->db
-                        ->insert('babyDailyKMC', $array);
-
-                    $lastID = $this
-                        ->db
-                        ->insert_id();
-
-                    $listID['id'] = $lastID;
-                    $listID['localId'] = $request['localId'];;
-                    $param[] = $listID;
-
-                    $motherData = $this
-                        ->db
-                        ->query("select MR.motherId, MR.motherName, BA.babyId FROM  babyRegistration AS BA LEFT JOIN  motherRegistration AS MR  On BA.motherId = MR.motherId  where  BA.babyId ='" . $request['babyId'] . "'")->row_array();
-
-                    $getNurseData = $this
-                        ->db
-                        ->query("select name from staffMaster where staffId=" . $request['nurseId'] . "")->row_array();
-
-                    $totalSscHrs = $this
-                        ->db
-                        ->query("select babyAdmissionId,@totsec:=sum(TIME_TO_SEC(subtime(endTime,startTime))) as totalSeconds, floor(@totsec/3600) as Hours, (@totsec%3600)/60 as Minutes, (@totsec%60) as seconds from `babyDailyKMC` where startTime < endTime and babyAdmissionId=" . $babyAdmisionLastId['id'] . " group by babyAdmissionId")->row_array();
-
-                    $SscHrs = floor(($totalSscHrs['totalSeconds'] / 60) / 60);
-                    $paramArray = array();
-                    $paramArray['type'] = '4';
-                    $paramArray['loungeId'] = $request['loungeId'];
-                    $paramArray['babyAdmissionId'] = $babyAdmisionLastId['id'];
-                    $paramArray['grantedForId'] = $lastID;
-                    $paramArray['feed'] = "B/O " . (!empty($motherData['motherName']) ? $motherData['motherName'] : 'UNKNOWN') . " has been on KMC position for " . $SscHrs . " hrs today 8 AM onwards.";
-                    $paramArray['status'] = '1';
-                    $paramArray['addDate']  = date('Y-m-d H:i:s');
-                    $paramArray['modifyDate']  = date('Y-m-d H:i:s');
-                    $this
-                        ->db
-                        ->insert('timeline', $paramArray);
-
-                    $this->BabyKmcPDF->KMCpdfGenerate($babyAdmisionLastId['id']);
-
-                    /*$this
-                        ->db
-                        ->where('id', $babyAdmisionLastId['id']);
-                    $this
-                        ->db
-                        ->update('babyAdmission', array(
-                        'babyKMCPdfName' => $PdfName
-                    ));*/
+                // kmc data is not less than admission date time
+                $babyAdmissionData = $this->db->get_where('babyAdmission', array('babyId' => $request['babyId']))->row_array();
+                $kmcStartDateTime = strtotime($request['startDate']." ".$request['startTime']);
+                $kmcEndDateTime = strtotime($request['endDate']." ".$request['endTime']);
+                
+                // kmc start date should be greator than last end date time
+                $this->db->order_by('babyDailyKMC.id','desc');
+                $babyLastKmcData = $this->db->get_where('babyDailyKMC', array('babyDailyKMC.babyAdmissionId' => $babyAdmissionData['id']))->row_array();
+                if(!empty($babyLastKmcData['endDate'])){
+                    $kmcLastDateTime = strtotime($babyLastKmcData['endDate']." ".$babyLastKmcData['endTime']);
+                }else{
+                    $kmcLastDateTime = "0";
                 }
-                else
-                {
-                    $Start = $request['startTime'];
-                    $End = $request['endTime'];
-                    $array = array();
-                    $array['androidUuid'] = $request['localId'];
-                    //$array['babyId'] = $request['babyId'];
-                    $array['nurseId'] = $request['nurseId'];
+                
+                
+                if((strtotime($babyAdmissionData['admissionDateTime']) <= $kmcStartDateTime) && ($kmcEndDateTime >= $kmcStartDateTime) && ($kmcStartDateTime >= $kmcLastDateTime) && (!empty($validateBabyId)) && (trim($request['nurseId']) != "0") && (trim($request['nurseId']) != "") && (trim($request['startDate']) != "0000-00-00") && (trim($request['startDate']) != "") && (trim($request['endDate']) != "0000-00-00") && (trim($request['endDate']) != "")){
+                    if ($checkDuplicateData == 0)
+                    {
+                        //get last Baby AdmissionId
+                        $this
+                            ->db
+                            ->order_by('id', 'desc');
 
-                    //$array['loungeId'] = $request['loungeId'];
-                    $array['startTime'] = $request['startTime'];
-                    $array['provider'] = $request['provider'];
-                    $array['endTime'] = $request['endTime'];
-                    $array['endDate']   =  $request['endDate'];
-                    $array['startDate'] = date("Y-m-d", strtotime($request['startDate']));
-                    $array['addDate'] = $request['localDateTime'];
-                    $array['lastSyncedTime']  = date('Y-m-d H:i:s');
+                        $babyAdmisionLastId = $this
+                            ->db
+                            ->get_where('babyAdmission', array(
+                            'babyId' => $request['babyId']
+                        ))->row_array();
 
-                    //get last Baby AdmissionId
-                    $this
-                        ->db
-                        ->order_by('id', 'desc');
+                        // check kmc data already exist 
+                        $getKmcDataAlreadyExist = $this->db->get_where('babyDailyKMC', array('babyAdmissionId'=>$babyAdmisionLastId['id'],'nurseId'=>$request['nurseId'],'startDate'=>$request['startDate'],'startTime'=>$request['startTime'],'endDate'=>$request['endDate'],'endTime'=>$request['endTime']))->row_array();
 
-                    $babyAdmisionLastId = $this
-                        ->db
-                        ->get_where('babyAdmission', array(
-                        'babyId' => $request['babyId']
-                    ))->row_array();
+                        if(empty($getKmcDataAlreadyExist)){
+                            $checkDataForAllUpdate = 2;
+                            $Start = $request['startTime'];
+                            $End = $request['endTime'];
+                            $array = array();
+                            $array['androidUuid'] = $request['localId'];
+                            //$array['babyId'] = $request['babyId'];
+                            $array['nurseId'] = $request['nurseId'];
 
-                    $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+                            //$array['loungeId'] = $request['loungeId'];
+                            $array['startTime'] = $request['startTime'];
+                            $array['provider']  = $request['provider'];
+                            $array['endDate']   =  $request['endDate'];
+                            $array['endTime'] = $request['endTime'];
+                            $array['startDate'] = date("Y-m-d", strtotime($request['startDate']));
+                            $array['addDate'] = $request['localDateTime'];
+                            $array['lastSyncedTime'] = date('Y-m-d H:i:s');
+                            $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
 
-                    $this
-                        ->db
-                        ->where('androidUuid', $request['localId']);
+                            $inserted = $this
+                                ->db
+                                ->insert('babyDailyKMC', $array);
 
-                    $this
-                        ->db
-                        ->update('babyDailyKMC', $array);
+                            $lastID = $this
+                                ->db
+                                ->insert_id();
 
-                    $lastID = $this
-                        ->db
-                        ->get_where('babyDailyKMC', array(
-                        'androidUuid' => $request['localId']
-                    ))->row_array();
+                            $listID['id'] = $lastID;
+                            $listID['localId'] = $request['localId'];
+                            $param[] = $listID;
 
-                    $listID['id'] = $lastID['id'];
-                    $listID['localId'] = $request['localId'];
-                    $param[] = $listID;
+                            $motherData = $this
+                                ->db
+                                ->query("select MR.motherId, MR.motherName, BA.babyId FROM  babyRegistration AS BA LEFT JOIN  motherRegistration AS MR  On BA.motherId = MR.motherId  where  BA.babyId ='" . $request['babyId'] . "'")->row_array();
 
-                    $this->BabyKmcPDF->KMCpdfGenerate($babyAdmisionLastId['id']);
+                            $getNurseData = $this
+                                ->db
+                                ->query("select name from staffMaster where staffId=" . $request['nurseId'] . "")->row_array();
 
-                    /*$PdfName = $this->generateBabyKMCPdfFile($request['loungeId'], $babyAdmisionLastId['id']);
-                    $this
-                        ->db
-                        ->where('id', $babyAdmisionLastId['id']);
-                    $this
-                        ->db
-                        ->update('babyAdmission', array(
-                        'babyKMCPdfName' => $PdfName
-                    ));*/
+                            $totalSscHrs = $this
+                                ->db
+                                ->query("select babyAdmissionId,@totsec:=sum(TIME_TO_SEC(subtime(endTime,startTime))) as totalSeconds, floor(@totsec/3600) as Hours, (@totsec%3600)/60 as Minutes, (@totsec%60) as seconds from `babyDailyKMC` where startTime < endTime and babyAdmissionId=" . $babyAdmisionLastId['id'] . " group by babyAdmissionId")->row_array();
+
+                            $SscHrs = floor(($totalSscHrs['totalSeconds'] / 60) / 60);
+                            $paramArray = array();
+                            $paramArray['type'] = '4';
+                            $paramArray['loungeId'] = $request['loungeId'];
+                            $paramArray['babyAdmissionId'] = $babyAdmisionLastId['id'];
+                            $paramArray['grantedForId'] = $lastID;
+                            $paramArray['feed'] = "B/O " . (!empty($motherData['motherName']) ? $motherData['motherName'] : 'UNKNOWN') . " has been on KMC position for " . $SscHrs . " hrs today 8 AM onwards.";
+                            $paramArray['status'] = '1';
+                            $paramArray['addDate']  = date('Y-m-d H:i:s');
+                            $paramArray['modifyDate']  = date('Y-m-d H:i:s');
+                            $this
+                                ->db
+                                ->insert('timeline', $paramArray);
+
+                            $this->BabyKmcPDF->KMCpdfGenerate($babyAdmisionLastId['id']);
+
+                            /*$this
+                                ->db
+                                ->where('id', $babyAdmisionLastId['id']);
+                            $this
+                                ->db
+                                ->update('babyAdmission', array(
+                                'babyKMCPdfName' => $PdfName
+                            ));*/
+                        }
+                    }
+                    else
+                    {
+                        $Start = $request['startTime'];
+                        $End = $request['endTime'];
+                        $array = array();
+                        $array['androidUuid'] = $request['localId'];
+                        //$array['babyId'] = $request['babyId'];
+                        $array['nurseId'] = $request['nurseId'];
+
+                        //$array['loungeId'] = $request['loungeId'];
+                        $array['startTime'] = $request['startTime'];
+                        $array['provider'] = $request['provider'];
+                        $array['endTime'] = $request['endTime'];
+                        $array['endDate']   =  $request['endDate'];
+                        $array['startDate'] = date("Y-m-d", strtotime($request['startDate']));
+                        $array['addDate'] = $request['localDateTime'];
+                        $array['lastSyncedTime']  = date('Y-m-d H:i:s');
+
+                        //get last Baby AdmissionId
+                        $this
+                            ->db
+                            ->order_by('id', 'desc');
+
+                        $babyAdmisionLastId = $this
+                            ->db
+                            ->get_where('babyAdmission', array(
+                            'babyId' => $request['babyId']
+                        ))->row_array();
+
+                        $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+
+                        $this
+                            ->db
+                            ->where('androidUuid', $request['localId']);
+
+                        $this
+                            ->db
+                            ->update('babyDailyKMC', $array);
+
+                        $lastID = $this
+                            ->db
+                            ->get_where('babyDailyKMC', array(
+                            'androidUuid' => $request['localId']
+                        ))->row_array();
+
+                        $listID['id'] = $lastID['id'];
+                        $listID['localId'] = $request['localId'];
+                        $param[] = $listID;
+
+                        $this->BabyKmcPDF->KMCpdfGenerate($babyAdmisionLastId['id']);
+
+                        /*$PdfName = $this->generateBabyKMCPdfFile($request['loungeId'], $babyAdmisionLastId['id']);
+                        $this
+                            ->db
+                            ->where('id', $babyAdmisionLastId['id']);
+                        $this
+                            ->db
+                            ->update('babyAdmission', array(
+                            'babyKMCPdfName' => $PdfName
+                        ));*/
+                    }
                 }
             }
             if ($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2)
@@ -3948,187 +3979,191 @@ class BabyModel extends CI_Model
             $checkSyncedData = 1; // check for all data synced or not
             foreach ($request['monitoringData'] as $key => $request)
             {
+                $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => $request['babyId']))->row_array();
 
-                $checkSyncedData = 2;
-                //get last Baby AdmissionId
-                $this
-                    ->db
-                    ->order_by('id', 'desc');
+                if((!empty($validateBabyId)) && ($request['staffId'] != "0") && ($request['staffId'] != "")){
 
-                $babyAdmisionLastId = $this
-                    ->db
-                    ->get_where('babyAdmission', array(
-                    'babyId' => $request['babyId']
-                ))->row_array();
-
-                $getCount = $this
-                        ->db
-                        ->query("SELECT * FROM babyDailyMonitoring where babyAdmissionId ='" . $babyAdmisionLastId['id'] . "'")->num_rows();
-                
-
-                $paramsArray['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
-                $paramsArray['staffId'] = $request['staffId'];
-                //$paramsArray['loungeId'] = $request['loungeId'];
-                //$paramsArray['babyId'] = $request['babyId'];
-                $paramsArray['staffSign'] = ($request['staffSign'] != '') ? saveImage($request['staffSign'], signDirectory) : 'NULL';
-                $paramsArray['androidUuid'] = $request['localId'];
-
-                $paramsArray['isThermometerAvailable'] = $request['isThermometerAvailable'];
-
-                if ($request['isThermometerAvailable'] == 'Yes')
-                {
-                    $paramsArray['temperatureValue']    = $request['temperatureValue'];
-                    $paramsArray['temperatureUnit']     = $request['temperatureUnit'];
-                }
-                else
-                {
-                    $paramsArray['temperatureValue']    = NULL;
-                    $paramsArray['temperatureUnit']     = NULL;
-                }
-
-                $paramsArray['respiratoryRate'] = $request['respiratoryRate'];
-                $paramsArray['isPulseOximatoryDeviceAvail'] = $request['isPulseOximatoryDeviceAvail'];
-                if ($request['isPulseOximatoryDeviceAvail'] == 'Yes')
-                {
-                    $paramsArray['spo2'] = $request['spo2'];
-                    $paramsArray['pulseRate'] = $request['pulseRate'];
-                }
-                else
-                {
-                    $paramsArray['spo2'] = NULL;
-                    $paramsArray['pulseRate'] = NULL;
-                }
-
-                $paramsArray['crtKnowledge']        = ($request['crtKnowledge'] != '') ? $request['crtKnowledge'] : NULL;
-                $paramsArray['isCrtGreaterThree']   = ($request['isCrtGreaterThree'] != '') ? $request['isCrtGreaterThree'] : NULL;
-
-                // $paramsArray['gestationalAge']  = ($request['gestationalAge'] != '') ? $request['gestationalAge'] : NULL;
-                $paramsArray['tone']            = ($request['tone'] != '') ? $request['tone'] : NULL;
-                $paramsArray['alertness']       = ($request['alertness'] != '') ? $request['alertness'] : NULL;
-                $paramsArray['color']           = ($request['color'] != '') ? $request['color'] : NULL;
-                
-
-                $paramsArray['apneaOrGasping']  = ($request['apneaGasping'] != '') ? $request['apneaGasping'] : NULL;
-                $paramsArray['grunting']        = ($request['grunting'] != '') ? $request['grunting'] : NULL;
-                $paramsArray['chestIndrawing']  = ($request['chestIndrawing'] != '') ? $request['chestIndrawing'] : NULL;
-
-                $paramsArray['interestInFeeding']   = ($request['interestInFeeding'] != '') ? $request['interestInFeeding'] : NULL;
-                $paramsArray['sufficientLactation'] = ($request['sufficientLactation'] != '') ? $request['sufficientLactation'] : NULL;
-                $paramsArray['sucking']         = ($request['sucking'] != '') ? $request['sucking'] : NULL;
-
-                $paramsArray['umbilicus']       = ($request['umbilicus'] != '') ? $request['umbilicus'] : NULL;
-                $paramsArray['skinPustules']    = ($request['skinPustules'] != '') ? $request['skinPustules'] : NULL;
-
-                // $paramsArray['isAnyComplicationAtBirth']    = ($request['isAnyComplicationAtBirth'] != '') ? $request['isAnyComplicationAtBirth'] : NULL;
-                
-
-                $paramsArray['bulgingAnteriorFontanel']     = ($request['bulgingAnteriorFontanel'] != '') ? $request['bulgingAnteriorFontanel'] : NULL;
-
-                // $paramsArray['convulsions']                 = ($request['convulsions'] != '') ? $request['convulsions'] : NULL;
-                $paramsArray['isBleeding']                  = ($request['isBleeding'] != '') ? $request['isBleeding'] : NULL;
-
-                $paramsArray['urinePassedIn24Hrs']          = ($request['urinePassedIn24Hrs'] != '') ? $request['urinePassedIn24Hrs'] : NULL;
-                $paramsArray['stoolPassedIn24Hrs']          = ($request['stoolPassedIn24Hrs'] != '') ? $request['stoolPassedIn24Hrs'] : NULL;
-                
-
-                $paramsArray['status'] = '1';
-                $paramsArray['assesmentDate'] = date('Y-m-d');
-                $paramsArray['assesmentNumber'] = $getCount + 1;
-                $paramsArray['assesmentTime'] = date('H:i');
-                $paramsArray['addDate'] = $request['localDateTime'];
-                $paramsArray['lastSyncedTime']  = date('Y-m-d H:i:s');
-                $paramsArray['modifyDate']  = $request['localDateTime'];
-
-                $returnArray = isBlankOrNull($paramsArray);
-
-
-                $checkDuplicateData = $this
-                    ->db
-                    ->get_where('babyDailyMonitoring', array(
-                    'androidUuid' => $request['localId']
-                ))->num_rows();
-
-                if ($checkDuplicateData == 0)
-                {
-                
-                    $insert = $this
-                        ->db
-                        ->insert('babyDailyMonitoring', $returnArray);
-
-                    $lastAssessmentId = $this
-                        ->db
-                        ->insert_id();
-                    $listID['id'] = $lastAssessmentId;
-                    $listID['localId'] = $request['localId'];
-                    $param[] = $listID;
-
-                    // generate log history
-                    $getNurseName = $this->db->get_where('staffMaster',array('staffId'=>$request['staffId']))->row_array();
-
-                    $logArray                         = array();
-                    $logArray['tableReference']       = '9';
-                    $logArray['tableReferenceId']     = $lastAssessmentId;
-                    
-                    $logArray['remark']               = $getNurseName['name']." has completed the baby assessment at the time of admission at ".date('d M Y, g:i A',strtotime($request['localDateTime'])).".";
-                    
-                    $logArray['latitude']             = $request['latitude'];
-                    $logArray['longitude']            = $request['longitude'];
-                    $logArray['addDate']              = $request['localDateTime'];
-                    $logArray['lastSyncedTime']       = date('Y-m-d H:i:s');
-                    $this->db->insert('logHistory',$logArray);  
-                    
-
-                    $getMotherData = $this
-                        ->db
-                        ->query("select MR.`motherId`, MR.`motherName`, BA.`babyId` FROM  babyRegistration AS BA LEFT JOIN  motherRegistration AS MR  On BA.`motherId` = MR.`motherId` where  BA.`babyId` ='" . $request['babyId'] . "'")->row_array();
-
-                    $getNurseData = $this
-                        ->db
-                        ->query("select name from staffMaster where staffId=" . $request['staffId'] . "")->row_array();
-
-                    
-
-                    $motherData = $this
-                        ->db
-                        ->query("SELECT MR.`motherId`, MR.`motherName`, BA.`babyId` FROM  babyRegistration AS BA LEFT JOIN  motherRegistration AS MR  On BA.`motherId` = MR.`motherId`  where  BA.`babyId` ='" . $request['babyId'] . "'")->row_array();
-                        
-                    $loungeName = getSingleRowFromTable('loungeName', 'loungeId', $request['loungeId'], 'loungeMaster');
-                    
-                    
-                }
-                else
-                {
+                    $checkSyncedData = 2;
+                    //get last Baby AdmissionId
                     $this
                         ->db
-                        ->where('androidUuid', $request['localId']);
-                    $this
+                        ->order_by('id', 'desc');
+
+                    $babyAdmisionLastId = $this
                         ->db
-                        ->update('babyDailyMonitoring', $paramsArray);
-                    $lastAssessmentId = $this
+                        ->get_where('babyAdmission', array(
+                        'babyId' => $request['babyId']
+                    ))->row_array();
+
+                    $getCount = $this
+                            ->db
+                            ->query("SELECT * FROM babyDailyMonitoring where babyAdmissionId ='" . $babyAdmisionLastId['id'] . "'")->num_rows();
+                    
+
+                    $paramsArray['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+                    $paramsArray['staffId'] = $request['staffId'];
+                    //$paramsArray['loungeId'] = $request['loungeId'];
+                    //$paramsArray['babyId'] = $request['babyId'];
+                    $paramsArray['staffSign'] = ($request['staffSign'] != '') ? saveImage($request['staffSign'], signDirectory) : 'NULL';
+                    $paramsArray['androidUuid'] = $request['localId'];
+
+                    $paramsArray['isThermometerAvailable'] = $request['isThermometerAvailable'];
+
+                    if ($request['isThermometerAvailable'] == 'Yes')
+                    {
+                        $paramsArray['temperatureValue']    = $request['temperatureValue'];
+                        $paramsArray['temperatureUnit']     = $request['temperatureUnit'];
+                    }
+                    else
+                    {
+                        $paramsArray['temperatureValue']    = NULL;
+                        $paramsArray['temperatureUnit']     = NULL;
+                    }
+
+                    $paramsArray['respiratoryRate'] = $request['respiratoryRate'];
+                    $paramsArray['isPulseOximatoryDeviceAvail'] = $request['isPulseOximatoryDeviceAvail'];
+                    if ($request['isPulseOximatoryDeviceAvail'] == 'Yes')
+                    {
+                        $paramsArray['spo2'] = $request['spo2'];
+                        $paramsArray['pulseRate'] = $request['pulseRate'];
+                    }
+                    else
+                    {
+                        $paramsArray['spo2'] = NULL;
+                        $paramsArray['pulseRate'] = NULL;
+                    }
+
+                    $paramsArray['crtKnowledge']        = ($request['crtKnowledge'] != '') ? $request['crtKnowledge'] : NULL;
+                    $paramsArray['isCrtGreaterThree']   = ($request['isCrtGreaterThree'] != '') ? $request['isCrtGreaterThree'] : NULL;
+
+                    // $paramsArray['gestationalAge']  = ($request['gestationalAge'] != '') ? $request['gestationalAge'] : NULL;
+                    $paramsArray['tone']            = ($request['tone'] != '') ? $request['tone'] : NULL;
+                    $paramsArray['alertness']       = ($request['alertness'] != '') ? $request['alertness'] : NULL;
+                    $paramsArray['color']           = ($request['color'] != '') ? $request['color'] : NULL;
+                    
+
+                    $paramsArray['apneaOrGasping']  = ($request['apneaGasping'] != '') ? $request['apneaGasping'] : NULL;
+                    $paramsArray['grunting']        = ($request['grunting'] != '') ? $request['grunting'] : NULL;
+                    $paramsArray['chestIndrawing']  = ($request['chestIndrawing'] != '') ? $request['chestIndrawing'] : NULL;
+
+                    $paramsArray['interestInFeeding']   = ($request['interestInFeeding'] != '') ? $request['interestInFeeding'] : NULL;
+                    $paramsArray['sufficientLactation'] = ($request['sufficientLactation'] != '') ? $request['sufficientLactation'] : NULL;
+                    $paramsArray['sucking']         = ($request['sucking'] != '') ? $request['sucking'] : NULL;
+
+                    $paramsArray['umbilicus']       = ($request['umbilicus'] != '') ? $request['umbilicus'] : NULL;
+                    $paramsArray['skinPustules']    = ($request['skinPustules'] != '') ? $request['skinPustules'] : NULL;
+
+                    // $paramsArray['isAnyComplicationAtBirth']    = ($request['isAnyComplicationAtBirth'] != '') ? $request['isAnyComplicationAtBirth'] : NULL;
+                    
+
+                    $paramsArray['bulgingAnteriorFontanel']     = ($request['bulgingAnteriorFontanel'] != '') ? $request['bulgingAnteriorFontanel'] : NULL;
+
+                    // $paramsArray['convulsions']                 = ($request['convulsions'] != '') ? $request['convulsions'] : NULL;
+                    $paramsArray['isBleeding']                  = ($request['isBleeding'] != '') ? $request['isBleeding'] : NULL;
+
+                    $paramsArray['urinePassedIn24Hrs']          = ($request['urinePassedIn24Hrs'] != '') ? $request['urinePassedIn24Hrs'] : NULL;
+                    $paramsArray['stoolPassedIn24Hrs']          = ($request['stoolPassedIn24Hrs'] != '') ? $request['stoolPassedIn24Hrs'] : NULL;
+                    
+
+                    $paramsArray['status'] = '1';
+                    $paramsArray['assesmentDate'] = date('Y-m-d');
+                    $paramsArray['assesmentNumber'] = $getCount + 1;
+                    $paramsArray['assesmentTime'] = date('H:i');
+                    $paramsArray['addDate'] = $request['localDateTime'];
+                    $paramsArray['lastSyncedTime']  = date('Y-m-d H:i:s');
+                    $paramsArray['modifyDate']  = $request['localDateTime'];
+
+                    $returnArray = isBlankOrNull($paramsArray);
+
+
+                    $checkDuplicateData = $this
                         ->db
                         ->get_where('babyDailyMonitoring', array(
                         'androidUuid' => $request['localId']
-                    ))->row_array();
+                    ))->num_rows();
 
-                    // generate log history
-                    $getNurseName = $this->db->get_where('staffMaster',array('staffId'=>$request['staffId']))->row_array();
+                    if ($checkDuplicateData == 0)
+                    {
+                    
+                        $insert = $this
+                            ->db
+                            ->insert('babyDailyMonitoring', $returnArray);
 
-                    $logArray                         = array();
-                    $logArray['tableReference']       = '9';
-                    
-                    $logArray['remark']               = $getNurseName['name']." has completed the baby assessment at the time of admission at ".date('d M Y, g:i A',strtotime($request['localDateTime'])).".";
-                    
-                    $logArray['latitude']             = $request['latitude'];
-                    $logArray['longitude']            = $request['longitude'];
-                    $logArray['addDate']              = $request['localDateTime'];
-                    $logArray['lastSyncedTime']       = date('Y-m-d H:i:s');
-                    $this->db->where(array('tableReferenceId' => $lastAssessmentId['id'], 'tableReference' => '9'));
-                    $this->db->update('logHistory', $logArray);
-                    
+                        $lastAssessmentId = $this
+                            ->db
+                            ->insert_id();
+                        $listID['id'] = $lastAssessmentId;
+                        $listID['localId'] = $request['localId'];
+                        $param[] = $listID;
 
-                    $listID['id'] = $lastAssessmentId['id'];
-                    $listID['localId'] = $request['localId'];
-                    $param[] = $listID;
+                        // generate log history
+                        $getNurseName = $this->db->get_where('staffMaster',array('staffId'=>$request['staffId']))->row_array();
+
+                        $logArray                         = array();
+                        $logArray['tableReference']       = '9';
+                        $logArray['tableReferenceId']     = $lastAssessmentId;
+                        
+                        $logArray['remark']               = $getNurseName['name']." has completed the baby assessment at the time of admission at ".date('d M Y, g:i A',strtotime($request['localDateTime'])).".";
+                        
+                        $logArray['latitude']             = $request['latitude'];
+                        $logArray['longitude']            = $request['longitude'];
+                        $logArray['addDate']              = $request['localDateTime'];
+                        $logArray['lastSyncedTime']       = date('Y-m-d H:i:s');
+                        $this->db->insert('logHistory',$logArray);  
+                        
+
+                        $getMotherData = $this
+                            ->db
+                            ->query("select MR.`motherId`, MR.`motherName`, BA.`babyId` FROM  babyRegistration AS BA LEFT JOIN  motherRegistration AS MR  On BA.`motherId` = MR.`motherId` where  BA.`babyId` ='" . $request['babyId'] . "'")->row_array();
+
+                        $getNurseData = $this
+                            ->db
+                            ->query("select name from staffMaster where staffId=" . $request['staffId'] . "")->row_array();
+
+                        
+
+                        $motherData = $this
+                            ->db
+                            ->query("SELECT MR.`motherId`, MR.`motherName`, BA.`babyId` FROM  babyRegistration AS BA LEFT JOIN  motherRegistration AS MR  On BA.`motherId` = MR.`motherId`  where  BA.`babyId` ='" . $request['babyId'] . "'")->row_array();
+                            
+                        $loungeName = getSingleRowFromTable('loungeName', 'loungeId', $request['loungeId'], 'loungeMaster');
+                        
+                        
+                    }
+                    else
+                    {
+                        $this
+                            ->db
+                            ->where('androidUuid', $request['localId']);
+                        $this
+                            ->db
+                            ->update('babyDailyMonitoring', $paramsArray);
+                        $lastAssessmentId = $this
+                            ->db
+                            ->get_where('babyDailyMonitoring', array(
+                            'androidUuid' => $request['localId']
+                        ))->row_array();
+
+                        // generate log history
+                        $getNurseName = $this->db->get_where('staffMaster',array('staffId'=>$request['staffId']))->row_array();
+
+                        $logArray                         = array();
+                        $logArray['tableReference']       = '9';
+                        
+                        $logArray['remark']               = $getNurseName['name']." has completed the baby assessment at the time of admission at ".date('d M Y, g:i A',strtotime($request['localDateTime'])).".";
+                        
+                        $logArray['latitude']             = $request['latitude'];
+                        $logArray['longitude']            = $request['longitude'];
+                        $logArray['addDate']              = $request['localDateTime'];
+                        $logArray['lastSyncedTime']       = date('Y-m-d H:i:s');
+                        $this->db->where(array('tableReferenceId' => $lastAssessmentId['id'], 'tableReference' => '9'));
+                        $this->db->update('logHistory', $logArray);
+                        
+
+                        $listID['id'] = $lastAssessmentId['id'];
+                        $listID['localId'] = $request['localId'];
+                        $param[] = $listID;
+                    }
                 }
 
             }

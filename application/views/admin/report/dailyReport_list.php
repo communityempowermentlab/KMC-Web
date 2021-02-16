@@ -132,16 +132,22 @@
                                 <?php 
                                   ($pageNo == '1') ? $counter = '1' : $counter = ((($pageNo*DATA_PER_PAGE)-DATA_PER_PAGE) + 1);
                                   if(!empty($results)) { 
-                                  foreach ($results as $value) { ?>
+                                  foreach ($results as $value) { 
+                                    if($value['reportSettingId'] == "1"){
+                                      $folder_name = "checkinReports";
+                                    }else if($value['reportSettingId'] == "2"){
+                                      $folder_name = "weightReports";
+                                    }else if($value['reportSettingId'] == "3"){
+                                      $folder_name = "kmcPositionDuplicateReports";
+                                    }else{
+                                      $folder_name = "baselineReports";
+                                    }
+                                  ?>
                                   <tr>
                                     <td><?php echo $counter; ?></td>
                                     
-                                    <td><a href="<?php echo base_url(); ?>/assets/checkinReports/<?php echo $value['fileName']; ?>" title="Download Report Information" class="btn btn-info btn-sm">Download</a>
-                                      
-                                    </td>
-                                   
-                                    
-                                    
+                                    <td><a href="<?php echo base_url('assets/Reports/'.$folder_name."/"); ?><?php echo $value['fileName']; ?>" title="Download Report Information" class="btn btn-info btn-sm">Download</a></td>
+
                                     <td><?php echo $value['fileName']; ?></td>
                                     
                                   </tr>

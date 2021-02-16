@@ -1,6 +1,16 @@
 
 
-   
+   <?php $adminData = $this->session->userdata('adminData');
+
+if($adminData['Type']==1) {
+  $action = site_url().'ProfileM/UpdateProfilePost/'.$GetStaff['id'];
+}
+else
+{
+  $action = site_url().'ProfileM/UpdatecoachProfilePost/'.$GetStaff['id'];
+}
+
+    ?>
     <!-- BEGIN: Content-->
   <div class="app-content content">
     <div class="content-overlay"></div>
@@ -35,10 +45,10 @@
         <div class="card-content">
           <div class="card-body">
             <div id="hiddenSms"><?php echo $this->session->flashdata('activate'); ?></div>
-            <form class="form-horizontal" method="post" novalidate action="<?php echo site_url();?>ProfileM/UpdateProfilePost/<?php echo $GetStaff['id'];?>" enctype="multipart/form-data">
+            <form class="form-horizontal" method="post" novalidate action="<?php echo $action; ?>" enctype="multipart/form-data">
 
               <div class="col-12">
-                <h5 class="float-left pr-1">Admin Information</h5>
+                <h5 class="float-left pr-1"> Information</h5>
               </div>
               
               <div class="row col-12">
@@ -51,7 +61,7 @@
                       </div>
                     </div>
                   </div>
-
+                  <?php if($adminData['Type']==1) { ?>
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Email <span class="red">*</span></label>
@@ -60,14 +70,43 @@
                       </div>
                     </div>
                   </div>
+                <?php } else{ ?>
 
                   <div class="col-md-4">
                     <div class="form-group">
+                      <label>Mobile Number <span class="red">*</span></label>
+                      <div class="controls">
+                        <input type="text" class="form-control" onkeypress="checkNum(event)" onblur="checkCoachMobile(this.value, '<?php echo base_url() ?>coachM/checkCoachMobile')" maxlength="10" name="coach_mobile_number" id="coach_mobile_number" placeholder="Mobile Number"  >
+                        <span class="custom-error" id="err_coach_mobile_number"></span>
+                      </div>
+                    </div>
+                  </div>
+                <?php } ?>
+
+                  <div class="col-md-4">
+                    <div class="form-group" id="passwordDiv">
+                    <label>Password <span class="red">*</span></label>
+                    <div class="controls">
+                      <fieldset>
+                        <div class="input-group">
+                          <input type="password" class="form-control hideCls" data-validation-required-message="This field is required" name="password" id="password" placeholder="Password" <?php if($adminData['Type']==1) { ?> value="<?php echo base64_decode($GetStaff['password']) ?>"<?php } ?>>
+                          <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon2-password" onclick="showPassword('password')"><i class="bx bxs-show"></i></span>
+                          </div>
+                        </div>
+                      </fieldset>
+                    </div>
+                  </div>
+
+
+
+
+                    <!-- <div class="form-group">
                       <label>Password </label>
                       <div class="controls">
                         <input type="password" class="form-control"  name="password" id="password" placeholder="*****" value="">
                       </div>
-                    </div>
+                    </div> -->
                   </div>
                   
               </div>

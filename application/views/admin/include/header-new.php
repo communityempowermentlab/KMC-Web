@@ -96,7 +96,14 @@
   <!-- BEGIN: Body-->
   <body class="horizontal-layout horizontal-menu navbar-sticky 2-columns   footer-static  " data-open="hover" data-menu="horizontal-menu" data-col="2-columns">
 
-    <?php $adminData = $this->session->userdata('adminData');   ?>
+    <?php $adminData = $this->session->userdata('adminData');   
+          if($adminData['Type']==1) {
+            $userlogindata  = $this->UserModel->GetDataById('adminMaster',$adminData['Id']);
+          }
+          else{
+            $userlogindata  = $this->UserModel->GetDataById('coachMaster',$adminData['Id']);
+          }
+    ?>
 
     <!-- BEGIN: Header-->
     <nav class="header-navbar navbar-expand-lg navbar navbar-with-menu navbar-fixed bg-primary navbar-brand-center">
@@ -179,10 +186,18 @@
                 </ul>
               </li>
               <li class="dropdown dropdown-user nav-item"><a class="dropdown-toggle nav-link dropdown-user-link" href="#" data-toggle="dropdown">
-                  <div class="user-nav d-lg-flex d-none"><span class="user-name"><?php echo $adminData['Name']; ?></span><span class="user-status">Available</span></div><span><img class="round" src="<?php echo base_url(); ?>app-assets/images/portrait/small/avatar-s-11.jpg" alt="avatar" height="40" width="40"></span></a>
+                  <div class="user-nav d-lg-flex d-none"><span class="user-name"><?php echo $adminData['Name']; ?></span><span class="user-status">Available</span></div><span>
+                    <?php if($userlogindata['profileImage']){ ?>
+                      <img class="round" src="<?php echo base_url(); ?>assets/admin/<?php echo $userlogindata['profileImage']; ?>" alt="avatar" height="40" width="40">
+                      <?php
+                    } else{ ?>
+                      <img class="round" src="<?php echo base_url(); ?>app-assets/images/portrait/small/avatar-s-11.jpg" alt="avatar" height="40" width="40">
+                    <?php } ?>
+                    <!-- <img class="round" src="<?php echo base_url(); ?>app-assets/images/portrait/small/avatar-s-11.jpg" alt="avatar" height="40" width="40"> -->
+                  </span></a>
                 <div class="dropdown-menu dropdown-menu-right pb-0">
 
-                  <?php if($adminData['Type']==1) { $profileUrl = base_url()."ProfileM/updateProfile"; } else { $profileUrl = base_url()."ProfileM/updateEmployeeProfile";  } ?>
+                  <?php if($adminData['Type']==1) { $profileUrl = base_url()."ProfileM/updateProfile"; } else { $profileUrl = base_url()."ProfileM/updateProfile";  } ?>
                   <a class="dropdown-item" href="<?= $profileUrl; ?>"><i class="bx bx-user mr-50"></i> Edit Profile</a>
                   
                   <a class="dropdown-item" href="app-email.html"><i class="bx bx-envelope mr-50"></i> My Inbox</a><a class="dropdown-item" href="app-todo.html"><i class="bx bx-check-square mr-50"></i> Task</a><a class="dropdown-item" href="app-chat.html"><i class="bx bx-message mr-50"></i> Chats</a>

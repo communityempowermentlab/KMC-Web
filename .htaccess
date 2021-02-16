@@ -6,4 +6,14 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php?/$1 [L,QSA]
 #Fix Rewrite
   
-Options -Multiviews
+#Options -Multiviews
+
+# directory browsing
+Options All -Indexes
+
+
+ErrorDocument 400 http://localhost/KMC-Web/Forbiden/index
+ErrorDocument 401 http://localhost/KMC-Web/Forbiden/index
+ErrorDocument 403 http://localhost/KMC-Web/Forbiden/index
+ErrorDocument 404 http://localhost/KMC-Web/Forbiden/index
+ErrorDocument 500 http://localhost/KMC-Web/Forbiden/index

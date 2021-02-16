@@ -49,6 +49,289 @@ class Cronjob extends CI_Controller {
         $this->load->library('excel');
     }
 
+    // Baseline information available report
+    public function getBaselineInfoAvailableReport(){
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->mergeCells('A1:G1');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+
+      for($col = ord('A'); $col <= ord('G'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."3")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
+      $objWorkSheet->getColumnDimension('B')->setWidth(20);
+      $objWorkSheet->getColumnDimension('C')->setWidth(24);
+      $objWorkSheet->getColumnDimension('D')->setWidth(15);
+      $objWorkSheet->getColumnDimension('E')->setWidth(15);
+      $objWorkSheet->getColumnDimension('F')->setWidth(15);
+      $objWorkSheet->getColumnDimension('G')->setWidth(15);
+
+      for($col = ord('A'); $col <= ord('G'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->setCellValue('A3', 'Sr. No.');
+      $objWorkSheet->setCellValue('B3', 'Facility Name');
+      $objWorkSheet->setCellValue('C3', 'Lounge Name');
+      $objWorkSheet->setCellValue('D3', 'Staff Nurse');
+      $objWorkSheet->setCellValue('E3', 'Doctor');
+      $objWorkSheet->setCellValue('F3', 'Amenities');
+      $objWorkSheet->setCellValue('G3', 'Password');
+      $objWorkSheet->setCellValue('A1', 'Baseline Report');
+
+      $getReportSettings = $this->cmodel->getReportSettings(4);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+
+      // Get all lounges
+      $getAllLounges = $this->cmodel->getAllLounges($loungeArray);
+      $dataCount = 1;
+      $a=4;
+
+      foreach($getAllLounges as $key_lounge => $getAllLoungesData){
+
+        $nurse_condition = array('staffMaster.facilityId'=>$getAllLoungesData['facilityId'],'staffMaster.staffType'=>2,'staffMaster.status'=>1);
+        $nurseData = $this->cmodel->getCountDataByTable('staffMaster',$nurse_condition);
+
+        $doctor_condition = array('staffMaster.facilityId'=>$getAllLoungesData['facilityId'],'staffMaster.staffType'=>1,'staffMaster.status'=>1);
+        $doctorData = $this->cmodel->getCountDataByTable('staffMaster',$doctor_condition);
+
+        $amenities_condition = array('loungeAmenities.loungeId'=>$getAllLoungesData['loungeId']);
+        $amenitiesData = $this->cmodel->getCountDataByTable('loungeAmenities',$amenities_condition);
+
+        $loungeListArray    = [];
+        $loungeListArray[]  = $dataCount;
+        $loungeListArray[]  = $getAllLoungesData['FacilityName'];
+        $loungeListArray[]  = $getAllLoungesData['loungeName'];
+        $loungeListArray[]  = ($nurseData > 0) ? "Yes" : "No";
+        $loungeListArray[]  = ($doctorData > 0) ? "Yes" : "No";
+        $loungeListArray[]  = ($amenitiesData > 0) ? "Yes" : "No";
+        $loungeListArray[]  = ($getAllLoungesData['loungePassword'] != "") ? "Yes" : "No";
+
+        $objWorkSheet->fromArray($loungeListArray, null, 'A'.$a);
+
+        $styleArray = array(
+          'borders' => array(
+          'allborders' => array(
+          'style' => PHPExcel_Style_Border::BORDER_THIN
+          )
+          )
+        );
+
+        $objWorkSheet->getStyle('A1:G'.$a.'')->applyFromArray($styleArray);
+
+        // red color if data not available
+        if($nurseData == 0){
+          $nurseColorArray = array(
+          'font'  => array(
+              'color' => array('rgb' => 'FF0000')
+          ));
+        }else{
+          $nurseColorArray = array(
+          'font'  => array(
+              'color' => array('rgb' => '000000')
+          ));
+        }
+
+        if($doctorData == 0){
+          $doctorColorArray = array(
+          'font'  => array(
+              'color' => array('rgb' => 'FF0000')
+          ));
+        }else{
+          $doctorColorArray = array(
+          'font'  => array(
+              'color' => array('rgb' => '000000')
+          ));
+        }
+
+        if($amenitiesData == 0){
+          $amenitiesColorArray = array(
+          'font'  => array(
+              'color' => array('rgb' => 'FF0000')
+          ));
+        }else{
+          $amenitiesColorArray = array(
+          'font'  => array(
+              'color' => array('rgb' => '000000')
+          ));
+        }
+
+        if($getAllLoungesData['loungePassword'] == ""){
+          $passwordColorArray = array(
+          'font'  => array(
+              'color' => array('rgb' => 'FF0000')
+          ));
+        }else{
+          $passwordColorArray = array(
+          'font'  => array(
+              'color' => array('rgb' => '000000')
+          ));
+        }
+
+        $objWorkSheet->getStyle('D'.$a.'')->applyFromArray($nurseColorArray);
+        $objWorkSheet->getStyle('E'.$a.'')->applyFromArray($doctorColorArray);
+        $objWorkSheet->getStyle('F'.$a.'')->applyFromArray($amenitiesColorArray);
+        $objWorkSheet->getStyle('G'.$a.'')->applyFromArray($passwordColorArray);
+
+        $a++;
+        $dataCount++;
+      }
+
+      $objWorkSheet->setTitle('Baseline Report');
+
+      $file = "Baseline-Report-".date('d-m-Y');  
+      $filename=$file.'.xls';
+      header('Content-Type: application/vnd.ms-excel');
+      header('Content-Disposition: attachment;filename="'.$filename.'"');
+      header('Cache-Control: max-age=0');
+
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+      $objWriter->save('php://output');
+      $objWriter->save(str_replace(__FILE__,'assets/Reports/baselineReports/'.$filename,__FILE__));
+      chmod('assets/Reports/baselineReports/'.$filename, 0777);
+
+      // save file log
+      if(!empty($getReportSettings)){
+        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+        if(empty($checkFileExist)){
+          $logData['reportSettingId']      = $getReportSettings['id'];
+          $logData['fileName']             = $filename;
+          $logData['addDate']              = date('Y-m-d');
+          $this->db->insert('reportLogs',$logData);
+        }
+      }
+    }
+
+    // KMC Position duplicate records
+    public function getKmcPositionDuplicateReport(){
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->mergeCells('A1:G1');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+
+      for($col = ord('A'); $col <= ord('K'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."3")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
+      $objWorkSheet->getColumnDimension('B')->setWidth(18);
+      $objWorkSheet->getColumnDimension('C')->setWidth(24);
+      $objWorkSheet->getColumnDimension('D')->setWidth(18);
+      $objWorkSheet->getColumnDimension('E')->setWidth(20);
+      $objWorkSheet->getColumnDimension('F')->setWidth(18);
+      $objWorkSheet->getColumnDimension('G')->setWidth(10);
+      $objWorkSheet->getColumnDimension('H')->setWidth(10);
+      $objWorkSheet->getColumnDimension('I')->setWidth(10);
+      $objWorkSheet->getColumnDimension('J')->setWidth(10);
+      $objWorkSheet->getColumnDimension('K')->setWidth(15);
+
+      for($col = ord('A'); $col <= ord('K'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->setCellValue('A3', 'Sr. No.');
+      $objWorkSheet->setCellValue('B3', 'Facility Name');
+      $objWorkSheet->setCellValue('C3', 'Lounge Name');
+      $objWorkSheet->setCellValue('D3', 'Baby Admission Id');
+      $objWorkSheet->setCellValue('E3', 'Baby Reg. No.');
+      $objWorkSheet->setCellValue('F3', 'Mother Name');
+      $objWorkSheet->setCellValue('G3', 'Start Date');
+      $objWorkSheet->setCellValue('H3', 'Start Time');
+      $objWorkSheet->setCellValue('I3', 'End Date');
+      $objWorkSheet->setCellValue('J3', 'End Time');
+      $objWorkSheet->setCellValue('K3', 'Duplicate Records');
+      $objWorkSheet->setCellValue('A1', 'KMC Position Duplicate Record Report');
+
+      $getReportSettings = $this->cmodel->getReportSettings(3);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+
+      // Get all baby
+      $getAllBabyAdmission = $this->cmodel->getBabyAdmissionList($loungeArray);
+      $dataCount = 1;
+      $a=4;
+
+      foreach($getAllBabyAdmission as $key_baby => $getAllBabyAdmissionData){
+
+          // get duplicate records
+          $getDuplicateRecords = $this->cmodel->getKmcPositionDuplicateData($getAllBabyAdmissionData['babyAdmissionId']);
+          foreach($getDuplicateRecords as $key_position => $getDuplicateRecordsData){
+            if(!empty($getDuplicateRecordsData)){
+              $babyListArray    = [];
+              $babyListArray[]  = $dataCount;
+              $babyListArray[]  = $getAllBabyAdmissionData['FacilityName'];
+              $babyListArray[]  = $getAllBabyAdmissionData['loungeName'];
+              $babyListArray[]  = $getAllBabyAdmissionData['babyAdmissionId'];
+              $babyListArray[]  = $getAllBabyAdmissionData['babyFileId'];
+              $babyListArray[]  = $getAllBabyAdmissionData['motherName'];
+              $babyListArray[]  = $getDuplicateRecordsData['startDate'];
+              $babyListArray[]  = $getDuplicateRecordsData['startTime'];
+              $babyListArray[]  = $getDuplicateRecordsData['endDate'];
+              $babyListArray[]  = $getDuplicateRecordsData['endTime'];
+              $babyListArray[]  = $getDuplicateRecordsData['duplicateCount'];
+
+              $objWorkSheet->fromArray($babyListArray, null, 'A'.$a);
+
+              $styleArray = array(
+                'borders' => array(
+                'allborders' => array(
+                'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+                )
+              );
+
+              $objWorkSheet->getStyle('A1:K'.$a.'')->applyFromArray($styleArray);
+
+              $a++;
+              $dataCount++;
+            }
+          }
+
+      }
+
+      $objWorkSheet->setTitle('KMC Position Duplicate Record');
+
+      $file = "KMC-Position-Duplicate-Record-Report-".date('d-m-Y');  
+      $filename=$file.'.xls';
+      header('Content-Type: application/vnd.ms-excel');
+      header('Content-Disposition: attachment;filename="'.$filename.'"');
+      header('Cache-Control: max-age=0');
+
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+      $objWriter->save('php://output');
+      $objWriter->save(str_replace(__FILE__,'assets/Reports/kmcPositionDuplicateReports/'.$filename,__FILE__));
+      chmod('assets/Reports/kmcPositionDuplicateReports/'.$filename, 0777);
+
+      // save file log
+      if(!empty($getReportSettings)){
+        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+        if(empty($checkFileExist)){
+          $logData['reportSettingId']      = $getReportSettings['id'];
+          $logData['fileName']             = $filename;
+          $logData['addDate']              = date('Y-m-d');
+          $this->db->insert('reportLogs',$logData);
+        }
+      }
+
+    }
+
     // Baby Weight Report
     public function babyWeightReport(){
       $objPHPExcel = new PHPExcel();
@@ -59,72 +342,97 @@ class Cronjob extends CI_Controller {
       $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
       $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
 
-      for($col = ord('A'); $col <= ord('Z'); $col++)
-      {
-        $objWorkSheet->getStyle(chr($col)."3")->getFont()->setBold(true)->setSize(10);
-        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setWrapText(true);
-      }
+      $objWorkSheet->getStyle('A3:AO3')->getFont()->setBold(true)->setSize(10);
+      $objWorkSheet->getStyle('A3:AO3')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A3:AO3')->getAlignment()->setWrapText(true);
 
       $objWorkSheet->getColumnDimension('A')->setWidth(8);
       $objWorkSheet->getColumnDimension('B')->setWidth(18);
       $objWorkSheet->getColumnDimension('C')->setWidth(24);
       $objWorkSheet->getColumnDimension('D')->setWidth(15);
       $objWorkSheet->getColumnDimension('E')->setWidth(16);
-      $objWorkSheet->getColumnDimension('F')->setWidth(25);
-      $objWorkSheet->getColumnDimension('G')->setWidth(8);
-      $objWorkSheet->getColumnDimension('H')->setWidth(18);
-      $objWorkSheet->getColumnDimension('I')->setWidth(16);
-      $objWorkSheet->getColumnDimension('J')->setWidth(20);
-      $objWorkSheet->getColumnDimension('K')->setWidth(16);
-      $objWorkSheet->getColumnDimension('L')->setWidth(30);
+      $objWorkSheet->getColumnDimension('F')->setWidth(15);
+      $objWorkSheet->getColumnDimension('G')->setWidth(15);
+      $objWorkSheet->getColumnDimension('H')->setWidth(8);
+      $objWorkSheet->getColumnDimension('I')->setWidth(18);
+      $objWorkSheet->getColumnDimension('J')->setWidth(16);
+      $objWorkSheet->getColumnDimension('K')->setWidth(20);
+      $objWorkSheet->getColumnDimension('L')->setWidth(16);
       $objWorkSheet->getColumnDimension('M')->setWidth(16);
-      $objWorkSheet->getColumnDimension('N')->setWidth(30);
-      $objWorkSheet->getColumnDimension('O')->setWidth(16);
-      $objWorkSheet->getColumnDimension('P')->setWidth(30);
+      $objWorkSheet->getColumnDimension('N')->setWidth(33);
+      $objWorkSheet->getColumnDimension('O')->setWidth(33);
+      $objWorkSheet->getColumnDimension('P')->setWidth(16);
       $objWorkSheet->getColumnDimension('Q')->setWidth(16);
-      $objWorkSheet->getColumnDimension('R')->setWidth(30);
-      $objWorkSheet->getColumnDimension('S')->setWidth(16);
-      $objWorkSheet->getColumnDimension('T')->setWidth(30);
+      $objWorkSheet->getColumnDimension('R')->setWidth(35);
+      $objWorkSheet->getColumnDimension('S')->setWidth(35);
+      $objWorkSheet->getColumnDimension('T')->setWidth(16);
       $objWorkSheet->getColumnDimension('U')->setWidth(16);
-      $objWorkSheet->getColumnDimension('V')->setWidth(30);
-      $objWorkSheet->getColumnDimension('W')->setWidth(10);
+      $objWorkSheet->getColumnDimension('V')->setWidth(35);
+      $objWorkSheet->getColumnDimension('W')->setWidth(35);
       $objWorkSheet->getColumnDimension('X')->setWidth(16);
-      $objWorkSheet->getColumnDimension('Y')->setWidth(18);
-      $objWorkSheet->getColumnDimension('Z')->setWidth(20);
+      $objWorkSheet->getColumnDimension('Y')->setWidth(16);
+      $objWorkSheet->getColumnDimension('Z')->setWidth(35);
+      $objWorkSheet->getColumnDimension('AA')->setWidth(35);
+      $objWorkSheet->getColumnDimension('AB')->setWidth(16);
+      $objWorkSheet->getColumnDimension('AC')->setWidth(16);
+      $objWorkSheet->getColumnDimension('AD')->setWidth(35);
+      $objWorkSheet->getColumnDimension('AE')->setWidth(35);
+      $objWorkSheet->getColumnDimension('AF')->setWidth(16);
+      $objWorkSheet->getColumnDimension('AG')->setWidth(16);
+      $objWorkSheet->getColumnDimension('AH')->setWidth(35);
+      $objWorkSheet->getColumnDimension('AI')->setWidth(35);
+      $objWorkSheet->getColumnDimension('AJ')->setWidth(12);
+      $objWorkSheet->getColumnDimension('AK')->setWidth(13);
+      $objWorkSheet->getColumnDimension('AL')->setWidth(16);
+      $objWorkSheet->getColumnDimension('AM')->setWidth(20);
+      $objWorkSheet->getColumnDimension('AN')->setWidth(16);
+      $objWorkSheet->getColumnDimension('AO')->setWidth(20);
 
-      for($col = ord('A'); $col <= ord('Z'); $col++){
-        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
-        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
-      }
+      $objWorkSheet->getStyle('A:AO')->getFont()->setSize(10);
+      $objWorkSheet->getStyle('A:AO')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A:AO')->getAlignment()->setWrapText(true);
 
       $objWorkSheet->setCellValue('A3', 'Sr. No.');
       $objWorkSheet->setCellValue('B3', 'Facility Name');
       $objWorkSheet->setCellValue('C3', 'Lounge Name');
       $objWorkSheet->setCellValue('D3', 'Reg. No.');
       $objWorkSheet->setCellValue('E3', 'Mother Name');
-      $objWorkSheet->setCellValue('F3', 'Admission Date & Time');
-      $objWorkSheet->setCellValue('G3', 'Gender');
-      $objWorkSheet->setCellValue('H3', 'Admission Height(cm)');
-      $objWorkSheet->setCellValue('I3', 'Birth Weight(gm)');
-      $objWorkSheet->setCellValue('J3', 'Admission Weight(gm)');
-      $objWorkSheet->setCellValue('K3', 'Day 2 Weight(gm)');
-      $objWorkSheet->setCellValue('L3', 'Gain/Loss % (Day 2-Admission Weight)');
-      $objWorkSheet->setCellValue('M3', 'Day 3 Weight(gm)');
-      $objWorkSheet->setCellValue('N3', 'Gain/Loss % (Current Weight-Last Weight)');
-      $objWorkSheet->setCellValue('O3', 'Day 4 Weight(gm)');
-      $objWorkSheet->setCellValue('P3', 'Gain/Loss % (Current Weight-Last Weight)');
-      $objWorkSheet->setCellValue('Q3', 'Day 5 Weight(gm)');
-      $objWorkSheet->setCellValue('R3', 'Gain/Loss % (Current Weight-Last Weight)');
-      $objWorkSheet->setCellValue('S3', 'Day 6 Weight(gm)');
-      $objWorkSheet->setCellValue('T3', 'Gain/Loss % (Current Weight-Last Weight)');
-      $objWorkSheet->setCellValue('U3', 'Day 7 Weight(gm)');
-      $objWorkSheet->setCellValue('V3', 'Gain/Loss % (Current Weight-Last Weight)');
-      $objWorkSheet->setCellValue('W3', 'Discharge');
-      $objWorkSheet->setCellValue('X3', 'Total duration');
-      $objWorkSheet->setCellValue('Y3', 'Overall Gain/Loss (%)');
-      $objWorkSheet->setCellValue('Z3', 'Remarks');
+      $objWorkSheet->setCellValue('F3', 'Admission Date');
+      $objWorkSheet->setCellValue('G3', 'Admission Time');
+      $objWorkSheet->setCellValue('H3', 'Gender');
+      $objWorkSheet->setCellValue('I3', 'Admission Height(cm)');
+      $objWorkSheet->setCellValue('J3', 'Birth Weight(gm)');
+      $objWorkSheet->setCellValue('K3', 'Admission Weight(gm)');
+      $objWorkSheet->setCellValue('L3', 'Day 2 Weight(gm)');
+      $objWorkSheet->setCellValue('M3', 'Day 2 KMC');
+      $objWorkSheet->setCellValue('N3', 'Difference (Day 2-Admission Weight)');
+      $objWorkSheet->setCellValue('O3', 'Gain/Loss % (Day 2-Admission Weight)');
+      $objWorkSheet->setCellValue('P3', 'Day 3 Weight(gm)');
+      $objWorkSheet->setCellValue('Q3', 'Day 3 KMC');
+      $objWorkSheet->setCellValue('R3', 'Difference (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('S3', 'Gain/Loss % (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('T3', 'Day 4 Weight(gm)');
+      $objWorkSheet->setCellValue('U3', 'Day 4 KMC');
+      $objWorkSheet->setCellValue('V3', 'Difference (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('W3', 'Gain/Loss % (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('X3', 'Day 5 Weight(gm)');
+      $objWorkSheet->setCellValue('Y3', 'Day 5 KMC');
+      $objWorkSheet->setCellValue('Z3', 'Difference (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('AA3', 'Gain/Loss % (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('AB3', 'Day 6 Weight(gm)');
+      $objWorkSheet->setCellValue('AC3', 'Day 6 KMC');
+      $objWorkSheet->setCellValue('AD3', 'Difference (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('AE3', 'Gain/Loss % (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('AF3', 'Day 7 Weight(gm)');
+      $objWorkSheet->setCellValue('AG3', 'Day 7 KMC');
+      $objWorkSheet->setCellValue('AH3', 'Difference (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('AI3', 'Gain/Loss % (Current Weight-Last Weight)');
+      $objWorkSheet->setCellValue('AJ3', 'Discharge');
+      $objWorkSheet->setCellValue('AK3', 'Total Duration');
+      $objWorkSheet->setCellValue('AL3', 'Total Difference');
+      $objWorkSheet->setCellValue('AM3', 'Overall Gain/Loss (%)');
+      $objWorkSheet->setCellValue('AN3', 'Total KMC');
+      $objWorkSheet->setCellValue('AO3', 'Remarks');
 
       $objWorkSheet->setCellValue('A1', 'Weight Report');
 
@@ -133,6 +441,7 @@ class Cronjob extends CI_Controller {
 
       // Get all baby
       $getAllBabyAdmission = $this->cmodel->getBabyAdmissionData($loungeArray);
+      $babyTotalKmc = 0;
       $dataCount = 1;
       $a=4;
 
@@ -144,7 +453,8 @@ class Cronjob extends CI_Controller {
           $babyListArray[]  = $getAllBabyAdmissionData['loungeName'];
           $babyListArray[]  = $getAllBabyAdmissionData['babyFileId'];
           $babyListArray[]  = $getAllBabyAdmissionData['motherName'];
-          $babyListArray[]  = date('jS M Y h:i A',strtotime($getAllBabyAdmissionData['registrationDateTime']));
+          $babyListArray[]  = date('jS M',strtotime($getAllBabyAdmissionData['registrationDateTime']));
+          $babyListArray[]  = date('h:i A',strtotime($getAllBabyAdmissionData['registrationDateTime']));
           $babyListArray[]  = ($getAllBabyAdmissionData['babyGender'] == "Male") ? "M":"F";
           $babyListArray[]  = $getAllBabyAdmissionData['admissionHeight'];
           $babyListArray[]  = $getAllBabyAdmissionData['babyWeight'];
@@ -165,14 +475,20 @@ class Cronjob extends CI_Controller {
             $getBabyWeightValue2 = $getBabyWeight2['babyWeight'];
             if(!empty($getAllBabyAdmissionData['babyAdmissionWeight'])){
               $getWeightGainLoss2 = round(((intval($getBabyWeightValue2-$getAllBabyAdmissionData['babyAdmissionWeight']))*100)/$getAllBabyAdmissionData['babyAdmissionWeight'],1);
+              $getWeightDifference2 = intval($getBabyWeightValue2-$getAllBabyAdmissionData['babyAdmissionWeight']);
             }else{
               $getWeightGainLoss2 = "";
+              $getWeightDifference2 = "";
             }
             
           }else{
             $getBabyWeightValue2 = "";
             $getWeightGainLoss2 = "";
+            $getWeightDifference2 = "";
           }
+
+          // Get baby kmc time 2
+          $getBabyKmcValue2 = $this->cmodel->getBabyKmcDateData($getAllBabyAdmissionData['babyAdmissionId'],$secondWeightDate);
 
           // Get baby weight 3
           $getBabyWeight3 = $this->cmodel->getBabyDailyWeightData($getAllBabyAdmissionData['babyAdmissionId'],$thirdWeightDate);
@@ -188,14 +504,20 @@ class Cronjob extends CI_Controller {
 
             if(!empty($previousWeightValue3)){
               $getWeightGainLoss3 = round(((intval($getBabyWeightValue3-$previousWeightValue3))*100)/$previousWeightValue3,1);
+              $getWeightDifference3 = intval($getBabyWeightValue3-$previousWeightValue3);
             }else{
               $getWeightGainLoss3 = "";
+              $getWeightDifference3 = "";
             }
             
           }else{
             $getBabyWeightValue3 = "";
             $getWeightGainLoss3 = "";
+            $getWeightDifference3 = "";
           }
+
+          // Get baby kmc time 3
+          $getBabyKmcValue3 = $this->cmodel->getBabyKmcDateData($getAllBabyAdmissionData['babyAdmissionId'],$thirdWeightDate);
 
           // Get baby weight 4
           $getBabyWeight4 = $this->cmodel->getBabyDailyWeightData($getAllBabyAdmissionData['babyAdmissionId'],$fourthWeightDate);
@@ -215,14 +537,20 @@ class Cronjob extends CI_Controller {
 
             if(!empty($previousWeightValue4)){
               $getWeightGainLoss4 = round(((intval($getBabyWeightValue4-$previousWeightValue4))*100)/$previousWeightValue4,1);
+              $getWeightDifference4 = intval($getBabyWeightValue4-$previousWeightValue4);
             }else{
               $getWeightGainLoss4 = "";
+              $getWeightDifference4 = "";
             }
             
           }else{
             $getBabyWeightValue4 = "";
             $getWeightGainLoss4 = "";
+            $getWeightDifference4 = "";
           }
+
+          // Get baby kmc time 4
+          $getBabyKmcValue4 = $this->cmodel->getBabyKmcDateData($getAllBabyAdmissionData['babyAdmissionId'],$fourthWeightDate);
 
           // Get baby weight 5
           $getBabyWeight5 = $this->cmodel->getBabyDailyWeightData($getAllBabyAdmissionData['babyAdmissionId'],$fifthWeightDate);
@@ -246,14 +574,20 @@ class Cronjob extends CI_Controller {
 
             if(!empty($previousWeightValue5)){
               $getWeightGainLoss5 = round(((intval($getBabyWeightValue5-$previousWeightValue5))*100)/$previousWeightValue5,1);
+              $getWeightDifference5 = intval($getBabyWeightValue5-$previousWeightValue5);
             }else{
               $getWeightGainLoss5 = "";
+              $getWeightDifference5 = "";
             }
             
           }else{
             $getBabyWeightValue5 = "";
             $getWeightGainLoss5 = "";
+            $getWeightDifference5 = "";
           }
+
+          // Get baby kmc time 5
+          $getBabyKmcValue5 = $this->cmodel->getBabyKmcDateData($getAllBabyAdmissionData['babyAdmissionId'],$fifthWeightDate);
 
           // Get baby weight 6
           $getBabyWeight6 = $this->cmodel->getBabyDailyWeightData($getAllBabyAdmissionData['babyAdmissionId'],$sixthWeightDate);
@@ -281,14 +615,20 @@ class Cronjob extends CI_Controller {
 
             if(!empty($previousWeightValue6)){
               $getWeightGainLoss6 = round(((intval($getBabyWeightValue6-$previousWeightValue6))*100)/$previousWeightValue6,1);
+              $getWeightDifference6 = intval($getBabyWeightValue6-$previousWeightValue6);
             }else{
               $getWeightGainLoss6 = "";
+              $getWeightDifference6 = "";
             }
             
           }else{
             $getBabyWeightValue6 = "";
             $getWeightGainLoss6 = "";
+            $getWeightDifference6 = "";
           }
+
+          // Get baby kmc time 6
+          $getBabyKmcValue6 = $this->cmodel->getBabyKmcDateData($getAllBabyAdmissionData['babyAdmissionId'],$sixthWeightDate);
 
           // Get baby weight 7
           $getBabyWeight7 = $this->cmodel->getBabyDailyWeightData($getAllBabyAdmissionData['babyAdmissionId'],$seventhWeightDate);
@@ -320,14 +660,20 @@ class Cronjob extends CI_Controller {
 
             if(!empty($previousWeightValue7)){
               $getWeightGainLoss7 = round(((intval($getBabyWeightValue7-$previousWeightValue7))*100)/$previousWeightValue7,1);
+              $getWeightDifference7 = intval($getBabyWeightValue7-$previousWeightValue7);
             }else{
               $getWeightGainLoss7 = "";
+              $getWeightDifference7 = "";
             }
             
           }else{
             $getBabyWeightValue7 = "";
             $getWeightGainLoss7 = "";
+            $getWeightDifference7 = "";
           }
+
+          // Get baby kmc time 7
+          $getBabyKmcValue7 = $this->cmodel->getBabyKmcDateData($getAllBabyAdmissionData['babyAdmissionId'],$seventhWeightDate);
 
           
           // get last weight data
@@ -372,41 +718,68 @@ class Cronjob extends CI_Controller {
             $getbabyAdmissionWeight = $getAllBabyAdmissionData['babyAdmissionWeight'];
             if(!empty($getbabyAdmissionWeight)){
               $getLastWeightGainLoss = round(((intval($getLastWeight-$getbabyAdmissionWeight))*100)/$getbabyAdmissionWeight,1);
+              $getLastWeightDifference = intval($getLastWeight-$getbabyAdmissionWeight);
             }else{
               $getLastWeightGainLoss = "";
+              $getLastWeightDifference = "";
             }
           }else{
             $totalWeightingDuration = "";
             $getLastWeightGainLoss = "";
+            $getLastWeightDifference = "";
           }
+
+          // total baby Kmc time
+          $babyTotalKmcSeconds = $getBabyKmcValue2['totalSeconds']+$getBabyKmcValue3['totalSeconds']+$getBabyKmcValue4['totalSeconds']+$getBabyKmcValue5['totalSeconds']+$getBabyKmcValue6['totalSeconds']+$getBabyKmcValue7['totalSeconds'];
+          $totalDurationHours = intval($babyTotalKmcSeconds/60);
+          $totalDurationMinutes = $babyTotalKmcSeconds%60;
+          $babyTotalKmc = (($totalDurationHours != "0" || $totalDurationHours != "") ? ($totalDurationHours."h "):"").$totalDurationMinutes."m";
 
           
           $babyListArray[]  = $getBabyWeightValue2;
+          $babyListArray[]  = $getBabyKmcValue2['totalKmcDuration'];
+          $babyListArray[]  = ($getWeightDifference2 == "0") ? "0" :(($getWeightDifference2 != "") ? $getWeightDifference2 : "");
           $babyListArray[]  = ($getWeightGainLoss2 == "0") ? "0" :(($getWeightGainLoss2 != "") ? $getWeightGainLoss2 : "");
           $babyListArray[]  = $getBabyWeightValue3;
+          $babyListArray[]  = $getBabyKmcValue3['totalKmcDuration'];
+          $babyListArray[]  = ($getWeightDifference3 == "0") ? "0" :(($getWeightDifference3 != "") ? $getWeightDifference3 : "");
           $babyListArray[]  = ($getWeightGainLoss3 == "0") ? "0" :(($getWeightGainLoss3 != "") ? $getWeightGainLoss3 : "");
           $babyListArray[]  = $getBabyWeightValue4;
+          $babyListArray[]  = $getBabyKmcValue4['totalKmcDuration'];
+          $babyListArray[]  = ($getWeightDifference4 == "0") ? "0" :(($getWeightDifference4 != "") ? $getWeightDifference4 : "");
           $babyListArray[]  = ($getWeightGainLoss4 == "0") ? "0" :(($getWeightGainLoss4 != "") ? $getWeightGainLoss4 : "");
           $babyListArray[]  = $getBabyWeightValue5;
+          $babyListArray[]  = $getBabyKmcValue5['totalKmcDuration'];
+          $babyListArray[]  = ($getWeightDifference5 == "0") ? "0" :(($getWeightDifference5 != "") ? $getWeightDifference5 : "");
           $babyListArray[]  = ($getWeightGainLoss5 == "0") ? "0" :(($getWeightGainLoss5 != "") ? $getWeightGainLoss5 : "");
           $babyListArray[]  = $getBabyWeightValue6;
+          $babyListArray[]  = $getBabyKmcValue6['totalKmcDuration'];
+          $babyListArray[]  = ($getWeightDifference6 == "0") ? "0" :(($getWeightDifference6 != "") ? $getWeightDifference6 : "");
           $babyListArray[]  = ($getWeightGainLoss6 == "0") ? "0" :(($getWeightGainLoss6 != "") ? $getWeightGainLoss6 : "");
           $babyListArray[]  = $getBabyWeightValue7;
+          $babyListArray[]  = $getBabyKmcValue7['totalKmcDuration'];
+          $babyListArray[]  = ($getWeightDifference7 == "0") ? "0" :(($getWeightDifference7 != "") ? $getWeightDifference7 : "");
           $babyListArray[]  = ($getWeightGainLoss7 == "0") ? "0" :(($getWeightGainLoss7 != "") ? $getWeightGainLoss7 : "");
           $babyListArray[]  = ($getAllBabyAdmissionData['dischargeStatus']== "2" || $getAllBabyAdmissionData['dischargeStatus']== "3") ? "Y":"N";
           $babyListArray[]  = $totalWeightingDuration;
+          $babyListArray[]  = ($getLastWeightDifference == "0") ? "0" :(($getLastWeightDifference != "") ? $getLastWeightDifference : "");
           $babyListArray[]  = ($getLastWeightGainLoss == "0") ? "0" :(($getLastWeightGainLoss != "") ? $getLastWeightGainLoss : "");
+          $babyListArray[]  = $babyTotalKmc;
           $babyListArray[]  = "";
 
           $objWorkSheet->fromArray($babyListArray, null, 'A'.$a);
 
           $gainLossArray = array('2'=>$getWeightGainLoss2,'3'=>$getWeightGainLoss3,'4'=>$getWeightGainLoss4,'5'=>$getWeightGainLoss5,'6'=>$getWeightGainLoss6,'7'=>$getWeightGainLoss7);
+          $weightDifferenceArray = array('2'=>$getWeightDifference2,'3'=>$getWeightDifference3,'4'=>$getWeightDifference4,'5'=>$getWeightDifference5,'6'=>$getWeightDifference6,'7'=>$getWeightDifference7);
 
           // red color if percentage is loss
           for ($profitRow=2; $profitRow<=7 ; $profitRow++) {
             $gainLossRow = $gainLossArray[$profitRow];
-            $cellName = array('2'=>'L','3'=>'N','4'=>'P','5'=>'R','6'=>'T','7'=>'V');
+            $weightDifferenceRow = $weightDifferenceArray[$profitRow];
+            $cellName = array('2'=>'O','3'=>'S','4'=>'W','5'=>'AA','6'=>'AE','7'=>'AI');
+            $differenceCellName = array('2'=>'N','3'=>'R','4'=>'V','5'=>'Z','6'=>'AD','7'=>'AH');
             
+            // if gain loss value is negative
             if($gainLossRow < 0){
               $lossColorArray = array(
               'font'  => array(
@@ -419,26 +792,55 @@ class Cronjob extends CI_Controller {
               ));
             }
 
-            $objWorkSheet->getStyle($cellName[$profitRow].$a)->applyFromArray($lossColorArray);
-          }
-
-          // red color if last percentage is loss
-          if($getLastWeightGainLoss < 0){
-              $lastLossColorArray = array(
+            // if weight difference value is negative
+            if($weightDifferenceRow < 0){
+              $weightDifferenceColorArray = array(
               'font'  => array(
                   'color' => array('rgb' => 'FF0000')
               ));
             }else{
-              $lastLossColorArray = array(
+              $weightDifferenceColorArray = array(
               'font'  => array(
                   'color' => array('rgb' => '000000')
               ));
             }
 
-            $objWorkSheet->getStyle('Y'.$a.'')->applyFromArray($lastLossColorArray);
-            /*********************/
-          
+            $objWorkSheet->getStyle($cellName[$profitRow].$a)->applyFromArray($lossColorArray);
+            $objWorkSheet->getStyle($differenceCellName[$profitRow].$a)->applyFromArray($weightDifferenceColorArray);
+          }
 
+          // red color if last percentage is loss
+          if($getLastWeightGainLoss < 0){
+            $lastLossColorArray = array(
+            'font'  => array(
+                'color' => array('rgb' => 'FF0000')
+            ));
+          }else{
+            $lastLossColorArray = array(
+            'font'  => array(
+                'color' => array('rgb' => '000000')
+            ));
+          }
+
+          $objWorkSheet->getStyle('AM'.$a.'')->applyFromArray($lastLossColorArray);
+          /*********************/
+
+          // red color if last total weight difference is loss
+          if($getLastWeightDifference < 0){
+            $lastWeightDifferenceColorArray = array(
+            'font'  => array(
+                'color' => array('rgb' => 'FF0000')
+            ));
+          }else{
+            $lastWeightDifferenceColorArray = array(
+            'font'  => array(
+                'color' => array('rgb' => '000000')
+            ));
+          }
+
+          $objWorkSheet->getStyle('AL'.$a.'')->applyFromArray($lastWeightDifferenceColorArray);
+          /*********************/
+          
           $styleArray = array(
             'borders' => array(
             'allborders' => array(
@@ -447,14 +849,13 @@ class Cronjob extends CI_Controller {
             )
           );
 
-          $objWorkSheet->getStyle('A1:Z'.$a.'')->applyFromArray($styleArray);
+          $objWorkSheet->getStyle('A1:AO'.$a.'')->applyFromArray($styleArray);
 
           $a++;
           $dataCount++;
       }
 
       $objWorkSheet->setTitle('Weight-Report');
-
 
       $file = "Weight-Report-".date('d-m-Y');  
       $filename=$file.'.xls';
@@ -464,8 +865,8 @@ class Cronjob extends CI_Controller {
 
       $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
       $objWriter->save('php://output');
-      $objWriter->save(str_replace(__FILE__,'assets/weightReports/'.$filename,__FILE__));
-      chmod('assets/weightReports/'.$filename, 0777);
+      $objWriter->save(str_replace(__FILE__,'assets/Reports/weightReports/'.$filename,__FILE__));
+      chmod('assets/Reports/weightReports/'.$filename, 0777);
 
       // save file log
       if(!empty($getReportSettings)){
@@ -477,7 +878,6 @@ class Cronjob extends CI_Controller {
           $this->db->insert('reportLogs',$logData);
         }
       }
-      
     }
 
     // Checkin Checkout Report
@@ -690,8 +1090,8 @@ class Cronjob extends CI_Controller {
 
       $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
       $objWriter->save('php://output');
-      $objWriter->save(str_replace(__FILE__,'assets/checkinReports/'.$filename,__FILE__));
-      chmod('assets/checkinReports/'.$filename, 0777);
+      $objWriter->save(str_replace(__FILE__,'assets/Reports/checkinReports/'.$filename,__FILE__));
+      chmod('assets/Reports/checkinReports/'.$filename, 0777);
 
       // save file log
       if(!empty($getReportSettings)){
@@ -704,7 +1104,14 @@ class Cronjob extends CI_Controller {
         }
       }
 
+      // call baby weight report cron
       $this->babyWeightReport();
+
+      // call kmc position duplicate report cron
+      $this->getKmcPositionDuplicateReport();
+
+      // call baseline report cron
+      $this->getBaselineInfoAvailableReport();
     }
 
 	
@@ -879,6 +1286,8 @@ class Cronjob extends CI_Controller {
       $objWriter->save('php://output');
 
     }
+
+    /**************************************************Old code start***********************************************/
 
 
 	public function sendDailyEmail1() {

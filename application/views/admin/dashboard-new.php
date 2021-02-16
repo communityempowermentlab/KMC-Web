@@ -96,10 +96,10 @@
                   <div class="card-content">
                     <div class="card-body py-1">
                       <div class="badge-circle badge-circle-lg badge-circle-light-success mx-auto mb-50">
-                        <i class="bx bx-video font-medium-5"></i>
+                        <i class="bx bx-donate-heart font-medium-5"></i>
                       </div>
-                      <div class="text-muted line-ellipsis">Total Videos</div>
-                      <h3 class="mb-0"><?php echo $getDashboardData['total_video']; ?></h3>
+                      <div class="text-muted line-ellipsis">Total Mothers</div>
+                      <h3 class="mb-0"><?php echo $getDashboardData['total_mothers']; ?></h3>
                     </div>
                   </div>
                 </div>
@@ -116,8 +116,8 @@
                       <div class="badge-circle badge-circle-lg badge-circle-light-danger mx-auto mb-50">
                         <i class="bx bx-group font-medium-5"></i>
                       </div>
-                      <div class="text-muted line-ellipsis">Total CEL Employees</div>
-                      <h3 class="mb-0"><?php echo $getDashboardData['cel_emp_count']; ?></h3>
+                      <div class="text-muted line-ellipsis">Total Infrants </div>
+                      <h3 class="mb-0"><?php echo $getDashboardData['total_baby']; ?></h3>
                     </div>
                   </div>
                 </div>
