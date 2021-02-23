@@ -1137,193 +1137,200 @@ class NurseModel extends CI_Model {
 	       	$param  = array();
 	       	$checkDataForAllUpdate = 1;  // check for all data synced or not
 	       	foreach ($request['doctorRoundData'] as $key => $request) {
-	       		$checkDuplicateData =  $this->db->get_where('doctorRound',array('androidUuid'=>$request['localId']))->num_rows();
 
-                //$babyAdmisionLastId  = $this->CreatePdf->getBabyAdmissionData($request['babyId']);
+	       		$validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => trim($request['babyId'])))->row_array();
+	       		$validateDoctorId = $this->db->get_where('staffMaster', array('staffId' => trim($request['doctorId']),'staffType'=>1))->row_array();
 
-				$this
-		            ->db
-		            ->order_by('id', 'desc');
-		        $babyAdmisionLastId = $this
-		            ->db
-		            ->get_where('babyAdmission', array(
-		            'babyId' => $request['babyId'],
-		            'loungeId' => $request['loungeId']
-		        ))->row_array();
+	       		if((!empty($validateBabyId)) && (!empty($validateDoctorId)) && (trim($request['doctorId']) != "0") && (trim($request['doctorId']) != "")){
 
-	       		if($checkDuplicateData == 0){
+		       		$checkDuplicateData =  $this->db->get_where('doctorRound',array('androidUuid'=>$request['localId']))->num_rows();
 
-	       		    $checkDataForAllUpdate = 2;			
-					$arrayName = array();
-			        $arrayName['androidUuid']         = $request['localId']; 
-					//$arrayName['loungeId'] 		      = $request['loungeId'];
-					$arrayName['babyAdmissionId'] 	  = $babyAdmisionLastId['id'];
-					$arrayName['staffId'] 		      = $request['doctorId'];
-					$arrayName['comment'] 		      = $request['comment'];
+	                //$babyAdmisionLastId  = $this->CreatePdf->getBabyAdmissionData($request['babyId']);
 
-					if($request['doctorSign']!=''){
-						$loungeImg=  saveImage($request['doctorSign'],signDirectory);
-						$arrayName['staffSignature']  =  ($loungeImg!='') ? $loungeImg : NULL;
-					}else{
-						$arrayName['staffSignature']  =  NULL;
-					}		
+					$this
+			            ->db
+			            ->order_by('id', 'desc');
+			        $babyAdmisionLastId = $this
+			            ->db
+			            ->get_where('babyAdmission', array(
+			            'babyId' => $request['babyId'],
+			            'loungeId' => $request['loungeId']
+			        ))->row_array();
 
-					$arrayName['addDate']                      = $request['localDateTime'];
-					$arrayName['lastSyncedTime']                = date('Y-m-d H:i:s');
-			      	//get last Baby AdmissionId
-			        $inserted = $this->db->insert('doctorRound', $arrayName);
-					$lastID   = $this->db->insert_id();
+		       		if($checkDuplicateData == 0){
 
-                    $prescriptionCount       = count($request['treatment']);
-                    $investigationCount      = count($request['investigation']);
-                   
-                    // update all previous prescription data 2
+		       		    $checkDataForAllUpdate = 2;			
+						$arrayName = array();
+				        $arrayName['androidUuid']         = $request['localId']; 
+						//$arrayName['loungeId'] 		      = $request['loungeId'];
+						$arrayName['babyAdmissionId'] 	  = $babyAdmisionLastId['id'];
+						$arrayName['staffId'] 		      = $request['doctorId'];
+						$arrayName['comment'] 		      = $request['comment'];
 
-     //                $arrayName3 = array('status' => '2', 'modifyDate' => $request['localDateTime'] );
-                    
-     //                $this->db->where(array('doctorId' => $request['doctorId'], 'babyAdmissionId' => $babyAdmisionLastId['id']));
-					// $this->db->update('doctorBabyPrescription', $arrayName3);	
+						if($request['doctorSign']!=''){
+							$loungeImg=  saveImage($request['doctorSign'],signDirectory);
+							$arrayName['staffSignature']  =  ($loungeImg!='') ? $loungeImg : NULL;
+						}else{
+							$arrayName['staffSignature']  =  NULL;
+						}		
 
-                    for ($i=0; $i < $prescriptionCount; $i++) { 
-                    	$param = array();
-						$param['androidUuid']         	= $request['treatment'][$i]['localId']; 
-						//$param['loungeId'] 		      	= $request['prescriptions'][$i]['loungeId'];
-						$param['roundId'] 		      	= $lastID;
-						$param['prescriptionName']   	= $request['treatment'][$i]['treatmentName'];
-						$param['comment'] 		      	= $request['treatment'][$i]['comment'];
-						$param['image'] 		      	= ($request['treatment'][$i]['image']!='') ? saveDynamicImage($request['treatment'][$i]['image'],reportDirectory) : NULL;
-						$param['doctorId'] 		  		= $request['doctorId'];
-						$param['babyAdmissionId'] 		= $babyAdmisionLastId['id'];
-						$param['addDate']             	= $request['treatment'][$i]['localDateTime'];
-						$param['status']			  	= $request['treatment'][$i]['status'];
-						$param['lastSyncedTime']      	 = date('Y-m-d H:i:s');
+						$arrayName['addDate']                      = $request['localDateTime'];
+						$arrayName['lastSyncedTime']                = date('Y-m-d H:i:s');
+				      	//get last Baby AdmissionId
+				        $inserted = $this->db->insert('doctorRound', $arrayName);
+						$lastID   = $this->db->insert_id();
 
-						$this->db->insert('doctorBabyPrescription', $param);
-					}
+	                    $prescriptionCount       = count($request['treatment']);
+	                    $investigationCount      = count($request['investigation']);
+	                   
+	                    // update all previous prescription data 2
 
-                 //medicalTest data Post
-                    for ($k=0; $k < $investigationCount; $k++) { 
-                    	$param2 = array();
-						$param2['androidUuid']         	= $request['investigation'][$k]['localId']; 
-						//$param2['loungeId'] 		   	= $request['investigation'][$k]['loungeId'];
-						$param2['roundId'] 		       	= $lastID;
-                        $param2['investigationName'] 	= $request['investigation'][$k]['investigationName'];
-                        $param2['investigationType'] 	= $request['investigation'][$k]['investigationType'];
-						$param2['doctorId'] 			= $request['doctorId'];
-						$param2['babyAdmissionId'] 		= $babyAdmisionLastId['id'];
-						$param2['doctorComment'] 	   	= $request['investigation'][$k]['comment'];
-						$param2['status'] 				= $request['investigation'][$k]['status'];
+	     //                $arrayName3 = array('status' => '2', 'modifyDate' => $request['localDateTime'] );
+	                    
+	     //                $this->db->where(array('doctorId' => $request['doctorId'], 'babyAdmissionId' => $babyAdmisionLastId['id']));
+						// $this->db->update('doctorBabyPrescription', $arrayName3);	
+
+	                    for ($i=0; $i < $prescriptionCount; $i++) { 
+	                    	$param = array();
+							$param['androidUuid']         	= $request['treatment'][$i]['localId']; 
+							//$param['loungeId'] 		      	= $request['prescriptions'][$i]['loungeId'];
+							$param['roundId'] 		      	= $lastID;
+							$param['prescriptionName']   	= $request['treatment'][$i]['treatmentName'];
+							$param['comment'] 		      	= $request['treatment'][$i]['comment'];
+							$param['image'] 		      	= ($request['treatment'][$i]['image']!='') ? saveDynamicImage($request['treatment'][$i]['image'],reportDirectory) : NULL;
+							$param['doctorId'] 		  		= $request['doctorId'];
+							$param['babyAdmissionId'] 		= $babyAdmisionLastId['id'];
+							$param['addDate']             	= $request['treatment'][$i]['localDateTime'];
+							$param['status']			  	= $request['treatment'][$i]['status'];
+							$param['lastSyncedTime']      	 = date('Y-m-d H:i:s');
+
+							$this->db->insert('doctorBabyPrescription', $param);
+						}
+
+	                 //medicalTest data Post
+	                    for ($k=0; $k < $investigationCount; $k++) { 
+	                    	$param2 = array();
+							$param2['androidUuid']         	= $request['investigation'][$k]['localId']; 
+							//$param2['loungeId'] 		   	= $request['investigation'][$k]['loungeId'];
+							$param2['roundId'] 		       	= $lastID;
+	                        $param2['investigationName'] 	= $request['investigation'][$k]['investigationName'];
+	                        $param2['investigationType'] 	= $request['investigation'][$k]['investigationType'];
+							$param2['doctorId'] 			= $request['doctorId'];
+							$param2['babyAdmissionId'] 		= $babyAdmisionLastId['id'];
+							$param2['doctorComment'] 	   	= $request['investigation'][$k]['comment'];
+							$param2['status'] 				= $request['investigation'][$k]['status'];
+							
+							$param2['addDate']             	= $request['investigation'][$k]['localDateTime'];
+							$param2['lastSyncedTime']       = date('Y-m-d H:i:s');
+							$this->db->insert('investigation', $param2);
+							
+						} 
+
+	                    // create treatment and investigation pdf
+	                    $pdfFileName1       = $this->CreatePdf->generateTreatmentInvestigationPdf($request['babyId'],$request['doctorId']);
+	                    $pdfFileName2       = $this->CreatePdf->generateTreatmentPrescriptionPdf($request['babyId'],$request['doctorId']);
+	                    $babyAdmissionData  = $this->CreatePdf->getBabyAdmissionData($request['babyId']);
 						
-						$param2['addDate']             	= $request['investigation'][$k]['localDateTime'];
-						$param2['lastSyncedTime']       = date('Y-m-d H:i:s');
-						$this->db->insert('investigation', $param2);
+						$this->db->where('id',$babyAdmissionData['id']);
+						$this->db->update('babyAdmission',array('BabyTreatmentPdfName'=> $pdfFileName1,'BabyPrescriptionPdfName'=> $pdfFileName2));
 						
-					} 
+						$listID['id']      = $lastID;
+						$listID['localId'] = $request['localId'];;
+						$param1[]          = $listID;
 
-                    // create treatment and investigation pdf
-                    $pdfFileName1       = $this->CreatePdf->generateTreatmentInvestigationPdf($request['babyId'],$request['doctorId']);
-                    $pdfFileName2       = $this->CreatePdf->generateTreatmentPrescriptionPdf($request['babyId'],$request['doctorId']);
-                    $babyAdmissionData  = $this->CreatePdf->getBabyAdmissionData($request['babyId']);
-					
-					$this->db->where('id',$babyAdmissionData['id']);
-					$this->db->update('babyAdmission',array('BabyTreatmentPdfName'=> $pdfFileName1,'BabyPrescriptionPdfName'=> $pdfFileName2));
-					
-					$listID['id']      = $lastID;
-					$listID['localId'] = $request['localId'];;
-					$param1[]          = $listID;
+						##################################################################################################
+						##################################################################################################
+						################################## Here Update Part start ################################
+						##################################################################################################
+						##################################################################################################
 
-					##################################################################################################
-					##################################################################################################
-					################################## Here Update Part start ################################
-					##################################################################################################
-					##################################################################################################
-
-	            } else {
-					$arrayName1 = array();
-			        $arrayName1['androidUuid']         = $request['localId']; 
-					//$arrayName1['loungeId'] 		   = $request['loungeId'];
-					$arrayName1['babyAdmissionId'] 		= $babyAdmisionLastId['id'];
-					$arrayName1['staffId'] 		      = $request['doctorId'];
-					$arrayName1['comment'] 		      = $request['comment'];
-					
-					if($request['doctorSign']!=''){
-						$loungeImg=  saveImage($request['doctorSign'],signDirectory);
-						$arrayName1['staffSignature']  =  ($loungeImg!='') ? $loungeImg : NULL;
-					}else{
-						$arrayName1['staffSignature']  =  NULL;
-					}		
-
-					$arrayName1['addDate']                      = $request['localDateTime'];
-					$arrayName1['lastSyncedTime']               = date('Y-m-d H:i:s');
-
-					 $this->db->where('androidUuid',$request['localId']);
-					 $this->db->update('doctorRound', $arrayName1);	
-					$lastID = $this->db->get_where('doctorRound',array('androidUuid'=>$request['localId']))->row_array();
-					$listID['id']      = $lastID['id'];
-
-                    $prescriptionCount = count($request['treatment']);
-                    // $vaccinationCount  = count($request['vaccination']);
-                    $investigationCount      = count($request['investigation']);
-
-                    // update all previous prescription data 2
-
-     //                $arrayName3 = array('status' => '2', 'modifyDate' => $request['localDateTime'] );
-                    
-     //                $this->db->where(array('doctorId' => $request['doctorId'], 'babyAdmissionId' => $babyAdmisionLastId['id']));
-					// $this->db->update('doctorBabyPrescription', $arrayName3);	
-
-
-                  	//prescription data Post
-                    for ($i=0; $i < $prescriptionCount; $i++) { 
-                       	$param = array();
-						$param['androidUuid']         	= $request['treatment'][$i]['localId']; 
-						//$param['loungeId'] 		      	= $request['prescriptions'][$i]['loungeId'];
-						$param['roundId'] 		      	= $lastID['id'];
-						$param['prescriptionName']   	= $request['treatment'][$i]['treatmentName'];
-						$param['comment'] 		      	= $request['treatment'][$i]['comment'];
-						$param['image'] 		      	= ($request['treatment'][$i]['image']!='') ? saveDynamicImage($request['treatment'][$i]['image'],reportDirectory) :NULL;
-						$param['doctorId'] 		  		= $request['doctorId'];
-						$param['babyAdmissionId'] 		= $babyAdmisionLastId['id'];
-						$param['addDate']             	= $request['treatment'][$i]['localDateTime'];
-						$param['status']			  	= $request['treatment'][$i]['status'];
-						$param['lastSyncedTime']      	 = date('Y-m-d H:i:s');
-						$this->db->where('androidUuid',$request['treatment'][$i]['localId']);
-						$this->db->update('doctorBabyPrescription', $param);
-
-					}
-
-
-                 	//investigation data Post
-                    for ($k=0; $k < $investigationCount; $k++) { 
-                    	$param2 = array();
-						$param2['androidUuid']         	= $request['investigation'][$k]['localId']; 
-						//$param2['loungeId'] 		   	= $request['investigation'][$k]['loungeId'];
-						$param2['roundId'] 		       	= $lastID['id'];
+		            } else {
+						$arrayName1 = array();
+				        $arrayName1['androidUuid']         = $request['localId']; 
+						//$arrayName1['loungeId'] 		   = $request['loungeId'];
+						$arrayName1['babyAdmissionId'] 		= $babyAdmisionLastId['id'];
+						$arrayName1['staffId'] 		      = $request['doctorId'];
+						$arrayName1['comment'] 		      = $request['comment'];
 						
+						if($request['doctorSign']!=''){
+							$loungeImg=  saveImage($request['doctorSign'],signDirectory);
+							$arrayName1['staffSignature']  =  ($loungeImg!='') ? $loungeImg : NULL;
+						}else{
+							$arrayName1['staffSignature']  =  NULL;
+						}		
 
-                        $param2['investigationName'] 	= $request['investigation'][$k]['investigationName'];
-                        $param2['investigationType'] 	= $request['investigation'][$k]['investigationType'];
-						// $param2['nurseId'] 				= $request['investigation'][$k]['nurseId'];
-						$param2['doctorId'] 			= $request['doctorId'];
-						$param2['babyAdmissionId'] 		= $babyAdmisionLastId['id'];
-						$param2['doctorComment'] 	   	= $request['investigation'][$k]['comment'];
-						$param2['status'] 				= $request['investigation'][$k]['status'];	
-						$param2['addDate']            	= $request['investigation'][$k]['localDateTime'];
-						$param2['lastSyncedTime']      = date('Y-m-d H:i:s');
-						$this->db->where('androidUuid',$request['investigation'][$k]['localId']);
-						$this->db->update('investigation', $param2);
-					}
+						$arrayName1['addDate']                      = $request['localDateTime'];
+						$arrayName1['lastSyncedTime']               = date('Y-m-d H:i:s');
 
-                    // create treatment and investigation pdf
-                    $pdfFileName1       = $this->CreatePdf->generateTreatmentInvestigationPdf($request['babyId'],$request['doctorId']);
-                    $pdfFileName2       = $this->CreatePdf->generateTreatmentPrescriptionPdf($request['babyId'],$request['doctorId']);
-                   
-					$this->db->where('id',$babyAdmissionData['id']);
-					$this->db->update('babyAdmission',array('BabyTreatmentPdfName'=> $pdfFileName1,'BabyPrescriptionPdfName'=> $pdfFileName2));
-					
-					$listID['localId'] = $request['localId'];
-					$param1[] = $listID;            	
-	        	}
+						 $this->db->where('androidUuid',$request['localId']);
+						 $this->db->update('doctorRound', $arrayName1);	
+						$lastID = $this->db->get_where('doctorRound',array('androidUuid'=>$request['localId']))->row_array();
+						$listID['id']      = $lastID['id'];
+
+	                    $prescriptionCount = count($request['treatment']);
+	                    // $vaccinationCount  = count($request['vaccination']);
+	                    $investigationCount      = count($request['investigation']);
+
+	                    // update all previous prescription data 2
+
+	     //                $arrayName3 = array('status' => '2', 'modifyDate' => $request['localDateTime'] );
+	                    
+	     //                $this->db->where(array('doctorId' => $request['doctorId'], 'babyAdmissionId' => $babyAdmisionLastId['id']));
+						// $this->db->update('doctorBabyPrescription', $arrayName3);	
+
+
+	                  	//prescription data Post
+	                    for ($i=0; $i < $prescriptionCount; $i++) { 
+	                       	$param = array();
+							$param['androidUuid']         	= $request['treatment'][$i]['localId']; 
+							//$param['loungeId'] 		      	= $request['prescriptions'][$i]['loungeId'];
+							$param['roundId'] 		      	= $lastID['id'];
+							$param['prescriptionName']   	= $request['treatment'][$i]['treatmentName'];
+							$param['comment'] 		      	= $request['treatment'][$i]['comment'];
+							$param['image'] 		      	= ($request['treatment'][$i]['image']!='') ? saveDynamicImage($request['treatment'][$i]['image'],reportDirectory) :NULL;
+							$param['doctorId'] 		  		= $request['doctorId'];
+							$param['babyAdmissionId'] 		= $babyAdmisionLastId['id'];
+							$param['addDate']             	= $request['treatment'][$i]['localDateTime'];
+							$param['status']			  	= $request['treatment'][$i]['status'];
+							$param['lastSyncedTime']      	 = date('Y-m-d H:i:s');
+							$this->db->where('androidUuid',$request['treatment'][$i]['localId']);
+							$this->db->update('doctorBabyPrescription', $param);
+
+						}
+
+
+	                 	//investigation data Post
+	                    for ($k=0; $k < $investigationCount; $k++) { 
+	                    	$param2 = array();
+							$param2['androidUuid']         	= $request['investigation'][$k]['localId']; 
+							//$param2['loungeId'] 		   	= $request['investigation'][$k]['loungeId'];
+							$param2['roundId'] 		       	= $lastID['id'];
+							
+
+	                        $param2['investigationName'] 	= $request['investigation'][$k]['investigationName'];
+	                        $param2['investigationType'] 	= $request['investigation'][$k]['investigationType'];
+							// $param2['nurseId'] 				= $request['investigation'][$k]['nurseId'];
+							$param2['doctorId'] 			= $request['doctorId'];
+							$param2['babyAdmissionId'] 		= $babyAdmisionLastId['id'];
+							$param2['doctorComment'] 	   	= $request['investigation'][$k]['comment'];
+							$param2['status'] 				= $request['investigation'][$k]['status'];	
+							$param2['addDate']            	= $request['investigation'][$k]['localDateTime'];
+							$param2['lastSyncedTime']      = date('Y-m-d H:i:s');
+							$this->db->where('androidUuid',$request['investigation'][$k]['localId']);
+							$this->db->update('investigation', $param2);
+						}
+
+	                    // create treatment and investigation pdf
+	                    $pdfFileName1       = $this->CreatePdf->generateTreatmentInvestigationPdf($request['babyId'],$request['doctorId']);
+	                    $pdfFileName2       = $this->CreatePdf->generateTreatmentPrescriptionPdf($request['babyId'],$request['doctorId']);
+	                   
+						$this->db->where('id',$babyAdmissionData['id']);
+						$this->db->update('babyAdmission',array('BabyTreatmentPdfName'=> $pdfFileName1,'BabyPrescriptionPdfName'=> $pdfFileName2));
+						
+						$listID['localId'] = $request['localId'];
+						$param1[] = $listID;            	
+		        	}
+		        }
 	   		} 
 	   		if($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2){
 		       $data['id'] = $param1;
@@ -1438,93 +1445,98 @@ class NurseModel extends CI_Model {
 
 	       	foreach ($request['nursePrescriptionData'] as $key => $val) {
 
-            	$checkDuplicateData =  $this->db->get_where('prescriptionNurseWise',array('androidUuid'=>$val['localId']))->num_rows();
-            	$DuplicateData      =  $this->db->get_where('prescriptionNurseWise',array('androidUuid'=>$val['localId']))->row_array();
-            	
-            	$this
-		            ->db
-		            ->order_by('id', 'desc');
-		        $babyAdmisionLastId = $this
-		            ->db
-		            ->get_where('babyAdmission', array(
-		            'babyId' => $val['babyId'],
-		            'loungeId' => $val['loungeId']
-		        ))->row_array();
+	       		$validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => trim($val['babyId'])))->row_array();
+                $validateNurseId = $this->db->get_where('staffMaster', array('staffId' => trim($val['nurseId']),'staffType'=>2))->row_array();
+
+                if(!empty($validateBabyId)){
+
+	            	$checkDuplicateData =  $this->db->get_where('prescriptionNurseWise',array('androidUuid'=>$val['localId']))->num_rows();
+	            	$DuplicateData      =  $this->db->get_where('prescriptionNurseWise',array('androidUuid'=>$val['localId']))->row_array();
+	            	
+	            	$this
+			            ->db
+			            ->order_by('id', 'desc');
+			        $babyAdmisionLastId = $this
+			            ->db
+			            ->get_where('babyAdmission', array(
+			            'babyId' => $val['babyId'],
+			            'loungeId' => $val['loungeId']
+			        ))->row_array();
 
 
-            	if($checkDuplicateData == 0){
-            		$checkDataForAllUpdate = 2;	
-            		$param = array();
+	            	if($checkDuplicateData == 0){
+	            		$checkDataForAllUpdate = 2;	
+	            		$param = array();
 
-					$param['androidUuid']         	= ($val['localId'] != '') ? $val['localId'] : NULL;
-					//$param['loungeId'] 		      	= ($val['loungeId'] != '') ? $val['loungeId'] : NULL;
-					$param['prescriptionName']      = ($val['treatmentName'] != '') ? $val['treatmentName'] : NULL;
-					$param['prescriptionTime']      = ($val['prescriptionTime'] != '') ? $val['prescriptionTime'] : NULL;
-					$param['quantity'] 		      	= ($val['quantity'] != '') ? $val['quantity'] : NULL;
-					$param['unit'] 		      		= ($val['unit'] != '') ? $val['unit'] : NULL;
-					$param['comment'] 		      	= ($val['comment'] != '') ? $val['comment'] : NULL;
-					$param['babyAdmissionId'] 		= ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
-					$param['nurseId'] 		  		= ($val['nurseId'] != '') ? $val['nurseId'] : NULL;
-					$param['addDate']             	= ($val['localDateTime'] != '') ? $val['localDateTime'] : NULL;
-					//$param['modifyDate']            = date('Y-m-d H:i:s');
-					$param['status']			  	= 1;
-					$param['lastSyncedTime']      	= date('Y-m-d H:i:s');
+						$param['androidUuid']         	= ($val['localId'] != '') ? $val['localId'] : NULL;
+						//$param['loungeId'] 		      	= ($val['loungeId'] != '') ? $val['loungeId'] : NULL;
+						$param['prescriptionName']      = ($val['treatmentName'] != '') ? $val['treatmentName'] : NULL;
+						$param['prescriptionTime']      = ($val['prescriptionTime'] != '') ? $val['prescriptionTime'] : NULL;
+						$param['quantity'] 		      	= ($val['quantity'] != '') ? $val['quantity'] : NULL;
+						$param['unit'] 		      		= ($val['unit'] != '') ? $val['unit'] : NULL;
+						$param['comment'] 		      	= ($val['comment'] != '') ? $val['comment'] : NULL;
+						$param['babyAdmissionId'] 		= ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+						$param['nurseId'] 		  		= ($val['nurseId'] != '') ? $val['nurseId'] : NULL;
+						$param['addDate']             	= ($val['localDateTime'] != '') ? $val['localDateTime'] : NULL;
+						//$param['modifyDate']            = date('Y-m-d H:i:s');
+						$param['status']			  	= 1;
+						$param['lastSyncedTime']      	= date('Y-m-d H:i:s');
 
-				  	$this->db->insert('prescriptionNurseWise', $param);
-				  	$lastId = $this->db->insert_id();
+					  	$this->db->insert('prescriptionNurseWise', $param);
+					  	$lastId = $this->db->insert_id();
 
-                    $pdfFileName1       = $this->CreateNurseOrderPdf->generateNurseOrderPdf($val['babyId'],$val['nurseId']);
-                    $babyAdmissionData  = $this->CreatePdf->getBabyAdmissionData($val['babyId']);
-					
-					$this->db->where('id',$babyAdmissionData['id']);
-					$this->db->update('babyAdmission',array('BabyNurseOrderPdfName'=> $pdfFileName1));
-					
+	                    $pdfFileName1       = $this->CreateNurseOrderPdf->generateNurseOrderPdf($val['babyId'],$val['nurseId']);
+	                    $babyAdmissionData  = $this->CreatePdf->getBabyAdmissionData($val['babyId']);
+						
+						$this->db->where('id',$babyAdmissionData['id']);
+						$this->db->update('babyAdmission',array('BabyNurseOrderPdfName'=> $pdfFileName1));
+						
 
-					$listID['id'] = $lastId;
-					$listID['localId'] = $val['localId']; 
-					$param1[] = $listID;   
+						$listID['id'] = $lastId;
+						$listID['localId'] = $val['localId']; 
+						$param1[] = $listID;   
 
-            	} else {
+	            	} else {
 
-            		$param = array();
-					$param['androidUuid']         	= ($val['localId'] != '') ? $val['localId'] : NULL;
-					//$param['loungeId'] 		      	= ($val['loungeId'] != '') ? $val['loungeId'] : NULL;
-					$param['prescriptionName']      = ($val['treatmentName'] != '') ? $val['treatmentName'] : NULL;
-					$param['prescriptionTime']      = ($val['prescriptionTime'] != '') ? $val['prescriptionTime'] : NULL;
-					$param['quantity'] 		      	= ($val['quantity'] != '') ? $val['quantity'] : NULL;
-					$param['unit'] 		      		= ($val['unit'] != '') ? $val['unit'] : NULL;
-					$param['comment'] 		      	= ($val['comment'] != '') ? $val['comment'] : NULL;
-					$param['babyAdmissionId'] 		= ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
-					$param['nurseId'] 		  		= ($val['nurseId'] != '') ? $val['nurseId'] : NULL;
-					$param['addDate']             	= ($val['localDateTime'] != '') ? $val['localDateTime'] : NULL;
-					//$param['modifyDate']            = date('Y-m-d H:i:s');
-					$param['status']			  	= 1;
-					$param['lastSyncedTime']      	= date('Y-m-d H:i:s');
+	            		$param = array();
+						$param['androidUuid']         	= ($val['localId'] != '') ? $val['localId'] : NULL;
+						//$param['loungeId'] 		      	= ($val['loungeId'] != '') ? $val['loungeId'] : NULL;
+						$param['prescriptionName']      = ($val['treatmentName'] != '') ? $val['treatmentName'] : NULL;
+						$param['prescriptionTime']      = ($val['prescriptionTime'] != '') ? $val['prescriptionTime'] : NULL;
+						$param['quantity'] 		      	= ($val['quantity'] != '') ? $val['quantity'] : NULL;
+						$param['unit'] 		      		= ($val['unit'] != '') ? $val['unit'] : NULL;
+						$param['comment'] 		      	= ($val['comment'] != '') ? $val['comment'] : NULL;
+						$param['babyAdmissionId'] 		= ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+						$param['nurseId'] 		  		= ($val['nurseId'] != '') ? $val['nurseId'] : NULL;
+						$param['addDate']             	= ($val['localDateTime'] != '') ? $val['localDateTime'] : NULL;
+						//$param['modifyDate']            = date('Y-m-d H:i:s');
+						$param['status']			  	= 1;
+						$param['lastSyncedTime']      	= date('Y-m-d H:i:s');
 
-					$this->db->where(array('androidUuid' => $val['localId']));
-					$this->db->update('prescriptionNurseWise', $param);	
+						$this->db->where(array('androidUuid' => $val['localId']));
+						$this->db->update('prescriptionNurseWise', $param);	
 
-                    $pdfFileName1       = $this->CreateNurseOrderPdf->generateNurseOrderPdf($val['babyId'],$val['nurseId']);
-                    $babyAdmissionData  = $this->CreatePdf->getBabyAdmissionData($val['babyId']);
-					
-					$this->db->where('id',$babyAdmissionData['id']);
-					$this->db->update('babyAdmission',array('BabyNurseOrderPdfName'=> $pdfFileName1));
-					
-					$listID['id'] = $DuplicateData['id'];
-					$listID['localId'] = $val['localId']; 
-					$param1[] = $listID;  
-            	}
-
-	       		} 	
-	   		} 
-	   		if($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2){
-		       $data['id']    =   $param1;
-	           generateServerResponse('1','S', $data);
-			}
-			else{ 
-				generateServerResponse('0','213');
-			} 	        
-        }  	
+	                    $pdfFileName1       = $this->CreateNurseOrderPdf->generateNurseOrderPdf($val['babyId'],$val['nurseId']);
+	                    $babyAdmissionData  = $this->CreatePdf->getBabyAdmissionData($val['babyId']);
+						
+						$this->db->where('id',$babyAdmissionData['id']);
+						$this->db->update('babyAdmission',array('BabyNurseOrderPdfName'=> $pdfFileName1));
+						
+						$listID['id'] = $DuplicateData['id'];
+						$listID['localId'] = $val['localId']; 
+						$param1[] = $listID;  
+	            	}
+	            }
+       		} 	
+   		} 
+   		if($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2){
+	       $data['id']    =   $param1;
+           generateServerResponse('1','S', $data);
+		}
+		else{ 
+			generateServerResponse('0','213');
+		} 	        
+    }  	
 
 
 
@@ -1536,78 +1548,84 @@ class NurseModel extends CI_Model {
 	       	$param  = array();
 	       	$checkDataForAllUpdate = 1;  // check for all data synced or not
 	       	foreach ($request['nurseInvestigationData'] as $key => $val) {
-                    	$checkDuplicateData =  $this->db->get_where('investigation',array('androidUuid'=>$val['localId']))->num_rows();
-                    	$DuplicateData      =  $this->db->get_where('investigation',array('androidUuid'=>$val['localId']))->row_array();
-                    	
-						$this
-				            ->db
-				            ->order_by('id', 'desc');
-				        $babyAdmisionLastId = $this
-				            ->db
-				            ->get_where('babyAdmission', array(
-				            'babyId' => $val['babyId'],
-				            'loungeId' => $val['loungeId']
-				        ))->row_array();
 
-                    	if($checkDuplicateData == 0){
-                    		$checkDataForAllUpdate = 2;	
+	       		$validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => trim($val['babyId'])))->row_array();
+                $validateNurseId = $this->db->get_where('staffMaster', array('staffId' => trim($val['nurseId']),'staffType'=>2))->row_array();
+                if((!empty($validateBabyId)) && (!empty($validateNurseId)) && (trim($val['nurseId']) != "0") && (trim($val['nurseId']) != "")){
 
-                    		$param = array();
-							$param['androidUuid']         	= ($val['localId'] != '') ? $val['localId'] : NULL;
-							//$param['loungeId'] 		      	= ($val['loungeId'] != '') ? $val['loungeId'] : NULL;
-							$param['investigationName'] 	= ($val['investigationName'] != '') ? $val['investigationName'] : NULL;
-							$param['result'] 		      	= ($val['result'] != '') ? $val['result'] : NULL;
-							$param['nurseComment'] 		    = ($val['comment'] != '') ? $val['comment'] : NULL;
-							$param['babyAdmissionId'] 		= ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
-							$param['nurseId'] 		  		= ($val['nurseId'] != '') ? $val['nurseId'] : NULL;
-							$param['addDate']             	= $val['localDateTime'];
-							$param['modifyDate']            = date('Y-m-d H:i:s');
-							// $param['status']			  	= 1;
-							$param['lastSyncedTime']      	= date('Y-m-d H:i:s');
+                	$checkDuplicateData =  $this->db->get_where('investigation',array('androidUuid'=>$val['localId']))->num_rows();
+                	$DuplicateData      =  $this->db->get_where('investigation',array('androidUuid'=>$val['localId']))->row_array();
+                	
+					$this
+			            ->db
+			            ->order_by('id', 'desc');
+			        $babyAdmisionLastId = $this
+			            ->db
+			            ->get_where('babyAdmission', array(
+			            'babyId' => $val['babyId'],
+			            'loungeId' => $val['loungeId']
+			        ))->row_array();
 
-							if($val['resultImage']!=''){
-							   $testImage =  saveDynamicImage($val['resultImage'],reportDirectory);
-							   $param['resultImage']  	=  ($testImage!='') ? $testImage : NULL;
-							} else{
-							  	$param['resultImage']  =  NULL;
-							}	
+                	if($checkDuplicateData == 0){
+                		$checkDataForAllUpdate = 2;	
 
-                             $this->db->insert('investigation', $param);
-                             $lastId = $this->db->insert_id();
+                		$param = array();
+						$param['androidUuid']         	= ($val['localId'] != '') ? $val['localId'] : NULL;
+						//$param['loungeId'] 		      	= ($val['loungeId'] != '') ? $val['loungeId'] : NULL;
+						$param['investigationName'] 	= ($val['investigationName'] != '') ? $val['investigationName'] : NULL;
+						$param['result'] 		      	= ($val['result'] != '') ? $val['result'] : NULL;
+						$param['nurseComment'] 		    = ($val['comment'] != '') ? $val['comment'] : NULL;
+						$param['babyAdmissionId'] 		= ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+						$param['nurseId'] 		  		= ($val['nurseId'] != '') ? $val['nurseId'] : NULL;
+						$param['addDate']             	= $val['localDateTime'];
+						$param['modifyDate']            = date('Y-m-d H:i:s');
+						// $param['status']			  	= 1;
+						$param['lastSyncedTime']      	= date('Y-m-d H:i:s');
 
-							$listID['id'] = $lastId;
-							$listID['localId'] = $val['localId']; 
-							$param1[] = $listID;   
+						if($val['resultImage']!=''){
+						   $testImage =  saveDynamicImage($val['resultImage'],reportDirectory);
+						   $param['resultImage']  	=  ($testImage!='') ? $testImage : NULL;
+						} else{
+						  	$param['resultImage']  =  NULL;
+						}	
 
-                    	} else {
+                         $this->db->insert('investigation', $param);
+                         $lastId = $this->db->insert_id();
 
-							$param = array();
-							$param['androidUuid']         	= ($val['localId'] != '') ? $val['localId'] : NULL;
-							//$param['loungeId'] 		      	= ($val['loungeId'] != '') ? $val['loungeId'] : NULL;
-							$param['investigationName'] 	= ($val['investigationName'] != '') ? $val['investigationName'] : NULL;
-							$param['result'] 		      	= ($val['result'] != '') ? $val['result'] : NULL;
-							$param['nurseComment'] 		    = ($val['comment'] != '') ? $val['comment'] : NULL;
-							$param['babyAdmissionId'] 		= ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
-							$param['nurseId'] 		  		= ($val['nurseId'] != '') ? $val['nurseId'] : NULL;
-							$param['addDate']             	= $val['localDateTime'];
-							$param['modifyDate']            = date('Y-m-d H:i:s');
-							// $param['status']			  	= 1;
-							$param['lastSyncedTime']      	= date('Y-m-d H:i:s');
+						$listID['id'] = $lastId;
+						$listID['localId'] = $val['localId']; 
+						$param1[] = $listID;   
 
-							if($val['resultImage']!=''){
-							   $testImage =  saveDynamicImage($val['resultImage'],reportDirectory);
-							   $param['resultImage']  	=  ($testImage!='') ? $testImage : NULL;
-							} else{
-							  	$param['resultImage']  =  NULL;
-							}	
-							$this->db->where(array('androidUuid' => $val['localId']));
-							$this->db->update('investigation', $param);	
+                	} else {
 
-							$listID['id'] = $DuplicateData['id'];
-							$listID['localId'] = $val['localId']; 
-							$param1[] = $listID;  
-                    	}
-	   		    } 
+						$param = array();
+						$param['androidUuid']         	= ($val['localId'] != '') ? $val['localId'] : NULL;
+						//$param['loungeId'] 		      	= ($val['loungeId'] != '') ? $val['loungeId'] : NULL;
+						$param['investigationName'] 	= ($val['investigationName'] != '') ? $val['investigationName'] : NULL;
+						$param['result'] 		      	= ($val['result'] != '') ? $val['result'] : NULL;
+						$param['nurseComment'] 		    = ($val['comment'] != '') ? $val['comment'] : NULL;
+						$param['babyAdmissionId'] 		= ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+						$param['nurseId'] 		  		= ($val['nurseId'] != '') ? $val['nurseId'] : NULL;
+						$param['addDate']             	= $val['localDateTime'];
+						$param['modifyDate']            = date('Y-m-d H:i:s');
+						// $param['status']			  	= 1;
+						$param['lastSyncedTime']      	= date('Y-m-d H:i:s');
+
+						if($val['resultImage']!=''){
+						   $testImage =  saveDynamicImage($val['resultImage'],reportDirectory);
+						   $param['resultImage']  	=  ($testImage!='') ? $testImage : NULL;
+						} else{
+						  	$param['resultImage']  =  NULL;
+						}	
+						$this->db->where(array('androidUuid' => $val['localId']));
+						$this->db->update('investigation', $param);	
+
+						$listID['id'] = $DuplicateData['id'];
+						$listID['localId'] = $val['localId']; 
+						$param1[] = $listID;  
+                	}
+                }
+   		    } 
 	   		if($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2){
 		       $data['id'] = $param1;
 	           generateServerResponse('1','S', $data);
@@ -1626,66 +1644,71 @@ class NurseModel extends CI_Model {
 	       	$param = array();
 	       	$checkDataForAllUpdate = 1;  
 	       	foreach ($request['sampleTakenByNurse'] as $key => $request) {
-	       		$checkDuplicateData =  $this->db->get_where('investigation',array('androidUuid'=>$request['localId']))->num_rows();
-	       		if($checkDuplicateData == 0) {
-					$checkDataForAllUpdate = 2;
-				    	$arrayName                        = array();
-				        $arrayName['androidUuid']        	= ($request['localId'] != '') ? $request['localId'] : NULL;
-						//$arrayName['loungeId'] 		     = ($request['localId'] != '') ? $request['localId'] : NULL;
-						$arrayName['nurseId'] 		     = ($request['takenByNurse'] != '') ? $request['takenByNurse'] : NULL;
-						$arrayName['sampleDate'] 	     = ($request['sampleDate'] != '') ? $request['sampleDate'] : NULL;
-						$arrayName['sampleComment'] 	  = ($request['sampleComment'] != '') ? $request['sampleComment'] : NULL;
-						$arrayName['status'] 	          = 1;
+                $validateNurseId = $this->db->get_where('staffMaster', array('staffId' => trim($request['takenByNurse']),'staffType'=>2))->row_array();
+                
+                if((!empty($validateNurseId)) && (trim($request['takenByNurse']) != "0") && (trim($request['takenByNurse']) != "")){
+		       		
+		       		$checkDuplicateData =  $this->db->get_where('investigation',array('androidUuid'=>$request['localId']))->num_rows();
+		       		if($checkDuplicateData == 0) {
+						$checkDataForAllUpdate = 2;
+					    	$arrayName                        = array();
+					        $arrayName['androidUuid']        	= ($request['localId'] != '') ? $request['localId'] : NULL;
+							//$arrayName['loungeId'] 		     = ($request['localId'] != '') ? $request['localId'] : NULL;
+							$arrayName['nurseId'] 		     = ($request['takenByNurse'] != '') ? $request['takenByNurse'] : NULL;
+							$arrayName['sampleDate'] 	     = ($request['sampleDate'] != '') ? $request['sampleDate'] : NULL;
+							$arrayName['sampleComment'] 	  = ($request['sampleComment'] != '') ? $request['sampleComment'] : NULL;
+							$arrayName['status'] 	          = 1;
 
-						if($request['sampleImage']!=''){
-							$sampleImg =  saveDynamicImage($request['sampleImage'],reportDirectory);
-							$arrayName['sampleImage']  =  ($sampleImg!='') ? $sampleImg : NULL;
-						}else{
-							$arrayName['sampleImage']  =  NULL;
-						}		
+							if($request['sampleImage']!=''){
+								$sampleImg =  saveDynamicImage($request['sampleImage'],reportDirectory);
+								$arrayName['sampleImage']  =  ($sampleImg!='') ? $sampleImg : NULL;
+							}else{
+								$arrayName['sampleImage']  =  NULL;
+							}		
 
-						$arrayName['addDate']                     = date('Y-m-d H:i:s');
-						$arrayName['modifyDate']                  = date('Y-m-d H:i:s');
-						$arrayName['lastSyncedTime']              = date('Y-m-d H:i:s');
+							$arrayName['addDate']                     = date('Y-m-d H:i:s');
+							$arrayName['modifyDate']                  = date('Y-m-d H:i:s');
+							$arrayName['lastSyncedTime']              = date('Y-m-d H:i:s');
 
-				        $this->db->insert('investigation', $arrayName);
+					        $this->db->insert('investigation', $arrayName);
 
-					$lastID            = $this->db->insert_id();
-					$listID['id']      = $lastID;
-					$listID['localId'] = $request['localId'];
-					$param[]           = $listID;	
-	     
-		        }
-		        else{
-		        	// update data
-				    	$arrayName                        = array();
+						$lastID            = $this->db->insert_id();
+						$listID['id']      = $lastID;
+						$listID['localId'] = $request['localId'];
+						$param[]           = $listID;	
+		     
+			        }
+			        else{
+			        	// update data
+					    	$arrayName                        = array();
 
-						$arrayName['androidUuid']         = ($request['localId'] != '') ? $request['localId'] : NULL;
-						//$arrayName['loungeId'] 		      = ($request['localId'] != '') ? $request['localId'] : NULL;
-						$arrayName['nurseId'] 		      = ($request['takenByNurse'] != '') ? $request['takenByNurse'] : NULL;
-						$arrayName['sampleDate'] 	      = ($request['sampleDate'] != '') ? $request['sampleDate'] : NULL;
-						$arrayName['sampleComment'] 	  = ($request['sampleComment'] != '') ? $request['sampleComment'] : NULL;
-						$arrayName['status'] 	          = 1;
+							$arrayName['androidUuid']         = ($request['localId'] != '') ? $request['localId'] : NULL;
+							//$arrayName['loungeId'] 		      = ($request['localId'] != '') ? $request['localId'] : NULL;
+							$arrayName['nurseId'] 		      = ($request['takenByNurse'] != '') ? $request['takenByNurse'] : NULL;
+							$arrayName['sampleDate'] 	      = ($request['sampleDate'] != '') ? $request['sampleDate'] : NULL;
+							$arrayName['sampleComment'] 	  = ($request['sampleComment'] != '') ? $request['sampleComment'] : NULL;
+							$arrayName['status'] 	          = 1;
 
 
-						if($request['sampleImage']!=''){
-							$sampleImg =  saveDynamicImage($request['sampleImage'],reportDirectory);
-							$arrayName['sampleImage']  =  ($sampleImg!='') ? $sampleImg : NULL;
-						}else{
-							$arrayName['sampleImage']  =  NULL;
-						}		
+							if($request['sampleImage']!=''){
+								$sampleImg =  saveDynamicImage($request['sampleImage'],reportDirectory);
+								$arrayName['sampleImage']  =  ($sampleImg!='') ? $sampleImg : NULL;
+							}else{
+								$arrayName['sampleImage']  =  NULL;
+							}		
 
-						$arrayName['addDate']          = date('Y-m-d H:i:s');
-						$arrayName['modifyDate']       = date('Y-m-d H:i:s');
-						$arrayName['lastSyncedTime']   = date('Y-m-d H:i:s');
-	                $this->db->where('androidUuid',$request['localId']);
-					$this->db->update('investigation',$arrayName);
-					$lastEntry = $this->db->get_where('investigation',array('androidUuid'=>$request['localId']))->row_array();
-					$listID['id']      = $lastEntry['id'];
-					$listID['localId'] = $request['localId'];
-					$param[] = $listID;					
+							$arrayName['addDate']          = date('Y-m-d H:i:s');
+							$arrayName['modifyDate']       = date('Y-m-d H:i:s');
+							$arrayName['lastSyncedTime']   = date('Y-m-d H:i:s');
+		                $this->db->where('androidUuid',$request['localId']);
+						$this->db->update('investigation',$arrayName);
+						$lastEntry = $this->db->get_where('investigation',array('androidUuid'=>$request['localId']))->row_array();
+						$listID['id']      = $lastEntry['id'];
+						$listID['localId'] = $request['localId'];
+						$param[] = $listID;					
 
-		        }	
+			        }
+			    }    	
 		    }
     }	
      if($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2){

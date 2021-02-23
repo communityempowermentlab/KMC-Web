@@ -1,4 +1,8 @@
-
+<?php
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
+?>
 
     <!-- BEGIN: Content-->
   <div class="app-content content">
@@ -6,11 +10,6 @@
     <div class="content-wrapper">
         
       <div class="content-body">
-
-
-
-
-
 
 <!-- Column selectors with Export Options and print table -->
 <section id="column-selectors">
@@ -90,7 +89,19 @@
                                           </span>
                                       <?php } ?>
                                    </td>
-                                   <td><a href="<?php echo base_url(); ?>staffM/editStaffType/<?php echo $value['staffTypeId']; ?>" title="Edit Facility Type Information" class="btn btn-info btn-sm">View/Edit</a>
+                                   <td><a href="<?php echo base_url(); ?>staffM/editStaffType/<?php echo $value['staffTypeId']; ?>" title="Facility Type Information" class="btn btn-info btn-sm">
+                                      <?php if(($sessionData['Type']==1) || in_array(41, $userPermittedMenuData)){
+                                        echo VIEW_BUTTON;
+                                      }
+                                      if(($sessionData['Type']==1) || (in_array(41,$userPermittedMenuData) && in_array(86,$userPermittedMenuData)))
+                                      {
+                                        echo "/";
+                                      }
+                                      if(($sessionData['Type']==1) || in_array(86, $userPermittedMenuData)){
+                                        echo EDIT_BUTTON;
+                                      }
+                                      ?>
+                                   </a>
                                    </td>
                                    <td><a class="tooltip" href="<?php echo base_url(); ?>staffM/staffTypeLog/<?php echo $value['staffTypeId']; ?>"><?php echo $last_updated; ?><span class="tooltiptext"><?php echo date("m/d/y, h:i A",strtotime($value['modifyDate'])) ?></span></a></td>
                                 </tr>
@@ -107,9 +118,10 @@
     </div>
 </section>
 <!-- Column selectors with Export Options and print table -->
-
-<div class="add-new">
-  <a href="<?php echo base_url(); ?>staffM/addStaffType/" class="btn btn btn-danger align-items-center">
-      <i class="bx bx-plus"></i>&nbsp; Add New Staff Type 
-  </a>
-</div>
+<?php if(($sessionData['Type']==1) || in_array(40, $userPermittedMenuData)){ ?>
+  <div class="add-new">
+    <a href="<?php echo base_url(); ?>staffM/addStaffType/" class="btn btn btn-danger align-items-center">
+        <i class="bx bx-plus"></i>&nbsp; Add New Staff Type 
+    </a>
+  </div>
+<?php } ?>

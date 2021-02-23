@@ -10,6 +10,7 @@ class LocationManagenent extends Welcome {
     $this->load->model('LocationModel');
     date_default_timezone_set('Asia/Kolkata');
     $this->is_not_logged_in(); 
+    $this->restrictPageAccess(array('17'));
   }
 
   

@@ -18,6 +18,7 @@ class BabyManagenent extends Welcome {
       $this->load->model('api/BabyDischargePdf');  
       $this->load->library('pagination');
       $this->is_not_logged_in(); 
+      $this->restrictPageAccess(array('24'));
 
     }
     /*Registred Baby Listing */

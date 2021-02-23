@@ -164,7 +164,7 @@ class BabyModel extends CI_Model {
 
   // get total kmc via babyAdmissionId
   public function totalKmcBYAdmissionID($asmissionID){
-   return $this->db->query("SELECT @totsec:=sum(TIME_TO_SEC(subtime(endTime,startTime))) as kmcTimeLatest, floor(@totsec/3600) as Hours, (@totsec%3600)/60 as Minutes, (@totsec%60) as seconds from `babyDailyKMC` where startTime < endTime and babyAdmissionId='".$asmissionID."'")->row_array();
+   return $this->db->query("SELECT @totsec:=sum(TIME_TO_SEC(subtime(endTime,startTime))) as kmcTimeLatest, floor(@totsec/3600) as Hours, (@totsec%3600)/60 as Minutes, (@totsec%60) as seconds from `babyDailyKMC` where startTime < endTime and babyAdmissionId='".$asmissionID."' and isDataValid=1")->row_array();
   }
 
   
@@ -428,7 +428,7 @@ class BabyModel extends CI_Model {
   /*Get Kmc data via babyId & babyAdmissionId in desc order */
   public function getBabysSkinBYAdmissionID($baby_id,$lastID){
     $this->db->order_by('id','desc');
-    return  $this->db->get_where('babyDailyKMC',array('babyAdmissionId'=>$lastID))->result_array();
+    return  $this->db->get_where('babyDailyKMC',array('babyAdmissionId'=>$lastID,'isDataValid'=>1))->result_array();
   }
 
   /*Get Baby feeding List via babyId in desc order  */

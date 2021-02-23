@@ -1,4 +1,8 @@
-
+<?php
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
+?>
 
     <!-- BEGIN: Content-->
   <div class="app-content content">
@@ -6,11 +10,6 @@
     <div class="content-wrapper">
         
       <div class="content-body">
-
-
-
-
-
 
 <!-- Column selectors with Export Options and print table -->
 <section id="column-selectors">
@@ -66,7 +65,19 @@
                                             </td>
                                             <td>
                                                 <a title="Edit Group Data" href="<?php echo base_url('Miscellaneous/editMenuGroup/'.$value['id']); ?>">
-                                                    <button type="button" class="btn btn-sm btn-info">View/Edit</button>
+                                                    <button type="button" class="btn btn-sm btn-info">
+                                                      <?php if(($sessionData['Type']==1) || in_array(44, $userPermittedMenuData)){
+                                                        echo VIEW_BUTTON;
+                                                      }
+                                                      if(($sessionData['Type']==1) || (in_array(44,$userPermittedMenuData) && in_array(90,$userPermittedMenuData)))
+                                                      {
+                                                        echo "/";
+                                                      }
+                                                      if(($sessionData['Type']==1) || in_array(90, $userPermittedMenuData)){
+                                                        echo EDIT_BUTTON;
+                                                      }
+                                                      ?>
+                                                    </button>
                                                 </a>
                                             </td>                                    
                                         </tr>
@@ -84,9 +95,10 @@
     </div>
 </section>
 <!-- Column selectors with Export Options and print table -->
-
-<div class="add-new">
-  <a href="<?php echo base_url('Miscellaneous/addMenuGroup'); ?>" class="btn btn btn-danger align-items-center">
-      <i class="bx bx-plus"></i>&nbsp; Add New Menu Group
-  </a>
-</div>
+<?php if(($sessionData['Type']==1) || in_array(43, $userPermittedMenuData)){ ?>
+  <div class="add-new">
+    <a href="<?php echo base_url('Miscellaneous/addMenuGroup'); ?>" class="btn btn btn-danger align-items-center">
+        <i class="bx bx-plus"></i>&nbsp; Add New Menu Group
+    </a>
+  </div>
+<?php } ?>

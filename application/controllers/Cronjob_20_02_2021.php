@@ -1112,9 +1112,179 @@ class Cronjob extends CI_Controller {
 
       // call baseline report cron
       $this->getBaselineInfoAvailableReport();
+    }
 
-      // baby nutrition report
-      $this->babyNutritionReport();
+	
+    // send nurse duty details
+    public function sendNurseDutyReportOld(){
+
+      $reportDate = date('jS F Y, l',strtotime("-1 days"));
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->getRowDimension('2')->setRowHeight(20);
+      $objWorkSheet->mergeCells('A1:G1');
+      $objWorkSheet->mergeCells('A2:G2');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
+
+      for($col = ord('A'); $col <= ord('G'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."4")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(7);
+      $objWorkSheet->getColumnDimension('B')->setWidth(25);
+      $objWorkSheet->getColumnDimension('C')->setWidth(25);
+      $objWorkSheet->getColumnDimension('D')->setWidth(12);
+      $objWorkSheet->getColumnDimension('E')->setWidth(12);
+      $objWorkSheet->getColumnDimension('F')->setWidth(12);
+      $objWorkSheet->getColumnDimension('G')->setWidth(12);
+
+      for($col = ord('A'); $col <= ord('G'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      }
+
+      $objWorkSheet->setCellValue('A4', 'Rank');
+      $objWorkSheet->setCellValue('B4', 'Facility Name');
+      $objWorkSheet->setCellValue('C4', 'Nurse Name');
+      $objWorkSheet->setCellValue('D4', 'Status');
+      $objWorkSheet->setCellValue('E4', '8AM - 2PM');
+      $objWorkSheet->setCellValue('F4', '2PM - 8PM');
+      $objWorkSheet->setCellValue('G4', '8PM - 8AM');
+
+      $objWorkSheet->setCellValue('A1', 'KMC App Usage Ranking');
+      $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate);
+
+      // Get all facilities
+      $getAllFacilities = $this->cmodel->getAllFacilities();
+      $dataCount = 1;
+      $a=5;
+      
+      foreach($getAllFacilities as $key_facility => $getAllFacilitiesData){
+
+          $facilityListArray    = [];
+          $facilityListArray[]  = $dataCount;
+          $facilityListArray[]  = $getAllFacilitiesData['FacilityName'];
+
+          $getNurseAttendanceList = $this->cmodel->getNurseAttendanceList($getAllFacilitiesData['loungeId']); 
+          
+          $objWorkSheet->fromArray($facilityListArray, null, 'A'.$a);
+          $innerRow = $a;
+
+          if(!empty($getNurseAttendanceList)){
+            foreach($getNurseAttendanceList as $key_nurse => $getNurseAttendanceListData){
+              
+              $getNurseAttendanceLogList = $this->cmodel->getNurseAttendanceLogList($getNurseAttendanceListData['id']); 
+              $firstShift = "";
+              $secondShift = "";
+              $thirdShift = "";
+              foreach($getNurseAttendanceLogList as $key_logs => $getNurseAttendanceLogListData){
+
+                  $search = 'checked in';
+                  if(preg_match("/{$search}/i", $getNurseAttendanceLogListData['remark'])) {
+                    $checkStatus = "Checked In";
+
+                    $splitDate = explode(" ",$getNurseAttendanceListData['addDate']);
+                    $newTime = str_replace(":","",$splitDate[1]);
+                    if($newTime >= 73100 && $newTime <= 133000)
+                    {
+                        $firstShift = date('h:i A',strtotime($getNurseAttendanceListData['addDate']));
+                        $secondShift = "";
+                        $thirdShift = "";
+                    }
+                    else if($newTime >= 133100 && $newTime <= 193000)
+                    {
+                        $firstShift = "";
+                        $secondShift = date('h:i A',strtotime($getNurseAttendanceListData['addDate']));
+                        $thirdShift = "";
+                    }
+                    else if($newTime >= 193100 || $newTime <= 73000)
+                    {
+                        $firstShift = "";
+                        $secondShift = "";
+                        $thirdShift = date('h:i A',strtotime($getNurseAttendanceListData['addDate']));
+                    }
+
+                  }else{
+                    $checkStatus = "Checked Out";
+
+                    $splitDate = explode(" ",$getNurseAttendanceListData['addDate']);
+                    $newTime = str_replace(":","",$splitDate[1]);
+                    if($newTime >= 73100 && $newTime <= 133000)
+                    {
+                        $firstShift = date('h:i A',strtotime($getNurseAttendanceListData['modifyDate']));
+                        $secondShift = "";
+                        $thirdShift = "";
+                    }
+                    else if($newTime >= 133100 && $newTime <= 193000)
+                    {
+                        $firstShift = "";
+                        $secondShift = date('h:i A',strtotime($getNurseAttendanceListData['modifyDate']));
+                        $thirdShift = "";
+                    }
+                    else if($newTime >= 193100 || $newTime <= 73000)
+                    {
+                        $firstShift = "";
+                        $secondShift = "";
+                        $thirdShift = date('h:i A',strtotime($getNurseAttendanceListData['modifyDate']));
+                    }
+
+                  }
+
+                  $nurseListArray   = [];
+                  $nurseListArray[] = $getNurseAttendanceListData['nurseName'];
+                  $nurseListArray[] = $checkStatus;
+                  $nurseListArray[] = $firstShift;
+                  $nurseListArray[] = $secondShift;
+                  $nurseListArray[] = $thirdShift;
+                  $objWorkSheet->fromArray($nurseListArray, null, 'C'.$innerRow);
+                  $innerRow = $innerRow+1;
+              }
+              
+            }
+            $a = $innerRow+1;
+          }
+          else{
+
+            $nurseListArray   = [];
+            $nurseListArray[] = "N/A";
+            $nurseListArray[] = "-";
+            $nurseListArray[] = "-";
+            $nurseListArray[] = "-";
+            $nurseListArray[] = "-";
+            $objWorkSheet->fromArray($nurseListArray, null, 'C'.$innerRow);
+
+            $a = $innerRow+2;
+          }
+
+          $styleArray = array(
+            'borders' => array(
+            'allborders' => array(
+            'style' => PHPExcel_Style_Border::BORDER_THIN
+            )
+            )
+          );
+
+          $objWorkSheet->getStyle('A1:G'.$a.'')->applyFromArray($styleArray);
+
+          $objWorkSheet->setTitle('KMC App Usage Ranking');
+          $dataCount++;   
+      }
+
+      $file = "Checkin_Report_".date('d-m-Y',strtotime("-1 days")); 
+      $filename=$file.'.xls';
+      header('Content-Type: application/vnd.ms-excel');
+      header('Content-Disposition: attachment;filename="'.$filename.'"');
+      header('Cache-Control: max-age=0');
+
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+      $objWriter->save('php://output');
+
     }
 
     /**************************************************Old code start***********************************************/
@@ -1680,146 +1850,6 @@ class Cronjob extends CI_Controller {
       }
     }
     
-  }
-
-
-
-  // Baby Daily Nutrition Report
-    public function babyNutritionReport(){
-    	$reportDate = date('jS F Y, l',strtotime("-1 days"));
-      $objPHPExcel = new PHPExcel();
-
-      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
-      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
-      $objWorkSheet->mergeCells('A1:K1');
-      $objWorkSheet->mergeCells('A2:K2');
-      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
-      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
-
-      for($col = ord('A'); $col <= ord('K'); $col++)
-      {
-        $objWorkSheet->getStyle(chr($col)."3")->getFont()->setBold(true)->setSize(10);
-        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setWrapText(true);
-      }
-
-      $objWorkSheet->getColumnDimension('A')->setWidth(8);
-      $objWorkSheet->getColumnDimension('B')->setWidth(18);
-      $objWorkSheet->getColumnDimension('C')->setWidth(24);
-      $objWorkSheet->getColumnDimension('D')->setWidth(15);
-      $objWorkSheet->getColumnDimension('E')->setWidth(16);
-      $objWorkSheet->getColumnDimension('F')->setWidth(15);
-      $objWorkSheet->getColumnDimension('G')->setWidth(15);
-      $objWorkSheet->getColumnDimension('H')->setWidth(15);
-      $objWorkSheet->getColumnDimension('I')->setWidth(18);
-      $objWorkSheet->getColumnDimension('J')->setWidth(16);
-      $objWorkSheet->getColumnDimension('K')->setWidth(20);
-      
-
-      for($col = ord('A'); $col <= ord('K'); $col++){
-        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
-        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
-      }
-
-      $objWorkSheet->setCellValue('A3', 'Sr. No.');
-      $objWorkSheet->setCellValue('B3', 'Lounge Name');
-      $objWorkSheet->setCellValue('C3', 'Staf Name');
-      $objWorkSheet->setCellValue('D3', 'Baby Reg. No.');
-      $objWorkSheet->setCellValue('E3', 'Mother Name');
-      $objWorkSheet->setCellValue('F3', 'Feeding Date');
-      $objWorkSheet->setCellValue('G3', 'Feeding Time');
-      $objWorkSheet->setCellValue('H3', 'Feeding Method');
-      $objWorkSheet->setCellValue('I3', 'Method type');
-      $objWorkSheet->setCellValue('J3', 'Quantity (ml)');
-      $objWorkSheet->setCellValue('K3', 'Exclusive & Non Exclusive');
-      
-		$timeNotes = "(Nutrition 08:00 am ".date('jS F',strtotime(date('Y-m-d',strtotime("-1 days"))))." to 08:00 am ".date('jS F',strtotime(date('Y-m-d'))).")";
-
-      $objWorkSheet->setCellValue('A1', 'Nutrition Report');
-      $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate." ".$timeNotes);
-
-      $getReportSettings = $this->cmodel->getReportSettings(5);
-      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
-     // print_r($loungeArray);die;
-
-      // Get all baby
-      $getAllBabyAdmission = $this->cmodel->getBabyNutritionList($loungeArray);
-      
-      $dataCount = 1;
-      $a=4;
-
-       foreach($getAllBabyAdmission as $key_baby => $getAllBabyAdmissionData){
-
-       	$babydetail = $this->cmodel->getBabyAdmissionDatabyBabyid($getAllBabyAdmissionData['babyAdmissionId']);
-
-          $babyListArray    = [];
-          $babyListArray[]  = $dataCount;
-          $babyListArray[]  = $babydetail['loungeName'];
-          $babyListArray[]  = $getAllBabyAdmissionData['nurseName'];
-          $babyListArray[]  = $babydetail['babyFileId'];
-          $babyListArray[]  = $babydetail['motherName'];
-          $babyListArray[]  = $getAllBabyAdmissionData['feedDate'];
-          $babyListArray[]  = $getAllBabyAdmissionData['feedTime'];
-          $babyListArray[]  = $getAllBabyAdmissionData['breastFeedMethod'];
-          $babyListArray[]  = $getAllBabyAdmissionData['fluid'];
-          $babyListArray[]  = $getAllBabyAdmissionData['milkQuantity'];
-          if($getAllBabyAdmissionData['fluid']=="Mother's own milk")
-          {
-          	$babyListArray[]  = "Exclusive";
-          }
-          else
-          {
-          	$babyListArray[]  = "Non Exclusive";
-          }
-
-          $objWorkSheet->fromArray($babyListArray, null, 'A'.$a);
-
-          $styleArray = array(
-            'borders' => array(
-            'allborders' => array(
-            'style' => PHPExcel_Style_Border::BORDER_THIN
-            )
-            )
-          );
-
-          $objWorkSheet->getStyle('A1:K'.$a.'')->applyFromArray($styleArray);
-
-          $a++;
-          $dataCount++;
-      }
-
-
-       $objWorkSheet->setTitle('Daily Nutrition Report');
-
-      $file = "Baby-Nutrition-Report-".date('d-m-Y',strtotime("-1 days"));  
-      $filename=$file.'.xls';
-
-      header('Content-Type: application/vnd.ms-excel');
-      header('Content-Disposition: attachment;filename="'.$filename.'"');
-      header('Cache-Control: max-age=0');
-
-      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
-      $objWriter->save('php://output');
-      $objWriter->save(str_replace(__FILE__,'assets/Reports/nutritionReports/'.$filename,__FILE__));
-      chmod('assets/Reports/nutritionReports/'.$filename, 0777);
-
-
-//print_r($getReportSettings);die;
-
-
-      // save file log
-      if(!empty($getReportSettings)){
-        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
-
-        if(empty($checkFileExist)){
-          $logData['reportSettingId']      = $getReportSettings['id'];
-          $logData['fileName']             = $filename;
-          $logData['addDate']              = date('Y-m-d',strtotime("-1 days"));
-          $this->db->insert('reportLogs',$logData);
-        }
-      }
   }
 
 

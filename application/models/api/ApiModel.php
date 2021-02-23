@@ -1184,6 +1184,136 @@ class ApiModel extends CI_Model
         generateServerResponse('1', 'S', $result);
     }
 
+    public function getAdmittedDataByLoungeV2($request){
+        $getAdmittedBaby = $this->db->query('SELECT ba.*,br.motherId,ma.id as motherAdmissionId FROM `babyAdmission` as ba JOIN babyRegistration as br ON br.babyId=ba.babyId JOIN motherAdmission as ma ON ma.motherId=br.motherId WHERE ba.loungeId='.$request['loungeId'].' AND (ba.status=1 OR ma.status=1)')->result_array();
+
+        $response = array();
+
+        foreach ($getAdmittedBaby as $key => $value) {
+            $this->db->select('babyRegistration.*,motherRegistration.motherName');
+            $this->db->join('motherRegistration','motherRegistration.motherId=babyRegistration.motherId');
+            $getRegistrationData = $this->db->get_where('babyRegistration', array('babyRegistration.babyId' => $value['babyId']))->row_array();
+            $getMotherRegistrationData = $this->db->get_where('motherRegistration', array('motherId' => $getRegistrationData['motherId']))->row_array();
+            if($getMotherRegistrationData['isMotherAdmitted'] == 'Yes') {
+                $getMotherAdmissionData = $this->db->get_where('motherAdmission', array('motherId' => $getMotherRegistrationData['motherId']))->row_array();
+                $response[$key]['motherAdmissionData']   = $getMotherAdmissionData;
+                $motherMonitoring = $this->db->get_where('motherMonitoring', array('motherAdmissionId' => $getMotherAdmissionData['id']))->result_array();
+                $response[$key]['motherMonitoring']   = $motherMonitoring;
+                $motherComments = $this->db->get_where('comments', array('admissionId' => $getMotherAdmissionData['id'], 'type' => 1, 'status!=' => 3))->result_array();
+                $response[$key]['motherComments']   = $motherComments;
+            }
+
+
+
+
+            $babyDailyKMC = $this->db->get_where('babyDailyKMC', array('babyAdmissionId' => $value['id'],'isDataValid'=>1))->result_array();
+
+            $babyComments = $this->db->get_where('comments', array('admissionId' => $value['id'], 'type' => 2, 'status!=' => 3))->result_array();
+
+            $babyDailyMonitoring = $this->db->get_where('babyDailyMonitoring', array('babyAdmissionId' => $value['id']))->result_array();
+
+            $babyDailyNutrition = $this->db->get_where('babyDailyNutrition', array('babyAdmissionId' => $value['id']))->result_array();
+
+            $babyDailyWeight = $this->db->get_where('babyDailyWeight', array('babyAdmissionId' => $value['id']))->result_array();
+
+            $doctorRound = $this->db->get_where('doctorRound', array('babyAdmissionId' => $value['id']))->result_array();
+            
+
+            foreach ($doctorRound as $key2 => $value2) {
+                // $investigation = $this->db->get_where('investigation', array('babyAdmissionId' => $value['id'], 'roundId' => $value2['id']))->result_array();
+                $this->db->select('investigation.*, staffMaster.name as doctorName');
+                $this->db->from('investigation');
+                $this->db->join('staffMaster','staffMaster.staffId=investigation.doctorId');
+                $this->db->where(array('babyAdmissionId' => $value['id'], 'roundId' => $value2['id']));
+                $investigation = $this->db->get()->result_array();
+
+                $this->db->select('doctorBabyPrescription.*, staffMaster.name as doctorName');
+                $this->db->from('doctorBabyPrescription');
+                $this->db->join('staffMaster','staffMaster.staffId=doctorBabyPrescription.doctorId');
+                $this->db->where(array('babyAdmissionId' => $value['id'], 'roundId' => $value2['id']));
+                $prescriptions = $this->db->get()->result_array();
+
+                // $prescriptions = $this->db->get_where('doctorBabyPrescription', array('babyAdmissionId' => $value['id'], 'roundId' => $value2['id']))->result_array();
+
+                $doctorRound[$key2]['investigation'] = array();
+                foreach ($investigation as $key3 => $value3) {
+                    $doctorRound[$key2]['investigation'][$key3]['localId'] = $value3['androidUuid'];
+                    $doctorRound[$key2]['investigation'][$key3]['investigationName'] = $value3['investigationName'];
+                    $doctorRound[$key2]['investigation'][$key3]['investigationType'] = $value3['investigationType'];
+                    $doctorRound[$key2]['investigation'][$key3]['doctorId'] = $value3['doctorId'];
+                    $doctorRound[$key2]['investigation'][$key3]['doctorName'] = $value3['doctorName'];
+                    $doctorRound[$key2]['investigation'][$key3]['comment'] = $value3['doctorComment'];
+                    $doctorRound[$key2]['investigation'][$key3]['status']  = $value3['status'];
+                    $doctorRound[$key2]['investigation'][$key3]['localDateTime'] = $value3['addDate'];
+                }
+
+                $doctorRound[$key2]['treatment'] = array();
+                foreach ($prescriptions as $key4 => $value4) {
+                    $doctorRound[$key2]['treatment'][$key4]['localId'] = $value4['androidUuid'];
+                    $doctorRound[$key2]['treatment'][$key4]['treatmentName'] = $value4['prescriptionName'];
+                    $doctorRound[$key2]['treatment'][$key4]['comment'] = $value4['comment'];
+                    $doctorRound[$key2]['treatment'][$key4]['image'] = $value4['image'];
+                    $doctorRound[$key2]['treatment'][$key4]['doctorId'] = $value4['doctorId'];
+                    $doctorRound[$key2]['treatment'][$key4]['doctorName'] = $value4['doctorName'];
+                    $doctorRound[$key2]['treatment'][$key4]['status']       = $value4['status'];
+                    $doctorRound[$key2]['treatment'][$key4]['localDateTime'] = $value4['addDate'];
+                }
+
+                
+            }
+
+            $response[$key]['doctorRound']          = $doctorRound;
+
+
+            $babyVaccination = $this->db->get_where('babyVaccination', array('babyAdmissionId' => $value['id']))->result_array();
+
+            $prescriptionNurseWise = $this->db->get_where('prescriptionNurseWise', array('babyAdmissionId' => $value['id']))->result_array();
+
+            // $investigations = $this->db->get_where('investigation', array('babyAdmissionId' => $value['id']))->result_array();
+
+            $this->db->select('investigation.*, staffMaster.name as doctorName');
+            $this->db->from('investigation');
+            $this->db->join('staffMaster','staffMaster.staffId=investigation.doctorId');
+            $this->db->where(array('babyAdmissionId' => $value['id']));
+            $investigations = $this->db->get()->result_array();
+
+            $response[$key]['babyAdmissionData']     = $value;
+            $response[$key]['babyRegistrationData']  = $getRegistrationData;
+            $response[$key]['motherRegistrationData']     = $getMotherRegistrationData;
+
+            $response[$key]['babyDailyKMC']         = $babyDailyKMC;
+            $response[$key]['babyDailyMonitoring']  = $babyDailyMonitoring;
+            $response[$key]['babyDailyNutrition']     = $babyDailyNutrition;
+            $response[$key]['investigation']      = $investigations;
+            
+            $response[$key]['babyAdmissionData']     = $value;
+            $response[$key]['prescriptionNurseWise']     = $prescriptionNurseWise;
+            $response[$key]['babyVaccination']   = $babyVaccination;
+            $response[$key]['babyComments']   = $babyComments;
+            $response[$key]['babyDailyWeight']   = $babyDailyWeight;
+            
+        }
+        $result['babyDirectoryUrl'] = babyDirectoryUrl;
+        $result['motherDirectoryUrl'] = motherDirectoryUrl;
+        $result['sehmatiPatraUrl'] = sehmatiPatraUrl;
+
+        $result['videoDirectoryUrl'] = videoDirectoryUrl;
+        $result['pdfDirectoryUrl'] = pdfDirectoryUrl;
+
+        $result['imageDirectoryUrl'] = imageDirectoryUrl;
+        $result['signDirectoryUrl'] = signDirectoryUrl;
+
+        $result['babyWeightDirectoryUrl'] = babyWeightDirectoryUrl;
+        $result['babyTemperaturetDirectoryUrl'] = babyTemperaturetDirectoryUrl;
+
+        $result['commentDirectoryUrl'] = commentDirectoryUrl;
+        $result['loungeDirectoryUrl'] = loungeDirectoryUrl;
+        $result['investigationDirectoryUrl'] = investigationDirectoryUrl;
+
+        $result['result'] = $response;
+        generateServerResponse('1', 'S', $result);
+    }
+
 
      //generate token code
     public function generateCoachToken($request)

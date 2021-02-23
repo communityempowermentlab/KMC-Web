@@ -10,6 +10,25 @@ class Welcome extends CI_Controller {
         $this->load->helper(array('captcha'));
   }
 
+  public function restrictPageAccess($validPageArray=false){
+    $adminData = $this->session->userdata('adminData');
+    $userPermittedMenuData = array();
+    $userPermittedMenuData = $this->session->userdata('userPermission');
+
+    $success = 0;
+    if(!empty($validPageArray) && ($adminData['Type']!=1)){ 
+      foreach($validPageArray as $validPageArrayData){
+        if(in_array($validPageArrayData, $userPermittedMenuData)){
+          $success = $success+1;
+        }
+      }
+    }
+
+    if(($adminData['Type']!=1) && ($success == 0)){
+      redirect('Admin/dashboard');
+    }
+  }
+
 
   public function Rcaptcha(){
         $data = array();

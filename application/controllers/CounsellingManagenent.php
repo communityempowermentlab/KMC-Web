@@ -7,6 +7,7 @@ class CounsellingManagenent extends Welcome {
       $this->load->model('CounsellingModel');  
       $this->load->model('FacilityModel');  
       $this->is_not_logged_in(); 
+      $this->restrictPageAccess(array('49','50','51'));
     }
     /* Call Video Listing Page*/
     public function manageCounsellingVideos(){
@@ -36,7 +37,7 @@ class CounsellingManagenent extends Welcome {
       $id = $this->uri->segment(3);
       $data['index']         = 'manageCounsellingVideos';
       $data['index2']        = '';
-      $data['title']         = 'Edit Counselling Videos | '.PROJECT_NAME; 
+      $data['title']         = 'Counselling Videos | '.PROJECT_NAME; 
       $data['VideoData']     = $this->db->query(" select * from counsellingMaster where ID='$id'")->row_array();
       $this->load->view('admin/include/header-new',$data);
       $this->load->view('admin/counselling/counselling-video-edit');
@@ -137,7 +138,7 @@ class CounsellingManagenent extends Welcome {
       $id = $this->uri->segment(3);
       $data['index']         = 'manageApplicationVideos';
       $data['index2']        = '';
-      $data['title']         = 'Edit Application Videos | '.PROJECT_NAME; 
+      $data['title']         = 'Application Videos | '.PROJECT_NAME; 
       $data['VideoData']     = $this->db->query(" select * from counsellingMaster where ID='$id'")->row_array();
       $this->load->view('admin/include/header-new',$data);
       $this->load->view('admin/counselling/application-video-edit');
@@ -238,7 +239,7 @@ class CounsellingManagenent extends Welcome {
       $id = $this->uri->segment(3);
       $data['index']         = 'manageCounsellingPoster';
       $data['index2']        = '';
-      $data['title']         = 'Edit Counselling Poster | '.PROJECT_NAME; 
+      $data['title']         = 'Counselling Poster | '.PROJECT_NAME; 
       $data['VideoData']     = $this->db->query(" select * from counsellingMaster where ID='$id'")->row_array();
       $this->load->view('admin/include/header-new',$data);
       $this->load->view('admin/counselling/counselling-poster-edit');

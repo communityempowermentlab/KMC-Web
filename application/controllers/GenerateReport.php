@@ -11,6 +11,7 @@ class GenerateReport extends Welcome {
     $this->load->model('LoungeModel');  
     $this->load->library('pagination'); 
     $this->is_not_logged_in(); 
+    $this->restrictPageAccess(array('46'));
   }
 
   /* Report Setting Listing page call */

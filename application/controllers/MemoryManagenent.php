@@ -10,6 +10,7 @@ class MemoryManagenent extends Welcome {
     $this->load->model('LoungeModel');  
     date_default_timezone_set('Asia/Kolkata');     
     $this->is_not_logged_in(); 
+    $this->restrictPageAccess(array('91'));
        
   }
 

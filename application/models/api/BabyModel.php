@@ -1982,9 +1982,10 @@ class BabyModel extends CI_Model
             $checkDataForAllUpdate = 1; // check for all data synced or not
             foreach ($request['babyWeightData'] as $key => $request)
             {
-                $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => $request['babyId']))->row_array();
+                $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => trim($request['babyId'])))->row_array();
+                $validateNurseId = $this->db->get_where('staffMaster', array('staffId' => trim($request['nurseId']),'staffType'=>2))->row_array();
 
-                if((!empty($validateBabyId)) && ($request['nurseId'] != "0") && ($request['nurseId'] != "")){
+                if(!empty($validateBabyId)){
                     $checkDuplicateData = $this
                         ->db
                         ->get_where('babyDailyWeight', array(
@@ -2194,7 +2195,7 @@ class BabyModel extends CI_Model
             {
                 $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => $request['babyId']))->row_array();
 
-                if((!empty($validateBabyId)) && ($request['nurseId'] != "0") && ($request['nurseId'] != "")){
+                if(!empty($validateBabyId)){
                     $checkDuplicateData = $this
                         ->db
                         ->get_where('babyDailyNutrition', array(
@@ -2355,6 +2356,7 @@ class BabyModel extends CI_Model
                 ))->num_rows();
 
                 $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => $request['babyId']))->row_array();
+                $validateNurseId = $this->db->get_where('staffMaster', array('staffId' => trim($request['nurseId']),'staffType'=>2))->row_array();
 
                 // kmc data is not less than admission date time
                 $babyAdmissionData = $this->db->get_where('babyAdmission', array('babyId' => $request['babyId']))->row_array();
@@ -2363,17 +2365,31 @@ class BabyModel extends CI_Model
                 
                 // kmc start date should be greator than last end date time
                 $this->db->order_by('babyDailyKMC.id','desc');
-                $babyLastKmcData = $this->db->get_where('babyDailyKMC', array('babyDailyKMC.babyAdmissionId' => $babyAdmissionData['id']))->row_array();
+                $babyLastKmcData = $this->db->get_where('babyDailyKMC', array('babyDailyKMC.babyAdmissionId' => $babyAdmissionData['id'],'babyDailyKMC.isDataValid'=>1))->row_array();
                 if(!empty($babyLastKmcData['endDate'])){
                     $kmcLastDateTime = strtotime($babyLastKmcData['endDate']." ".$babyLastKmcData['endTime']);
                 }else{
                     $kmcLastDateTime = "0";
                 }
                 
-                
-                if((strtotime($babyAdmissionData['admissionDateTime']) <= $kmcStartDateTime) && ($kmcEndDateTime >= $kmcStartDateTime) && ($kmcStartDateTime >= $kmcLastDateTime) && (!empty($validateBabyId)) && (trim($request['nurseId']) != "0") && (trim($request['nurseId']) != "") && (trim($request['startDate']) != "0000-00-00") && (trim($request['startDate']) != "") && (trim($request['endDate']) != "0000-00-00") && (trim($request['endDate']) != "")){
+                //if((strtotime($babyAdmissionData['admissionDateTime']) <= $kmcStartDateTime) && ($kmcEndDateTime >= $kmcStartDateTime) && ($kmcStartDateTime >= $kmcLastDateTime) && (!empty($validateBabyId)) && (!empty($validateNurseId)) && (trim($request['nurseId']) != "0") && (trim($request['nurseId']) != "") && (trim($request['startDate']) != "0000-00-00") && (trim($request['startDate']) != "") && (trim($request['endDate']) != "0000-00-00") && (trim($request['endDate']) != "")){
                     if ($checkDuplicateData == 0)
                     {
+                        // set data valid status
+                        if((strtotime($babyAdmissionData['admissionDateTime']) <= $kmcStartDateTime) && ($kmcEndDateTime >= $kmcStartDateTime) && ($kmcStartDateTime >= $kmcLastDateTime) && (!empty($validateBabyId)) && (!empty($validateNurseId)) && (trim($request['nurseId']) != "0") && (trim($request['nurseId']) != "") && (trim($request['startDate']) != "0000-00-00") && (trim($request['startDate']) != "") && (trim($request['endDate']) != "0000-00-00") && (trim($request['endDate']) != "")){
+
+                            $getKmcDataAlreadyExist = $this->db->get_where('babyDailyKMC', array('babyAdmissionId'=>$babyAdmisionLastId['id'],'nurseId'=>trim($request['nurseId']),'startDate'=>trim($request['startDate']),'startTime'=>trim($request['startTime']),'endDate'=>trim($request['endDate']),'endTime'=>trim($request['endTime'])))->row_array();
+                            if(empty($getKmcDataAlreadyExist)){
+                                $dataValidStatus = 1;
+                            }
+                            else{
+                                $dataValidStatus = 0;
+                            }
+                        }
+                        else{
+                            $dataValidStatus = 0;
+                        }
+
                         //get last Baby AdmissionId
                         $this
                             ->db
@@ -2386,16 +2402,16 @@ class BabyModel extends CI_Model
                         ))->row_array();
 
                         // check kmc data already exist 
-                        $getKmcDataAlreadyExist = $this->db->get_where('babyDailyKMC', array('babyAdmissionId'=>$babyAdmisionLastId['id'],'nurseId'=>$request['nurseId'],'startDate'=>$request['startDate'],'startTime'=>$request['startTime'],'endDate'=>$request['endDate'],'endTime'=>$request['endTime']))->row_array();
+                        //$getKmcDataAlreadyExist = $this->db->get_where('babyDailyKMC', array('babyAdmissionId'=>$babyAdmisionLastId['id'],'nurseId'=>$request['nurseId'],'startDate'=>$request['startDate'],'startTime'=>$request['startTime'],'endDate'=>$request['endDate'],'endTime'=>$request['endTime']))->row_array();
 
-                        if(empty($getKmcDataAlreadyExist)){
+                        //if(empty($getKmcDataAlreadyExist)){
                             $checkDataForAllUpdate = 2;
                             $Start = $request['startTime'];
                             $End = $request['endTime'];
                             $array = array();
                             $array['androidUuid'] = $request['localId'];
                             //$array['babyId'] = $request['babyId'];
-                            $array['nurseId'] = $request['nurseId'];
+                            $array['nurseId'] = trim($request['nurseId']);
 
                             //$array['loungeId'] = $request['loungeId'];
                             $array['startTime'] = $request['startTime'];
@@ -2406,6 +2422,9 @@ class BabyModel extends CI_Model
                             $array['addDate'] = $request['localDateTime'];
                             $array['lastSyncedTime'] = date('Y-m-d H:i:s');
                             $array['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+                            $array['latitude'] = (isset($request['latitude'])) ? trim($request['latitude']):NULL;
+                            $array['longitude']  = (isset($request['longitude'])) ? trim($request['longitude']):NULL;
+                            $array['isDataValid']  = $dataValidStatus;
 
                             $inserted = $this
                                 ->db
@@ -2423,9 +2442,9 @@ class BabyModel extends CI_Model
                                 ->db
                                 ->query("select MR.motherId, MR.motherName, BA.babyId FROM  babyRegistration AS BA LEFT JOIN  motherRegistration AS MR  On BA.motherId = MR.motherId  where  BA.babyId ='" . $request['babyId'] . "'")->row_array();
 
-                            $getNurseData = $this
-                                ->db
-                                ->query("select name from staffMaster where staffId=" . $request['nurseId'] . "")->row_array();
+                            // $getNurseData = $this
+                            //     ->db
+                            //     ->query("select name from staffMaster where staffId=" . trim($request['nurseId']) . "")->row_array();
 
                             $totalSscHrs = $this
                                 ->db
@@ -2455,16 +2474,24 @@ class BabyModel extends CI_Model
                                 ->update('babyAdmission', array(
                                 'babyKMCPdfName' => $PdfName
                             ));*/
-                        }
+                        //}
                     }
                     else
-                    {
+                    { 
+                        // set data valid status
+                        if((strtotime($babyAdmissionData['admissionDateTime']) <= $kmcStartDateTime) && ($kmcEndDateTime >= $kmcStartDateTime) && (!empty($validateBabyId)) && (!empty($validateNurseId)) && (trim($request['nurseId']) != "0") && (trim($request['nurseId']) != "") && (trim($request['startDate']) != "0000-00-00") && (trim($request['startDate']) != "") && (trim($request['endDate']) != "0000-00-00") && (trim($request['endDate']) != "")){
+                            $dataValidStatusUpdate = 1;
+                        }
+                        else{
+                            $dataValidStatusUpdate = 0;
+                        }
+
                         $Start = $request['startTime'];
                         $End = $request['endTime'];
                         $array = array();
                         $array['androidUuid'] = $request['localId'];
                         //$array['babyId'] = $request['babyId'];
-                        $array['nurseId'] = $request['nurseId'];
+                        $array['nurseId'] = trim($request['nurseId']);
 
                         //$array['loungeId'] = $request['loungeId'];
                         $array['startTime'] = $request['startTime'];
@@ -2474,6 +2501,9 @@ class BabyModel extends CI_Model
                         $array['startDate'] = date("Y-m-d", strtotime($request['startDate']));
                         $array['addDate'] = $request['localDateTime'];
                         $array['lastSyncedTime']  = date('Y-m-d H:i:s');
+                        $array['latitude'] = (isset($request['latitude'])) ? trim($request['latitude']):NULL;
+                        $array['longitude']  = (isset($request['longitude'])) ? trim($request['longitude']):NULL;
+                        $array['isDataValid']  = $dataValidStatusUpdate;
 
                         //get last Baby AdmissionId
                         $this
@@ -2518,7 +2548,7 @@ class BabyModel extends CI_Model
                             'babyKMCPdfName' => $PdfName
                         ));*/
                     }
-                }
+                //}
             }
             if ($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2)
             {
@@ -2997,92 +3027,93 @@ class BabyModel extends CI_Model
         $countData = count($request['vaccinationData']);
         if ($countData > 0)
         {
-          
-
             $param = array();
             $checkDataForAllUpdate = 1; // check for all data synced or not
 
             foreach ($request['vaccinationData'] as $key => $request)
             {
-                $checkDuplicateData = $this
-                    ->db
-                    ->get_where('babyVaccination', array(
-                    'androidUuid' => $request['localId']
-                ))->num_rows();
+                $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => trim($request['babyId'])))->row_array();
+                $validateNurseId = $this->db->get_where('staffMaster', array('staffId' => trim($request['nurseId']),'staffType'=>2))->row_array();
 
-                $checkDataForAllUpdate = 2;
-                $array = array();
-
-
-                $arrayName = array();
-                $arrayName['androidUuid'] = $request['localId'];
-                //$arrayName['babyId'] = $request['babyId'];
-                //$arrayName['loungeId'] = $request['loungeId'];
-                $arrayName['vaccinationName'] = $request['vaccinationName'];
-                $arrayName['quantity'] = $request['quantity'];
-                $arrayName['vaccinationDate'] = $request['date'];
-                $arrayName['VaccinationTime'] = $request['time'];
-                $arrayName['nurseId'] = $request['nurseId'];
-               
-
-                //get last Baby AdmissionId
-                $this
-                    ->db
-                    ->order_by('id', 'desc');
-                $babyAdmisionLastId = $this
-                    ->db
-                    ->get_where('babyAdmission', array(
-                    'babyId' => $request['babyId']
-                ))->row_array();
-
-                $arrayName['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
-
-                if ($checkDuplicateData == 0)
-                {   
-                    $arrayName['addDate'] = date('Y-m-d H:i:s');
-
-                    $inserted = $this
-                    ->db
-                    ->insert('babyVaccination', $arrayName);
-                    $lastInsertID            = $this->db->insert_id();
-
-                    $lastID = $this
+                if(!empty($validateBabyId)){
+                    $checkDuplicateData = $this
                         ->db
                         ->get_where('babyVaccination', array(
                         'androidUuid' => $request['localId']
-                    ))->row_array();
-            
-                    $listID['id'] = $lastInsertID;
-                    $listID['localId'] = $request['localId'];
-                    $param[] = $listID;
-                }
-                else
-                { 
-                    $inserted = $this
-                    ->db
-                    ->insert('babyVaccination', $arrayName);
-                    $lastInsertID            = $this->db->insert_id();
-                //($inserted > 0) ? generateServerResponse('1', 'S') : generateServerResponse('0', 'E');
+                    ))->num_rows();
 
-                    // $this
-                    //     ->db
-                    //     ->where('androidUuid', $request['localId']);
-                    // $this
-                    //     ->db
-                    //     ->update('babyVaccination', $arrayName);
+                    $checkDataForAllUpdate = 2;
+                    $array = array();
 
-                    $lastID = $this
+
+                    $arrayName = array();
+                    $arrayName['androidUuid'] = $request['localId'];
+                    //$arrayName['babyId'] = $request['babyId'];
+                    //$arrayName['loungeId'] = $request['loungeId'];
+                    $arrayName['vaccinationName'] = $request['vaccinationName'];
+                    $arrayName['quantity'] = $request['quantity'];
+                    $arrayName['vaccinationDate'] = $request['date'];
+                    $arrayName['VaccinationTime'] = $request['time'];
+                    $arrayName['nurseId'] = $request['nurseId'];
+                   
+
+                    //get last Baby AdmissionId
+                    $this
                         ->db
-                        ->get_where('babyVaccination', array(
-                        'androidUuid' => $request['localId']
+                        ->order_by('id', 'desc');
+                    $babyAdmisionLastId = $this
+                        ->db
+                        ->get_where('babyAdmission', array(
+                        'babyId' => $request['babyId']
                     ))->row_array();
-            
-                    $listID['id'] = $lastInsertID;
-                    $listID['localId'] = $request['localId'];
-                    $param[] = $listID;
+
+                    $arrayName['babyAdmissionId'] = ($babyAdmisionLastId['id'] != '') ? $babyAdmisionLastId['id'] : NULL;
+
+                    if ($checkDuplicateData == 0)
+                    {   
+                        $arrayName['addDate'] = date('Y-m-d H:i:s');
+
+                        $inserted = $this
+                        ->db
+                        ->insert('babyVaccination', $arrayName);
+                        $lastInsertID            = $this->db->insert_id();
+
+                        $lastID = $this
+                            ->db
+                            ->get_where('babyVaccination', array(
+                            'androidUuid' => $request['localId']
+                        ))->row_array();
+                
+                        $listID['id'] = $lastInsertID;
+                        $listID['localId'] = $request['localId'];
+                        $param[] = $listID;
+                    }
+                    else
+                    { 
+                        $inserted = $this
+                        ->db
+                        ->insert('babyVaccination', $arrayName);
+                        $lastInsertID            = $this->db->insert_id();
+                    //($inserted > 0) ? generateServerResponse('1', 'S') : generateServerResponse('0', 'E');
+
+                        // $this
+                        //     ->db
+                        //     ->where('androidUuid', $request['localId']);
+                        // $this
+                        //     ->db
+                        //     ->update('babyVaccination', $arrayName);
+
+                        $lastID = $this
+                            ->db
+                            ->get_where('babyVaccination', array(
+                            'androidUuid' => $request['localId']
+                        ))->row_array();
+                
+                        $listID['id'] = $lastInsertID;
+                        $listID['localId'] = $request['localId'];
+                        $param[] = $listID;
+                    }
                 }
-
-
             }
 
             if ($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2)
@@ -3979,9 +4010,10 @@ class BabyModel extends CI_Model
             $checkSyncedData = 1; // check for all data synced or not
             foreach ($request['monitoringData'] as $key => $request)
             {
-                $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => $request['babyId']))->row_array();
+                $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => trim($request['babyId'])))->row_array();
+                $validateStaffId = $this->db->get_where('staffMaster', array('staffId' => trim($request['staffId'])))->row_array();
 
-                if((!empty($validateBabyId)) && ($request['staffId'] != "0") && ($request['staffId'] != "")){
+                if((!empty($validateBabyId)) && (!empty($validateStaffId)) && (trim($request['staffId']) != "0") && (trim($request['staffId']) != "")){
 
                     $checkSyncedData = 2;
                     //get last Baby AdmissionId

@@ -125,6 +125,15 @@ public function captcha(){
     $this->load->view('/admin/auth-login',$data);
   }
 
+  // lounge login
+  public function loungeLogin(){ 
+    $this->is_logged_in(); 
+    $data['title'] = PROJECT_NAME; 
+    $data['backgroundImages'] = $this->FacilityModel->getActiveImage(); 
+    $data['district'] = $this->db->query('SELECT DISTINCT StateCode, StateNameProperCase, PRIDistrictCode , DistrictNameProperCase, UrbanRural, STATUS FROM revenuevillagewithblcoksandsubdistandgs')->result_array();
+    $this->load->view('/admin/lounge-auth-login',$data);
+  }
+
 
   public function Login(){
     $this->is_logged_in(); 

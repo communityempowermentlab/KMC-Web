@@ -872,247 +872,252 @@ class MotherModel extends CI_Model
             $checkDataForAllUpdate = 1; // check for all data synced or not
             foreach ($request['monitoringData'] as $key => $value)
             {
-                $checkDuplicateData = $this
-                    ->db
-                    ->get_where('motherMonitoring', array(
-                    'androidUuid' => $value['localId']
-                ))->num_rows();
-
-                if ($checkDuplicateData == 0)
-                {
-                    $checkDataForAllUpdate = 2;
-                    $this
-                        ->db
-                        ->order_by('id', 'desc');
-                    $motherAdmisionLastId = $this
-                        ->db
-                        ->get_where('motherAdmission', array(
-                        'motherId' => $value['motherId']
-                    ))->row_array();
-
-                    $getCount = $this
-                        ->db
-                        ->query("SELECT * FROM motherMonitoring where motherAdmissionId ='" . $motherAdmisionLastId['id'] . "' ")->num_rows();
-                    $ImageOfadmittedPersonSign = ($value['admittedSign'] != '') ? saveImage($value['admittedSign'], signDirectory) : '';
-
-                    $padPicture = ($value['padPicture'] != '') ? saveDynamicImage($value['padPicture'], padDirectory) : '';
-                    $request = array();
-                    $request['motherAdmissionId'] = $motherAdmisionLastId['id'];
-                    //$request['loungeId'] = $value['loungeId'];
-                    $request['androidUuid'] = ($value['localId'] != '') ? $value['localId'] : NULL;
-                    $request['motherTemperature'] = $value['motherTemperature'];
-                    $request['temperatureUnit'] = $value['temperatureUnit'];
-                    $request['padNotChangeReason'] = $value['padNotChangeReason'];
-
-                    $request['motherSystolicBP'] = $value['motherSystolicBP'];
-                    $request['motherDiastolicBP'] = $value['motherDiastolicBP'];
-                    $request['motherPulse'] = $value['motherPulse'];
-                    $request['episitomyCondition'] = $value['episitomyCondition'];
-                    $request['sanitoryPadStatus'] = $value['sanitoryPadStatus'];
-                    $request['isSanitoryPadStink'] = $value['isSanitoryPadStink'];
-                    $request['other'] = $value['other'];
-                    $request['motherUterineTone'] = $value['motherUterineTone'];
-                    $request['motherUrinationAfterDelivery'] = $value['motherUrinationAfterDelivery'];
-                    $request['staffId'] = $value['staffId'];
-
-                    $request['padPicture'] = $padPicture;
-                    $request['admittedSign'] = $ImageOfadmittedPersonSign;
-                    $request['motherAdmissionId'] = ($motherAdmisionLastId['id'] != '') ? $motherAdmisionLastId['id'] : NULL;
-                    $request['assesmentDate'] = date('Y-m-d');
-                    $request['assesmentTime'] = date('H:i');
-                    $request['assesmentNumber'] = $getCount + 1;
-                    $request['status'] = 1;
-                    $request['addDate'] = $value['localDateTime'];
-                    $request['lastSyncedTime'] = date('Y-m-d H:i:s');
-                    $request['modifyDate'] = date('Y-m-d H:i:s');
-
-                    $resultArray = isBlankOrNull($request);
-                    $insert = $this
-                        ->db
-                        ->insert('motherMonitoring', $resultArray);
-                    $lastAssessmentId = $this
-                        ->db
-                        ->insert_id();
-                    $listID['id'] = $lastAssessmentId;
-                    $listID['localId'] = $value['localId'];
-                    $param[] = $listID;
-                    ######### manage points ##########
-                    
-
-                    $GetNoticfictaionEntry = $this
-                        ->db
-                        ->query("SELECT * From notification where  loungeId = '" . $value['loungeId'] . "'  AND  motherId = '" . $value['motherId'] . "' AND status = '1' AND typeOfNotification='1' order by id desc limit 0, 1")->result_array();
-                    $GetNoticfictaionEntry1 = $this
-                        ->db
-                        ->query("SELECT * From notification where  loungeId = '" . $value['loungeId'] . "'  AND  motherId = '" . $value['motherId'] . "' AND status = '1' AND typeOfNotification='1' order by id desc limit 0, 1")->row_array();
-
-                    $settingDetail = getAllData('settings', 'id', '1');
-
-                    $secondMonitoring = $settingDetail['motherMonitoringSecondTime'];
-                    $secondTiming = date('Y-m-d ' . $secondMonitoring . ':00:00');
-                    $secondMonitoringTime = strtotime($secondTiming);
-
-                    $secondEnddate = date('Y-m-d H:i:s', strtotime('+ 3 hours' . date('Y-m-d H:i:s', $secondMonitoringTime)));
-                    $secondEndTiming = strtotime($secondEnddate);
-
-                    $thirdMonitoing = $settingDetail['motherMonitoringThirdTime'];
-                    $thirdTiming = date('Y-m-d ' . $thirdMonitoing . ':00:00');
-                    $thirdMonitoringTime = strtotime($thirdTiming);
-
-                    $thirdEndDate = date('Y-m-d H:i:s', strtotime('+ 3 hours' . date('Y-m-d H:i:s', $thirdMonitoringTime)));
-                    $thirdEndTiming = strtotime($thirdEndDate);
-
-                    $fourthMonitoring = $settingDetail['motherMonitoringFourthTime'];
-                    $fourthTiming = date('Y-m-d ' . $fourthMonitoring . ':00:00');
-                    $fourthMonitoringTime = strtotime($fourthTiming);
-
-                    $fourthEndDate = date('Y-m-d H:i:s', strtotime('+ 3 hours' . date('Y-m-d H:i:s', $fourthMonitoringTime)));
-                    $fourthEndTime = strtotime($fourthEndDate);
-
-                    $curDateTime = time();
-
-                    if ($settingDetail > 0)
-                    {
-                        $firstMonitoring = $settingDetail['motherMonitoringFirstTime'];
-                        $firstTiming = date('Y-m-d ' . $firstMonitoring . ':00:00');
-                        $firstMonitoringTime = strtotime($firstTiming);
-
-                        $firstEnddate = date('Y-m-d H:i:s', strtotime('+ 3 hours' . date('Y-m-d H:i:s', $firstMonitoringTime)));
-                        $firstEndTiming = strtotime($firstEnddate);
-
-                        if ($firstMonitoringTime <= $curDateTime && $firstEndTiming > $curDateTime)
-                        {
-                            if (count($GetNoticfictaionEntry) == 1)
-                            {
-                                $this
-                                    ->db
-                                    ->where('id', $GetNoticfictaionEntry1['id']);
-                                $this
-                                    ->db
-                                    ->update('notification', array(
-                                    'status' => '2',
-                                    'modifyDate' => $curDateTime
-                                ));
-                                $this->givenPointsAtMonitoring($request, $lastAssessmentId);
-                            }
-
-                        }
-                        else if ($secondMonitoringTime <= $curDateTime && $secondEndTiming > $curDateTime)
-                        {
-                            if (count($GetNoticfictaionEntry) == 1)
-                            {
-                                $this
-                                    ->db
-                                    ->where('id', $GetNoticfictaionEntry1['id']);
-                                $this
-                                    ->db
-                                    ->update('notification', array(
-                                    'status' => '2',
-                                    'modifyDate' => $curDateTime
-                                ));
-                                $this->givenPointsAtMonitoring($request, $lastAssessmentId);
-                            }
-                        }
-                        else if ($thirdMonitoringTime <= $curDateTime && $thirdEndTiming > $curDateTime)
-                        {
-                            if (count($GetNoticfictaionEntry) == 1)
-                            {
-                                $this
-                                    ->db
-                                    ->where('id', $GetNoticfictaionEntry1['id']);
-                                $this
-                                    ->db
-                                    ->update('notification', array(
-                                    'status' => '2',
-                                    'modifyDate' => $curDateTime
-                                ));
-                                $this->givenPointsAtMonitoring($request, $lastAssessmentId);
-                            }
-                        }
-                        else if ($fourthMonitoringTime <= $curDateTime && $fourthEndTime > $curDateTime)
-                        {
-                            if (count($GetNoticfictaionEntry) == 1)
-                            {
-                                $this
-                                    ->db
-                                    ->where('id', $GetNoticfictaionEntry1['id']);
-                                $this
-                                    ->db
-                                    ->update('notification', array(
-                                    'status' => '2',
-                                    'modifyDate' => $curDateTime
-                                ));
-                                $this->givenPointsAtMonitoring($request, $lastAssessmentId);
-                            }
-                        }
-
-                    }
-                }
-                else
-                {
-                    // all update data
-                    $this
-                        ->db
-                        ->order_by('id', 'desc');
-                    $motherAdmisionLastId = $this
-                        ->db
-                        ->get_where('motherAdmission', array(
-                        'motherId' => $value['motherId']
-                    ))->row_array();
-
-                    $getCount = $this
-                        ->db
-                        ->query("SELECT * FROM motherMonitoring where motherAdmissionId ='" .  $motherAdmisionLastId['id'] . "' ")->num_rows();
-                    
-                    $ImageOfadmittedPersonSign = ($value['admittedSign'] != '') ? saveImage($value['admittedSign'], signDirectory) : '';
-
-                    $padPicture = ($value['padPicture'] != '') ? saveDynamicImage($value['padPicture'], padDirectory) : '';
-                    $request = array();
-                    $request['motherAdmissionId'] =  $motherAdmisionLastId['id'];
-                    //$request['loungeId'] = $value['loungeId'];
-                    $request['androidUuid'] = ($value['localId'] != '') ? $value['localId'] : NULL;
-                    $request['motherTemperature'] = $value['motherTemperature'];
-                    $request['temperatureUnit'] = $value['temperatureUnit'];
-                    $request['padNotChangeReason'] = ($value['padNotChangeReason'] != '') ? $value['padNotChangeReason'] : NULL;
-
-                    $request['motherSystolicBP'] = $value['motherSystolicBP']; 
-                    $request['motherDiastolicBP'] = $value['motherDiastolicBP'];
-                    $request['motherPulse'] = $value['motherPulse'];
-                    $request['episitomyCondition'] = ($value['episitomyCondition'] != '') ? $value['episitomyCondition'] : NULL;
-                    $request['sanitoryPadStatus'] =  ($value['sanitoryPadStatus'] != '') ? $value['sanitoryPadStatus'] : NULL;
-                    $request['isSanitoryPadStink'] = ($value['isSanitoryPadStink'] != '') ? $value['isSanitoryPadStink'] : NULL;
-                    $request['otherComment'] = ($value['other'] != '') ? $value['other'] : NULL;
-                    $request['motherUterineTone'] = ($value['motherUterineTone'] != '') ? $value['motherUterineTone'] : NULL;
-                    $request['motherUrinationAfterDelivery'] = ($value['motherUrinationAfterDelivery'] != '') ? $value['motherUrinationAfterDelivery'] : NULL;
-                    $request['staffId'] = $value['staffId'];
-
-                    $request['padPicture'] = $padPicture;
-                    $request['admittedSign'] = $ImageOfadmittedPersonSign;
-                    $request['motherAdmissionId'] = ($motherAdmisionLastId['id'] != '') ? $motherAdmisionLastId['id'] : NULL;
-                    $request['assesmentDate'] = date('Y-m-d');
-                    $request['assesmentTime'] = date('H:i');
-                    $request['assesmentNumber'] = $getCount + 1;
-                    $request['status'] = 1;
-                    $request['addDate'] = $value['localDateTime'];
-                    $request['lastSyncedTime'] = date('Y-m-d H:i:s');
-                    $request['modifyDate'] = date('Y-m-d H:i:s');
-
-                    $resultArray = isBlankOrNull($request);
-                    $this
-                        ->db
-                        ->where('androidUuid', $value['localId']);
-                    $this
-                        ->db
-                        ->update('motherMonitoring', $resultArray);
-                    $lastAssessmentId = $this
+                $validateMotherId = $this->db->get_where('motherRegistration', array('motherId' => trim($value['motherId'])))->row_array();
+                $validateStaffId = $this->db->get_where('staffMaster', array('staffId' => trim($value['staffId'])))->row_array();
+                
+                if((!empty($validateMotherId)) && (!empty($validateStaffId)) && (trim($value['staffId']) != "0") && (trim($value['staffId']) != "")){
+                    $checkDuplicateData = $this
                         ->db
                         ->get_where('motherMonitoring', array(
                         'androidUuid' => $value['localId']
-                    ))->row_array();
-                    $listID['id'] = $lastAssessmentId['id'];
-                    $listID['localId'] = $value['localId'];
-                    $param[] = $listID;
+                    ))->num_rows();
 
+                    if ($checkDuplicateData == 0)
+                    {
+                        $checkDataForAllUpdate = 2;
+                        $this
+                            ->db
+                            ->order_by('id', 'desc');
+                        $motherAdmisionLastId = $this
+                            ->db
+                            ->get_where('motherAdmission', array(
+                            'motherId' => $value['motherId']
+                        ))->row_array();
+
+                        $getCount = $this
+                            ->db
+                            ->query("SELECT * FROM motherMonitoring where motherAdmissionId ='" . $motherAdmisionLastId['id'] . "' ")->num_rows();
+                        $ImageOfadmittedPersonSign = ($value['admittedSign'] != '') ? saveImage($value['admittedSign'], signDirectory) : '';
+
+                        $padPicture = ($value['padPicture'] != '') ? saveDynamicImage($value['padPicture'], padDirectory) : '';
+                        $request = array();
+                        $request['motherAdmissionId'] = $motherAdmisionLastId['id'];
+                        //$request['loungeId'] = $value['loungeId'];
+                        $request['androidUuid'] = ($value['localId'] != '') ? $value['localId'] : NULL;
+                        $request['motherTemperature'] = $value['motherTemperature'];
+                        $request['temperatureUnit'] = $value['temperatureUnit'];
+                        $request['padNotChangeReason'] = $value['padNotChangeReason'];
+
+                        $request['motherSystolicBP'] = $value['motherSystolicBP'];
+                        $request['motherDiastolicBP'] = $value['motherDiastolicBP'];
+                        $request['motherPulse'] = $value['motherPulse'];
+                        $request['episitomyCondition'] = $value['episitomyCondition'];
+                        $request['sanitoryPadStatus'] = $value['sanitoryPadStatus'];
+                        $request['isSanitoryPadStink'] = $value['isSanitoryPadStink'];
+                        $request['other'] = $value['other'];
+                        $request['motherUterineTone'] = $value['motherUterineTone'];
+                        $request['motherUrinationAfterDelivery'] = $value['motherUrinationAfterDelivery'];
+                        $request['staffId'] = $value['staffId'];
+
+                        $request['padPicture'] = $padPicture;
+                        $request['admittedSign'] = $ImageOfadmittedPersonSign;
+                        $request['motherAdmissionId'] = ($motherAdmisionLastId['id'] != '') ? $motherAdmisionLastId['id'] : NULL;
+                        $request['assesmentDate'] = date('Y-m-d');
+                        $request['assesmentTime'] = date('H:i');
+                        $request['assesmentNumber'] = $getCount + 1;
+                        $request['status'] = 1;
+                        $request['addDate'] = $value['localDateTime'];
+                        $request['lastSyncedTime'] = date('Y-m-d H:i:s');
+                        $request['modifyDate'] = date('Y-m-d H:i:s');
+
+                        $resultArray = isBlankOrNull($request);
+                        $insert = $this
+                            ->db
+                            ->insert('motherMonitoring', $resultArray);
+                        $lastAssessmentId = $this
+                            ->db
+                            ->insert_id();
+                        $listID['id'] = $lastAssessmentId;
+                        $listID['localId'] = $value['localId'];
+                        $param[] = $listID;
+                        ######### manage points ##########
+                        
+
+                        $GetNoticfictaionEntry = $this
+                            ->db
+                            ->query("SELECT * From notification where  loungeId = '" . $value['loungeId'] . "'  AND  motherId = '" . $value['motherId'] . "' AND status = '1' AND typeOfNotification='1' order by id desc limit 0, 1")->result_array();
+                        $GetNoticfictaionEntry1 = $this
+                            ->db
+                            ->query("SELECT * From notification where  loungeId = '" . $value['loungeId'] . "'  AND  motherId = '" . $value['motherId'] . "' AND status = '1' AND typeOfNotification='1' order by id desc limit 0, 1")->row_array();
+
+                        $settingDetail = getAllData('settings', 'id', '1');
+
+                        $secondMonitoring = $settingDetail['motherMonitoringSecondTime'];
+                        $secondTiming = date('Y-m-d ' . $secondMonitoring . ':00:00');
+                        $secondMonitoringTime = strtotime($secondTiming);
+
+                        $secondEnddate = date('Y-m-d H:i:s', strtotime('+ 3 hours' . date('Y-m-d H:i:s', $secondMonitoringTime)));
+                        $secondEndTiming = strtotime($secondEnddate);
+
+                        $thirdMonitoing = $settingDetail['motherMonitoringThirdTime'];
+                        $thirdTiming = date('Y-m-d ' . $thirdMonitoing . ':00:00');
+                        $thirdMonitoringTime = strtotime($thirdTiming);
+
+                        $thirdEndDate = date('Y-m-d H:i:s', strtotime('+ 3 hours' . date('Y-m-d H:i:s', $thirdMonitoringTime)));
+                        $thirdEndTiming = strtotime($thirdEndDate);
+
+                        $fourthMonitoring = $settingDetail['motherMonitoringFourthTime'];
+                        $fourthTiming = date('Y-m-d ' . $fourthMonitoring . ':00:00');
+                        $fourthMonitoringTime = strtotime($fourthTiming);
+
+                        $fourthEndDate = date('Y-m-d H:i:s', strtotime('+ 3 hours' . date('Y-m-d H:i:s', $fourthMonitoringTime)));
+                        $fourthEndTime = strtotime($fourthEndDate);
+
+                        $curDateTime = time();
+
+                        if ($settingDetail > 0)
+                        {
+                            $firstMonitoring = $settingDetail['motherMonitoringFirstTime'];
+                            $firstTiming = date('Y-m-d ' . $firstMonitoring . ':00:00');
+                            $firstMonitoringTime = strtotime($firstTiming);
+
+                            $firstEnddate = date('Y-m-d H:i:s', strtotime('+ 3 hours' . date('Y-m-d H:i:s', $firstMonitoringTime)));
+                            $firstEndTiming = strtotime($firstEnddate);
+
+                            if ($firstMonitoringTime <= $curDateTime && $firstEndTiming > $curDateTime)
+                            {
+                                if (count($GetNoticfictaionEntry) == 1)
+                                {
+                                    $this
+                                        ->db
+                                        ->where('id', $GetNoticfictaionEntry1['id']);
+                                    $this
+                                        ->db
+                                        ->update('notification', array(
+                                        'status' => '2',
+                                        'modifyDate' => $curDateTime
+                                    ));
+                                    $this->givenPointsAtMonitoring($request, $lastAssessmentId);
+                                }
+
+                            }
+                            else if ($secondMonitoringTime <= $curDateTime && $secondEndTiming > $curDateTime)
+                            {
+                                if (count($GetNoticfictaionEntry) == 1)
+                                {
+                                    $this
+                                        ->db
+                                        ->where('id', $GetNoticfictaionEntry1['id']);
+                                    $this
+                                        ->db
+                                        ->update('notification', array(
+                                        'status' => '2',
+                                        'modifyDate' => $curDateTime
+                                    ));
+                                    $this->givenPointsAtMonitoring($request, $lastAssessmentId);
+                                }
+                            }
+                            else if ($thirdMonitoringTime <= $curDateTime && $thirdEndTiming > $curDateTime)
+                            {
+                                if (count($GetNoticfictaionEntry) == 1)
+                                {
+                                    $this
+                                        ->db
+                                        ->where('id', $GetNoticfictaionEntry1['id']);
+                                    $this
+                                        ->db
+                                        ->update('notification', array(
+                                        'status' => '2',
+                                        'modifyDate' => $curDateTime
+                                    ));
+                                    $this->givenPointsAtMonitoring($request, $lastAssessmentId);
+                                }
+                            }
+                            else if ($fourthMonitoringTime <= $curDateTime && $fourthEndTime > $curDateTime)
+                            {
+                                if (count($GetNoticfictaionEntry) == 1)
+                                {
+                                    $this
+                                        ->db
+                                        ->where('id', $GetNoticfictaionEntry1['id']);
+                                    $this
+                                        ->db
+                                        ->update('notification', array(
+                                        'status' => '2',
+                                        'modifyDate' => $curDateTime
+                                    ));
+                                    $this->givenPointsAtMonitoring($request, $lastAssessmentId);
+                                }
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        // all update data
+                        $this
+                            ->db
+                            ->order_by('id', 'desc');
+                        $motherAdmisionLastId = $this
+                            ->db
+                            ->get_where('motherAdmission', array(
+                            'motherId' => $value['motherId']
+                        ))->row_array();
+
+                        $getCount = $this
+                            ->db
+                            ->query("SELECT * FROM motherMonitoring where motherAdmissionId ='" .  $motherAdmisionLastId['id'] . "' ")->num_rows();
+                        
+                        $ImageOfadmittedPersonSign = ($value['admittedSign'] != '') ? saveImage($value['admittedSign'], signDirectory) : '';
+
+                        $padPicture = ($value['padPicture'] != '') ? saveDynamicImage($value['padPicture'], padDirectory) : '';
+                        $request = array();
+                        $request['motherAdmissionId'] =  $motherAdmisionLastId['id'];
+                        //$request['loungeId'] = $value['loungeId'];
+                        $request['androidUuid'] = ($value['localId'] != '') ? $value['localId'] : NULL;
+                        $request['motherTemperature'] = $value['motherTemperature'];
+                        $request['temperatureUnit'] = $value['temperatureUnit'];
+                        $request['padNotChangeReason'] = ($value['padNotChangeReason'] != '') ? $value['padNotChangeReason'] : NULL;
+
+                        $request['motherSystolicBP'] = $value['motherSystolicBP']; 
+                        $request['motherDiastolicBP'] = $value['motherDiastolicBP'];
+                        $request['motherPulse'] = $value['motherPulse'];
+                        $request['episitomyCondition'] = ($value['episitomyCondition'] != '') ? $value['episitomyCondition'] : NULL;
+                        $request['sanitoryPadStatus'] =  ($value['sanitoryPadStatus'] != '') ? $value['sanitoryPadStatus'] : NULL;
+                        $request['isSanitoryPadStink'] = ($value['isSanitoryPadStink'] != '') ? $value['isSanitoryPadStink'] : NULL;
+                        $request['otherComment'] = ($value['other'] != '') ? $value['other'] : NULL;
+                        $request['motherUterineTone'] = ($value['motherUterineTone'] != '') ? $value['motherUterineTone'] : NULL;
+                        $request['motherUrinationAfterDelivery'] = ($value['motherUrinationAfterDelivery'] != '') ? $value['motherUrinationAfterDelivery'] : NULL;
+                        $request['staffId'] = $value['staffId'];
+
+                        $request['padPicture'] = $padPicture;
+                        $request['admittedSign'] = $ImageOfadmittedPersonSign;
+                        $request['motherAdmissionId'] = ($motherAdmisionLastId['id'] != '') ? $motherAdmisionLastId['id'] : NULL;
+                        $request['assesmentDate'] = date('Y-m-d');
+                        $request['assesmentTime'] = date('H:i');
+                        $request['assesmentNumber'] = $getCount + 1;
+                        $request['status'] = 1;
+                        $request['addDate'] = $value['localDateTime'];
+                        $request['lastSyncedTime'] = date('Y-m-d H:i:s');
+                        $request['modifyDate'] = date('Y-m-d H:i:s');
+
+                        $resultArray = isBlankOrNull($request);
+                        $this
+                            ->db
+                            ->where('androidUuid', $value['localId']);
+                        $this
+                            ->db
+                            ->update('motherMonitoring', $resultArray);
+                        $lastAssessmentId = $this
+                            ->db
+                            ->get_where('motherMonitoring', array(
+                            'androidUuid' => $value['localId']
+                        ))->row_array();
+                        $listID['id'] = $lastAssessmentId['id'];
+                        $listID['localId'] = $value['localId'];
+                        $param[] = $listID;
+
+                    }
                 }
             }
         }

@@ -23,113 +23,125 @@ class CommentModel extends CI_Model {
 	       	$param  = array();
 	       	$checkDataForAllUpdate = 1;  // check for all data synced or not
 	       	foreach ($request['commentData'] as $key => $request) {
-	       		$checkDuplicateData =  $this->db->get_where('comments',array('androidUuid'=>$request['localId']))->num_rows();
-	       		if($checkDuplicateData == 0){
-	       		    $checkDataForAllUpdate = 2;	
-					$array = array();
-					if($request['type'] == '1')
-					{
-						$array['doctorId'] 	         = $request['doctorId'];
-						//$array['loungeId'] 	         = $request['loungeId'];
-						$array['type'] 	             = $request['type'];
-						$array['admissionId'] 	 = $request['motherOrBabyId'];
-						$array['androidUuid']        = ($request['localId']!='') ? $request['localId']:NULL;
 
-			         $this->db->order_by('id','desc');
-			         $getAdmisionID=$this->db->get_where('motherAdmission', array('motherId'=>$request['motherOrBabyId']))->row_array();
+	       		if($request['type'] == '1'){
+	       			$validateAdmissionId = $this->db->get_where('motherRegistration', array('motherId' => trim($request['motherOrBabyId'])))->row_array();
+	       		}else{
+	       			$validateAdmissionId = $this->db->get_where('babyRegistration', array('babyId' => trim($request['motherOrBabyId'])))->row_array();
+	       		}
+                $validateDoctorId = $this->db->get_where('staffMaster', array('staffId' => trim($request['doctorId'])))->row_array();
 
+                //if((!empty($validateDoctorId)) && (!empty($validateAdmissionId)) && (trim($request['doctorId']) != "0") && (trim($request['doctorId']) != "")){
 
-						$array['admissionId']        = $getAdmisionID['id'];
-						$array['comment']            = $request['comment'];
-						$array['status']             = $request['status'];
-						$array['addDate']             = $request['localDateTime'];
-						$array['lastSyncedTime']      = date('Y-m-d : H:i:s');
-						$array['modifyDate'] 	   	  = date('Y-m-d : H:i:s');
+		       		$checkDuplicateData =  $this->db->get_where('comments',array('androidUuid'=>$request['localId']))->num_rows();
+		       		if($checkDuplicateData == 0){
+		       		    $checkDataForAllUpdate = 2;	
+						$array = array();
+						if($request['type'] == '1')
+						{
+							$array['doctorId'] 	         = $request['doctorId'];
+							//$array['loungeId'] 	         = $request['loungeId'];
+							$array['type'] 	             = $request['type'];
+							$array['admissionId'] 	 = $request['motherOrBabyId'];
+							$array['androidUuid']        = ($request['localId']!='') ? $request['localId']:NULL;
 
-			            $inserted = $this->db->insert('comments', $array);
-						$lastID            = $this->db->insert_id();
-						$listID['id']      = $lastID;
-						$listID['localId'] = $request['localId'];;
-						$param1[]          = $listID;
-
-			         }else if($request['type'] == '2') {
-						$array['doctorId'] 	         = $request['doctorId'];
-						//$array['loungeId'] 	         = $request['loungeId'];
-						$array['type'] 	             = $request['type'];
-						$array['admissionId'] 	 = $request['motherOrBabyId'];
-						$array['androidUuid']       = ($request['localId']!='') ? $request['localId']:NULL;
-			         $this->db->order_by('id','desc');
-			         $getAdmisionID=$this->db->get_where('babyAdmission', array('babyId'=>$request['motherOrBabyId']))->row_array();
-
-						$array['admissionId']        = $getAdmisionID['id'];
-						$array['comment']            = $request['comment'];
-						$array['status']             = $request['status'];
-						$array['addDate']             = $request['localDateTime'];
-						$array['lastSyncedTime']      = date('Y-m-d : H:i:s');
-						$array['modifyDate'] 	   	 = date('Y-m-d : H:i:s');
-
-			            $inserted = $this->db->insert('comments', $array);  
-						$lastID            = $this->db->insert_id();
-						$listID['id']      = $lastID;
-						$listID['localId'] = $request['localId'];;
-						$param1[]          = $listID;   	
-			         }
-			    }else {               // update code here 
-					$array = array();
-					if($request['type'] == '1')
-					{
-						$array['doctorId'] 	         = $request['doctorId'];
-						//$array['loungeId'] 	         = $request['loungeId'];
-						$array['type'] 	             = $request['type'];
-						$array['admissionId'] 	 = $request['motherOrBabyId'];
-						$array['androidUuid']       = ($request['localId']!='') ? $request['localId']:NULL;
-			         $this->db->order_by('id','desc');
-			         $getAdmisionID=$this->db->get_where('motherAdmission', array('motherId'=>$request['motherOrBabyId']))->row_array();
+				         $this->db->order_by('id','desc');
+				         $getAdmisionID=$this->db->get_where('motherAdmission', array('motherId'=>$request['motherOrBabyId']))->row_array();
 
 
-						$array['admissionId']        = $getAdmisionID['id'];
-						$array['comment']            = $request['comment'];
-						$array['status']             = $request['status'];
-						$array['addDate']             = $request['localDateTime'];
-						$array['lastSyncedTime']       = date('Y-m-d : H:i:s');
-						$array['modifyDate'] 	   	  = date('Y-m-d : H:i:s');
+							$array['admissionId']        = $getAdmisionID['id'];
+							$array['comment']            = $request['comment'];
+							$array['status']             = $request['status'];
+							$array['addDate']             = $request['localDateTime'];
+							$array['lastSyncedTime']      = date('Y-m-d : H:i:s');
+							$array['modifyDate'] 	   	  = date('Y-m-d : H:i:s');
 
-						$this->db->where('androidUuid',$request['localId']);
-						$this->db->update('comments', $array);
-						$lastID = $this->db->get_where('comments',array('androidUuid'=>$request['localId']))->row_array();
-						$listID['id']      = $lastID['id'];
-						$listID['localId'] = $request['localId'];
-						$param1[] = $listID; 
+				            $inserted = $this->db->insert('comments', $array);
+							$lastID            = $this->db->insert_id();
+							$listID['id']      = $lastID;
+							$listID['localId'] = $request['localId'];;
+							$param1[]          = $listID;
 
-			         }else if($request['type'] == '2') {
-						$array['doctorId'] 	         = $request['doctorId'];
-						//$array['loungeId'] 	         = $request['loungeId'];
-						$array['type'] 	             = $request['type'];
-						$array['admissionId'] 	 = $request['motherOrBabyId'];
-						$array['androidUuid']        = ($request['localId']!='') ? $request['localId']:NULL;
-			         $this->db->order_by('id','desc');
-			         $getAdmisionID=$this->db->get_where('babyAdmission', array('babyId'=>$request['motherOrBabyId']))->row_array();
+				         }else if($request['type'] == '2') {
+							$array['doctorId'] 	         = $request['doctorId'];
+							//$array['loungeId'] 	         = $request['loungeId'];
+							$array['type'] 	             = $request['type'];
+							$array['admissionId'] 	 = $request['motherOrBabyId'];
+							$array['androidUuid']       = ($request['localId']!='') ? $request['localId']:NULL;
+				         $this->db->order_by('id','desc');
+				         $getAdmisionID=$this->db->get_where('babyAdmission', array('babyId'=>$request['motherOrBabyId']))->row_array();
+
+							$array['admissionId']        = $getAdmisionID['id'];
+							$array['comment']            = $request['comment'];
+							$array['status']             = $request['status'];
+							$array['addDate']             = $request['localDateTime'];
+							$array['lastSyncedTime']      = date('Y-m-d : H:i:s');
+							$array['modifyDate'] 	   	 = date('Y-m-d : H:i:s');
+
+				            $inserted = $this->db->insert('comments', $array);  
+							$lastID            = $this->db->insert_id();
+							$listID['id']      = $lastID;
+							$listID['localId'] = $request['localId'];;
+							$param1[]          = $listID;   	
+				         }
+				    }else {               // update code here 
+						$array = array();
+						if($request['type'] == '1')
+						{
+							$array['doctorId'] 	         = $request['doctorId'];
+							//$array['loungeId'] 	         = $request['loungeId'];
+							$array['type'] 	             = $request['type'];
+							$array['admissionId'] 	 = $request['motherOrBabyId'];
+							$array['androidUuid']       = ($request['localId']!='') ? $request['localId']:NULL;
+				         $this->db->order_by('id','desc');
+				         $getAdmisionID=$this->db->get_where('motherAdmission', array('motherId'=>$request['motherOrBabyId']))->row_array();
 
 
-						$array['admissionId']        = $getAdmisionID['id'];
-						$array['comment']            = $request['comment'];
-						$array['status']             = $request['status'];
-						$array['addDate']             = $request['localDateTime'];
-						$array['lastSyncedTime']       = date('Y-m-d : H:i:s');
-						$array['modifyDate'] 	   	  = date('Y-m-d : H:i:s');
+							$array['admissionId']        = $getAdmisionID['id'];
+							$array['comment']            = $request['comment'];
+							$array['status']             = $request['status'];
+							$array['addDate']             = $request['localDateTime'];
+							$array['lastSyncedTime']       = date('Y-m-d : H:i:s');
+							$array['modifyDate'] 	   	  = date('Y-m-d : H:i:s');
 
-						$this->db->where('androidUuid',$request['localId']);
-						$this->db->update('comments', $array);
-						$lastID = $this->db->get_where('comments',array('androidUuid'=>$request['localId']))->row_array();
-						$listID['id']      = $lastID['id'];
-						$listID['localId'] = $request['localId'];
-						$param1[] = $listID;  	
-			         }
-			    }  
-	        }if($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2){
+							$this->db->where('androidUuid',$request['localId']);
+							$this->db->update('comments', $array);
+							$lastID = $this->db->get_where('comments',array('androidUuid'=>$request['localId']))->row_array();
+							$listID['id']      = $lastID['id'];
+							$listID['localId'] = $request['localId'];
+							$param1[] = $listID; 
+
+				         }else if($request['type'] == '2') {
+							$array['doctorId'] 	         = $request['doctorId'];
+							//$array['loungeId'] 	         = $request['loungeId'];
+							$array['type'] 	             = $request['type'];
+							$array['admissionId'] 	 = $request['motherOrBabyId'];
+							$array['androidUuid']        = ($request['localId']!='') ? $request['localId']:NULL;
+				         $this->db->order_by('id','desc');
+				         $getAdmisionID=$this->db->get_where('babyAdmission', array('babyId'=>$request['motherOrBabyId']))->row_array();
+
+
+							$array['admissionId']        = $getAdmisionID['id'];
+							$array['comment']            = $request['comment'];
+							$array['status']             = $request['status'];
+							$array['addDate']             = $request['localDateTime'];
+							$array['lastSyncedTime']       = date('Y-m-d : H:i:s');
+							$array['modifyDate'] 	   	  = date('Y-m-d : H:i:s');
+
+							$this->db->where('androidUuid',$request['localId']);
+							$this->db->update('comments', $array);
+							$lastID = $this->db->get_where('comments',array('androidUuid'=>$request['localId']))->row_array();
+							$listID['id']      = $lastID['id'];
+							$listID['localId'] = $request['localId'];
+							$param1[] = $listID;  	
+				         }
+				    }
+				//}      
+	        }
+	        if($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2){
 		       $data['id'] = $param1;
 	           generateServerResponse('1','S', $data);
-			  }
+			}
 			else{
 				generateServerResponse('0','213');
 			} 	        

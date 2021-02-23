@@ -8,6 +8,7 @@ class LoungeManagenent extends Welcome {
     $this->load->model('LoungeModel');  
     $this->load->model('FacilityModel');  
     $this->is_not_logged_in(); 
+    $this->restrictPageAccess(array('6','61'));
   }
 
 

@@ -327,6 +327,8 @@
                 </li>
                 <li data-menu="" class="<?php echo (($index=='StaffType')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo base_url('staffM/staffType/');?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Staff Type</a>
                 </li>
+                <li data-menu="" class="<?php echo (($index=='manageMedicine')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/Miscellaneous/manageMedicine'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Manage Medicine</a>
+                </li>
                 <!-- <li data-menu="" class="<?php echo (($index=='videoType')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo base_url('videoM/videoType');?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Video Type</a>
                 </li> -->
                 <li data-menu="" class="<?php echo (($index=='manageTemplate')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/staffM/manageTemplate/'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>SMS Template</a>
@@ -428,6 +430,10 @@
                     <li data-menu="" class="<?php echo (($index=='report2') ? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/GenerateReportM/manageGeneralReport'); ?>" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Generate Reports</a>
                     </li>
                   <?php } ?>
+                  <?php if(in_array(91, $userPermittedMenuData)){ ?>
+                    <li data-menu="" class="<?php echo (($index=='Setting')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/MemoryM/detail/1'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Memory Details</a>
+                    </li>
+                  <?php } ?>
                 </ul>
               </li>
             <?php } ?>
@@ -487,6 +493,11 @@
 
                   <?php if(in_array(39, $userPermittedMenuData)){ ?>
                     <li data-menu="" class="<?php echo (($index=='StaffType')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo base_url('staffM/staffType/');?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Staff Type</a>
+                    </li>
+                  <?php } ?>
+
+                  <?php if(in_array(82, $userPermittedMenuData)){ ?>
+                    <li data-menu="" class="<?php echo (($index=='manageMedicine')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/Miscellaneous/manageMedicine'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Manage Medicine</a>
                     </li>
                   <?php } ?>
 

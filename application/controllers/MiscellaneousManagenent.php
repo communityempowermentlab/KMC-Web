@@ -8,8 +8,144 @@ class MiscellaneousManagenent extends Welcome {
     $this->load->model('FacilityModel');
     $this->load->model('MiscellaneousModel');
     date_default_timezone_set('Asia/Kolkata');
-       
+    $this->is_not_logged_in();   
+    $this->restrictPageAccess(array('30','33','42','45','47','52','82')); 
   }
+
+
+
+   public function manageMedicine(){
+    $data['index']         = 'manageMedicine';
+    $data['index2']        = '';
+    $data['fileName']      = 'medicineList';
+    $data['title']         = 'Medicine | '.PROJECT_NAME; 
+    $data['GetList'] = $this->UserModel->GetMedicine(); 
+     /*echo $this->db->last_query(); exit;*/
+    $this->load->view('admin/include/header-new',$data);
+    $this->load->view('admin/miscellaneous/medicine-list');
+    $this->load->view('admin/include/datatable-new');
+    $this->load->view('admin/include/footer-new');
+  }
+
+  public function viewMedicineLog(){
+    $id=$this->uri->segment(3);
+    $data['index']         = 'manageMedicine';
+    $data['index2']        = '';
+    $data['fileName']      = 'MedicineList';
+    $data['title']         = 'Medicine Log | '.PROJECT_NAME; 
+    
+    $data['GetNBCULog'] = $this->UserModel->GetMasterDataLog($id); 
+     /*echo $this->db->last_query(); exit;*/
+    $this->load->view('admin/include/header-new',$data);
+    $this->load->view('admin/miscellaneous/medicine-log-list');
+    $this->load->view('admin/include/footer-new');
+    $this->load->view('admin/include/datatable-new');
+  }
+
+
+  public function addMedicine(){
+    $data['index']         = 'manageMedicine';
+    $data['index2']        = '';
+    $data['title']         = 'Add Medicine | '.PROJECT_NAME; 
+    $data['fileName']      = 'medicine';
+
+    if($this->input->post()){
+      $nbcu_name = $this->input->post('nbcu_name');
+
+      $InsertData = array('name'    => $nbcu_name,
+                          'type'    => 5,
+                          'status'  => 1,
+                          'addDate' => date('Y-m-d H:i:s'),
+                          'modifyDate' => date('Y-m-d H:i:s')
+                         );
+
+      $masterId = $this->UserModel->insertData('masterData', $InsertData);
+
+      $loginId = $this->session->userdata('adminData')['Id'];
+      $ip = $this->input->ip_address();
+
+      $InsertData2 = array('name'           => $nbcu_name,
+                          'masterDataId'    => $masterId,
+                          'type'          => 5,
+                          'status'        => 1,
+                          'addDate'       => date('Y-m-d H:i:s'),
+                          'addedBy'       => $loginId,
+                          'ipAddress'     => $ip
+                          
+                         );
+
+      $check = $this->UserModel->insertData('masterDataLog', $InsertData2);
+
+      if ($masterId) {
+        $this->session->set_flashdata('activate', getCustomAlert('S','Medicine Data has been Added successfully'));
+        redirect('Miscellaneous/manageMedicine');
+      }
+    }
+      
+    $this->load->view('admin/include/header-new',$data);
+    $this->load->view('admin/include/tableScript');
+    $this->load->view('admin/miscellaneous/medicine-add');
+    $this->load->view('admin/include/footer-new');
+  }
+
+
+  /* 
+    view edit Facility type page when click on View/Edit button on Facility Type Listing page
+    view file name & path : admin/facility/editFacilityType
+    facility table : facilityType
+    
+  */  
+  public function editMedicine(){
+    $id=$this->uri->segment(3); 
+    $data['index']         = 'manageMedicine';
+    $data['index2']        = '';
+    $data['title']         = 'Medicine Information | '.PROJECT_NAME; 
+    $data['fileName']      = 'medicine';
+
+    $data['GetNBCUData'] = $this->UserModel->GetDataById('masterData', $id); 
+
+    if($this->input->post()){
+      $nbcu_name  = $this->input->post('nbcu_name');
+      $status     = $this->input->post('status');
+
+      $UpdateData = array('name'      => $nbcu_name,
+                          'type'      => 5,
+                          'status'    => $status,
+                          'modifyDate' => date('Y-m-d H:i:s')
+                         );
+
+      $cond = array('id' => $id );
+
+      $check = $this->UserModel->updateData('masterData', $UpdateData, $cond);
+
+      $loginId = $this->session->userdata('adminData')['Id'];
+      $ip = $this->input->ip_address();
+
+      $InsertData2 = array('name'           => $nbcu_name,
+                          'masterDataId'    => $id,
+                          'type'          => 5,
+                          'status'        => $status,
+                          'addDate'       => date('Y-m-d H:i:s'),
+                          'addedBy'       => $loginId,
+                          'ipAddress'     => $ip
+                          
+                         );
+
+      $this->UserModel->insertData('masterDataLog', $InsertData2);
+
+      if ($check == 1) {
+        $this->session->set_flashdata('activate', getCustomAlert('S','Medicine Data has been Updated successfully'));
+        redirect('Miscellaneous/manageMedicine');
+      }
+    }
+
+    $this->load->view('admin/include/header-new',$data);
+    $this->load->view('admin/miscellaneous/medicine-edit');
+    $this->load->view('admin/include/footer-new');
+
+  }
+
+// end medicine section
 
   
 
@@ -117,7 +253,7 @@ class MiscellaneousManagenent extends Welcome {
     $id=$this->uri->segment(3); 
     $data['index']         = 'manageNBCU';
     $data['index2']        = '';
-    $data['title']         = 'Edit Newborn Care Unit | '.PROJECT_NAME; 
+    $data['title']         = 'Newborn Care Unit | '.PROJECT_NAME; 
     $data['fileName']      = 'FacilityTypeList';
 
     $data['GetNBCUData'] = $this->UserModel->GetDataById('masterData', $id); 
@@ -245,7 +381,7 @@ class MiscellaneousManagenent extends Welcome {
     $id=$this->uri->segment(3); 
     $data['index']         = 'managementType';
     $data['index2']        = '';
-    $data['title']         = 'Edit Management Type | '.PROJECT_NAME; 
+    $data['title']         = 'Management Type | '.PROJECT_NAME; 
     $data['fileName']      = 'managementTypeList';
 
     $data['GetData'] = $this->UserModel->GetDataById('masterData', $id); 
@@ -1062,7 +1198,7 @@ class MiscellaneousManagenent extends Welcome {
         
         $data['index']  = 'MenuGroup'; 
         $data['index2'] = ''; 
-        $data['title'] = 'Edit Menu Group | '.PROJECT_NAME; 
+        $data['title'] = 'Menu Group Information | '.PROJECT_NAME; 
         $this->load->view('admin/include/header-new', $data);
         $this->load->view('admin/manage_group/group-edit', $data);
         $this->load->view('admin/include/footer-new');

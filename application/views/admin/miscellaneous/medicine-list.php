@@ -11,7 +11,6 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
         
       <div class="content-body">
 
-
 <!-- Column selectors with Export Options and print table -->
 <section id="column-selectors">
     <div class="row">
@@ -19,19 +18,20 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
             <div class="card">
                 <div class="card-header">
                     <div class="col-12 pull-left">
-                      <h5 class="content-header-title float-left pr-1 mb-0">Management Type  </h5>
+                      <h5 class="content-header-title float-left pr-1 mb-0">Medicine  </h5>
                       <div class="breadcrumb-wrapper col-12">
                         <ol class="breadcrumb p-0 mb-0 breadcrumb-white">
                           <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>admin/dashboard"><i class="fa fa-home" aria-hidden="true"></i></a>
                           </li>
-                          <li class="breadcrumb-item active">Management Type 
+                          <li class="breadcrumb-item active">Medicine  
                           </li>
                         </ol>
                       </div>
                     </div>
                     <div class="col-6 pull-right">
-                        <p>Resources [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/misERDiagram.png', 'ManagementType Data Flow Diagram (DFD)')">Data Flow Diagram</a>]</p>
+                        <p>Resources [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/misERDiagram.png', 'Medicine Data Flow Diagram (DFD)')">Data Flow Diagram</a>] </p>
                     </div>
+
                 </div>
                 <div class="card-content">
                     <div class="card-body card-dashboard">
@@ -56,6 +56,7 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
 
                                   foreach ($GetList as $value) {
                                     $last_updated =     $this->load->FacilityModel->time_ago_in_php($value['modifyDate']); 
+                    
                                 ?>
                                   <tr id="update<?php echo $value['id'];?>">
                                     <td><?php echo $counter; ?></td>
@@ -74,20 +75,20 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                                       <?php } ?>
                                       &nbsp;  
                                     </td>
-                                    <td> <a href="<?php echo base_url(); ?>Miscellaneous/editManagementType/<?php echo $value['id']; ?>" class="btn btn-info btn-sm" title="NBCU Information">
-                                      <?php if(($sessionData['Type']==1) || in_array(35, $userPermittedMenuData)){
+                                    <td> <a href="<?php echo base_url(); ?>Miscellaneous/editMedicine/<?php echo $value['id']; ?>" class="btn btn-info btn-sm" title="Medicine Information">
+                                      <?php if(($sessionData['Type']==1) || in_array(88, $userPermittedMenuData)){
                                         echo VIEW_BUTTON;
                                       }
-                                      if(($sessionData['Type']==1) || (in_array(35,$userPermittedMenuData) && in_array(84,$userPermittedMenuData)))
+                                      if(($sessionData['Type']==1) || (in_array(88,$userPermittedMenuData) && in_array(89,$userPermittedMenuData)))
                                       {
                                         echo "/";
                                       }
-                                      if(($sessionData['Type']==1) || in_array(84, $userPermittedMenuData)){
+                                      if(($sessionData['Type']==1) || in_array(89, $userPermittedMenuData)){
                                         echo EDIT_BUTTON;
                                       }
                                       ?>
                                     </a> </td>
-                                    <td><a class="tooltip" href="<?php echo base_url(); ?>Miscellaneous/viewManagementTypeLog/<?php echo $value['id']; ?>"><?php echo $last_updated; ?><span class="tooltiptext"><?php echo date("m/d/y, h:i A",strtotime($value['modifyDate'])) ?></span></a></td>
+                                    <td><a class="tooltip" href="<?php echo base_url(); ?>Miscellaneous/viewMedicineLog/<?php echo $value['id']; ?>"><?php echo $last_updated; ?><span class="tooltiptext"><?php echo date("m/d/y, h:i A",strtotime($value['modifyDate'])) ?></span></a></td>
                                   </tr>
                                 <?php $counter ++ ; } ?>
                                     
@@ -102,10 +103,10 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
     </div>
 </section>
 <!-- Column selectors with Export Options and print table -->
-<?php if(($sessionData['Type']==1) || in_array(34, $userPermittedMenuData)){ ?>
+<?php if(($sessionData['Type']==1) || in_array(87, $userPermittedMenuData)){ ?>
   <div class="add-new">
-    <a href="<?php echo base_url('Miscellaneous/addManagementType');?>" class="btn btn btn-danger align-items-center">
-        <i class="bx bx-plus"></i>&nbsp; Add New Management Type 
+    <a href="<?php echo base_url('Miscellaneous/addMedicine');?>" class="btn btn btn-danger align-items-center">
+        <i class="bx bx-plus"></i>&nbsp; Add New Medicine
     </a>
   </div>
 <?php } ?>

@@ -1,4 +1,20 @@
+<?php 
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
 
+if(($sessionData['Type']==2) && (in_array(41, $userPermittedMenuData) && !in_array(86, $userPermittedMenuData))){
+  $pageHeading = "View";
+  $inputDisable = "readonly";
+  $dropdownDisable = "disabled";
+  $buttonDisable = "display:none;";
+}else{
+  $pageHeading = "Update";
+  $inputDisable = "";
+  $dropdownDisable = "";
+  $buttonDisable = "";
+}
+?>
 
    
     <!-- BEGIN: Content-->
@@ -8,9 +24,6 @@
         
       <div class="content-body">
 
-
-
-
 <!-- Input Validation start -->
 <section class="input-validation">
   <div class="row">
@@ -18,14 +31,14 @@
       <div class="card">
         <div class="card-header">
           <div class="col-12">
-            <h5 class="content-header-title float-left pr-1 mb-0">Edit Staff Type</h5>
+            <h5 class="content-header-title float-left pr-1 mb-0"><?php echo $pageHeading; ?> Staff Type</h5>
             <div class="breadcrumb-wrapper col-12">
               <ol class="breadcrumb p-0 mb-0 breadcrumb-white">
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>admin/dashboard"><i class="fa fa-home" aria-hidden="true"></i></a>
                 </li>
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>staffM/staffType/">Staff Type</a>
                 </li>
-                <li class="breadcrumb-item active">Edit Staff Type
+                <li class="breadcrumb-item active"><?php echo $pageHeading; ?> Staff Type
                 </li>
               </ol>
             </div>
@@ -44,7 +57,7 @@
                     <div class="form-group">
                       <label>Staff Type Name <span class="red">*</span></label>
                       <div class="controls">
-                        <input type="text" class="form-control" name="staff_type_name" id="staff_type_name" placeholder="Staff Type Name" required="" data-validation-required-message="This field is required" value="<?= $StaffType['staffTypeNameEnglish'] ?>">
+                        <input type="text" class="form-control" name="staff_type_name" id="staff_type_name" placeholder="Staff Type Name" required="" data-validation-required-message="This field is required" value="<?= $StaffType['staffTypeNameEnglish'] ?>" <?php echo $inputDisable; ?>>
                       </div>
                     </div>
                   </div>
@@ -54,7 +67,7 @@
                         <label>Parent Staff Type</label>
                         <div class="controls">
                           
-                          <select class="select2 form-control" name="parent_staff_type" id="parent_staff_type">
+                          <select class="select2 form-control" name="parent_staff_type" id="parent_staff_type" <?php echo $dropdownDisable; ?>>
                             <option value="">Select Parent Staff Type</option>
                             <?php $GetStaffType=$this->load->FacilityModel->GetNoParentStaffType();
 
@@ -72,8 +85,7 @@
                     <div class="form-group">
                       <label>Status <span class="red">*</span></label>
                       <div class="controls">
-                        
-                        <select class="select2 form-control" name="status" id="status" required="" data-validation-required-message="This field is required">
+                        <select class="select2 form-control" name="status" id="status" required="" data-validation-required-message="This field is required" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Status</option>
                           <option value="1" <?php if($StaffType['status'] == 1) { echo 'selected'; } ?>>Active</option>
                           <option value="2" <?php if($StaffType['status'] == 2) { echo 'selected'; } ?>>Deactive</option>
@@ -83,7 +95,7 @@
                   </div>
               </div>
               
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary" style="<?php echo $buttonDisable; ?>">Submit</button>
             </form>
           </div>
         </div>

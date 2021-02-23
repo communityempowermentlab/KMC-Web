@@ -13,6 +13,7 @@ class MotherManagenent extends Welcome {
       $this->load->model('DangerSignModel');
       $this->load->library('pagination');
       $this->is_not_logged_in(); 
+      $this->restrictPageAccess(array('23'));
     }
 // Get Mother list
 

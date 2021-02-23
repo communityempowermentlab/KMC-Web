@@ -1,4 +1,8 @@
-
+<?php
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
+?>
     <!-- BEGIN: Content-->
   <div class="app-content content">
     <div class="content-overlay"></div>
@@ -63,7 +67,19 @@
                                           </span>
                                         <?php } ?>
                                         </td>
-                                       <td><a href="<?php echo base_url(); ?>counsellingM/editApplicationVideo/<?php echo $value['id']; ?>" title="Edit Video Information" class="btn btn-info btn-sm">View/Edit</a></td> 
+                                       <td><a href="<?php echo base_url(); ?>counsellingM/editApplicationVideo/<?php echo $value['id']; ?>" title="Video Information" class="btn btn-info btn-sm">
+                                          <?php if(($sessionData['Type']==1) || in_array(77, $userPermittedMenuData)){
+                                            echo VIEW_BUTTON;
+                                          }
+                                          if(($sessionData['Type']==1) || (in_array(77,$userPermittedMenuData) && in_array(78,$userPermittedMenuData)))
+                                          {
+                                            echo "/";
+                                          }
+                                          if(($sessionData['Type']==1) || in_array(78, $userPermittedMenuData)){
+                                            echo EDIT_BUTTON;
+                                          }
+                                          ?>
+                                       </a></td> 
                                        <td><a class="tooltip nonclick_link"><?php echo $last_updated; ?><span class="tooltiptext"><?php echo date("m/d/y, h:i A",strtotime($value['modifyDate'])) ?></span></a></td>
                                     </tr>
                                       <?php $counter ++ ; } ?>
@@ -79,9 +95,10 @@
     </div>
 </section>
 <!-- Column selectors with Export Options and print table -->
-
-<div class="add-new">
-  <a href="<?php echo base_url(); ?>counsellingM/addApplicationVideos" class="btn btn btn-danger align-items-center">
-      <i class="bx bx-plus"></i>&nbsp; Add New Video
-  </a>
-</div>
+<?php if(($sessionData['Type']==1) || in_array(76, $userPermittedMenuData)){ ?>
+  <div class="add-new">
+    <a href="<?php echo base_url(); ?>counsellingM/addApplicationVideos" class="btn btn btn-danger align-items-center">
+        <i class="bx bx-plus"></i>&nbsp; Add New Video
+    </a>
+  </div>
+<?php } ?>

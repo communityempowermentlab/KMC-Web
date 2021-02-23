@@ -10,6 +10,7 @@ class FacilityManagenent extends Welcome {
     $this->load->model('LoungeModel');  
     date_default_timezone_set('Asia/Kolkata');     
     $this->is_not_logged_in(); 
+    $this->restrictPageAccess(array('3','36'));  
        
   }
 
@@ -247,7 +248,7 @@ class FacilityManagenent extends Welcome {
     $id=$this->uri->segment(3); 
     $data['index']         = 'FacilityType';
     $data['index2']        = '';
-    $data['title']         = 'Edit Facility Type | '.PROJECT_NAME; 
+    $data['title']         = 'Facility Type | '.PROJECT_NAME; 
     $data['fileName']      = 'FacilityTypeList';
 
     $data['GetFacilities'] = $this->FacilityModel->GetFacilitiesTypeById('facilityType', $id); 

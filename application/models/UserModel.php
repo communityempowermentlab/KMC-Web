@@ -239,6 +239,9 @@ class UserModel extends CI_Model {
   public function GetNBCU(){
     return $this->db->get_where('masterData',array('type'=>1))->result_array();
   }
+  public function GetMedicine(){
+    return $this->db->get_where('masterData',array('type'=>5))->result_array();
+  }
 
   public function GetMasterDataLog($id){
     $this->db->order_by('id ','desc');

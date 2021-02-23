@@ -11,6 +11,7 @@ class StaffManagenent extends Welcome {
     $this->load->model('LoungeModel');  
     $this->load->library('pagination'); 
     $this->is_not_logged_in(); 
+    $this->restrictPageAccess(array('9','39','65'));
   }
 
   /* Staff Listing page call */
@@ -234,7 +235,7 @@ class StaffManagenent extends Welcome {
       $id = $this->uri->segment(3); 
       $data['index']         = 'StaffType';
       $data['index2']        = 'Manage Staff Type';
-      $data['title']         = 'Edit Staff Type | '.PROJECT_NAME; 
+      $data['title']         = 'Staff Type Information | '.PROJECT_NAME; 
       $data['fileName']      = 'StaffTypeList'; 
 
       $data['StaffType']     = $this->StaffModel->GetStaffTypeById($id);

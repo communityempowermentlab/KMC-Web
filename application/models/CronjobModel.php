@@ -12,6 +12,7 @@ class CronjobModel extends CI_Model {
     if(!empty($loungeArray)){
       $this->db->where_in('loungeMaster.loungeId',$loungeArray);
     }
+    $this->db->order_by('loungeMaster.loungeName','asc');
     $query = $this->db->get_where('loungeMaster',array('loungeMaster.status'=>1))->result_array();
     return $query;
   }
@@ -123,7 +124,7 @@ class CronjobModel extends CI_Model {
     $to = date("Y-m-d", strtotime("+1 day", strtotime($kmcDate)));
     $endTime = '08:00:00';
 
-    $query = $this->db->query("SELECT * FROM `babyDailyKMC` where babyAdmissionId = ".$admissionId." AND ((startDate = '".$from."' AND startTime >= '".$startTime."') OR (startDate = '".$to."' AND startTime < '".$endTime."')) AND ((endDate = '".$from."' AND endTime > '".$startTime."') OR (endDate = '".$to."' AND endTime < '".$endTime."')) ORDER BY `id` DESC ")->result_array();
+    $query = $this->db->query("SELECT * FROM `babyDailyKMC` where babyAdmissionId = ".$admissionId." AND isDataValid=1 AND ((startDate = '".$from."' AND startTime >= '".$startTime."') OR (startDate = '".$to."' AND startTime < '".$endTime."')) AND ((endDate = '".$from."' AND endTime > '".$startTime."') OR (endDate = '".$to."' AND endTime < '".$endTime."')) ORDER BY `id` DESC ")->result_array();
 
     $totalSeconds = 0;
     foreach($query as $query_data){
@@ -143,6 +144,43 @@ class CronjobModel extends CI_Model {
 
     return $returnArray;
   }
+
+
+  public function getBabyNutritionList($loungeArray=false){
+    $previousDate = date('Y-m-d',strtotime("-1 days"));
+    $currentDate = date('Y-m-d');
+    // $previousDate = "2021-01-27";
+    // $currentDate = "2021-01-28";
+    $time = "08:00:00";
+    if(!empty($loungeArray))
+    {
+      $loung = implode(",", $loungeArray);
+      $con = "babyAdmission.loungeId in(".$loung.") AND ";
+    }
+    else
+    {
+      $con = '';
+    }
+
+
+    $query = $this->db->query('SELECT babyDailyNutrition.*,staffMaster.name as nurseName, babyAdmission.loungeId FROM babyDailyNutrition JOIN staffMaster on staffMaster.staffId=babyDailyNutrition.nurseId JOIN babyAdmission on babyAdmission.id=babyDailyNutrition.babyAdmissionId WHERE '.$con.' ((babyDailyNutrition.feedDate ="'.$previousDate.'" AND babyDailyNutrition.feedTime >= "'.$time.'") OR (babyDailyNutrition.feedDate = "'.$currentDate.'" AND babyDailyNutrition.feedTime < "'.$time.'"))')->result_array();
+    return $query;
+  }
+
+
+  public function getBabyAdmissionDatabyBabyid($id){
+    $this->db->select('babyAdmission.id as babyAdmissionId,babyAdmission.babyFileId,babyRegistration.registrationDateTime,babyRegistration.motherId,motherRegistration.motherName,loungeMaster.facilityId,loungeMaster.loungeName,facilitylist.FacilityName');
+    $this->db->join('babyRegistration','babyRegistration.babyId=babyAdmission.babyId');
+    $this->db->join('motherRegistration','motherRegistration.motherId=babyRegistration.motherId');
+    $this->db->join('loungeMaster','loungeMaster.loungeId=babyAdmission.loungeId');
+    $this->db->join('facilitylist','facilitylist.FacilityID=loungeMaster.facilityId');
+    
+      $this->db->where('babyAdmission.id',$id);
+    
+    $query = $this->db->get_where('babyAdmission')->row_array();
+    return $query;
+  }
+
 
 }
 ?>

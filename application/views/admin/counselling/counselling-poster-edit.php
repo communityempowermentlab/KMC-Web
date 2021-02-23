@@ -1,4 +1,20 @@
-  
+<?php 
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
+
+if(($sessionData['Type']==2) && (in_array(77, $userPermittedMenuData) && !in_array(78, $userPermittedMenuData))){
+  $pageHeading = "View";
+  $inputDisable = "readonly";
+  $dropdownDisable = "disabled";
+  $buttonDisable = "display:none;";
+}else{
+  $pageHeading = "Update";
+  $inputDisable = "";
+  $dropdownDisable = "";
+  $buttonDisable = "";
+}
+?>   
     <!-- BEGIN: Content-->
   <div class="app-content content">
     <div class="content-overlay"></div>
@@ -14,14 +30,14 @@
       <div class="card">
         <div class="card-header">
           <div class="col-12">
-            <h5 class="content-header-title float-left pr-1 mb-0">Edit Counselling Poster</h5>
+            <h5 class="content-header-title float-left pr-1 mb-0"><?php echo $pageHeading; ?> Counselling Poster</h5>
             <div class="breadcrumb-wrapper col-12">
               <ol class="breadcrumb p-0 mb-0 breadcrumb-white">
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>admin/dashboard"><i class="fa fa-home" aria-hidden="true"></i></a>
                 </li>
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>counsellingM/manageCounsellingPoster">Counselling Poster</a>
                 </li>
-                <li class="breadcrumb-item active">Edit Counselling Poster
+                <li class="breadcrumb-item active"><?php echo $pageHeading; ?> Counselling Poster
                 </li>
               </ol>
             </div>
@@ -40,7 +56,7 @@
                     <div class="form-group">
                       <label>Poster Type <span class="red">*</span></label>
                       <div class="controls">
-                        <select class="select2 form-control" name="posterType" id="posterType" required="" data-validation-required-message="This field is required">
+                        <select class="select2 form-control" name="posterType" id="posterType" required="" data-validation-required-message="This field is required" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Poster Type</option>
                           <option value="1" <?php if($VideoData['posterType'] == 1){ echo "selected"; } ?>>What is KMC?</option>
                           <option value="2" <?php if($VideoData['posterType'] == 2){ echo "selected"; } ?>>KMC Position</option>
@@ -56,7 +72,7 @@
                     <div class="form-group">
                       <label>Poster Title <span class="red">*</span></label>
                       <div class="controls">
-                        <input type="text" class="form-control" name="VideoTitle" id="VideoTitle" placeholder="Poster Title" required="" data-validation-required-message="This field is required" value="<?php echo $VideoData['videoTitle'];?>">
+                        <input type="text" class="form-control" name="VideoTitle" id="VideoTitle" placeholder="Poster Title" required="" data-validation-required-message="This field is required" value="<?php echo $VideoData['videoTitle'];?>" <?php echo $inputDisable; ?>>
                       </div>
                     </div>
                   </div>
@@ -64,7 +80,7 @@
                     <div class="form-group">
                       <label>Status <span class="red">*</span></label>
                       <div class="controls">
-                        <select class="select2 form-control" name="status" id="status" required="" data-validation-required-message="This field is required">
+                        <select class="select2 form-control" name="status" id="status" required="" data-validation-required-message="This field is required" <?php echo $dropdownDisable; ?>>
                           <option value="">Select Status</option>
                           <option value="1" <?php if($VideoData['status'] == 1) { echo 'selected'; } ?>>Active</option>
                           <option value="2" <?php if($VideoData['status'] == 2) { echo 'selected'; } ?>>Deactive</option>
@@ -80,7 +96,7 @@
                     <div class="form-group">
                       <label>Upload Image </label>
                       <div class="controls">
-                        <input type="file" class="form-control" name="image" id="image">
+                        <input type="file" class="form-control" name="image" id="image" style="<?php echo $buttonDisable; ?>">
                         <input type="hidden"  class="form-control" name="imageOld" value="<?php echo $VideoData['videoName'];?>"><br/>
                         <span>
                           <img src="<?php echo base_url();?>assets/images/video/<?=$VideoData['videoName'];?>" style="width:100%;height: 100%;">
@@ -90,7 +106,7 @@
                   </div>
               </div>
               
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary" style="<?php echo $buttonDisable; ?>">Submit</button>
             </form>
           </div>
         </div>

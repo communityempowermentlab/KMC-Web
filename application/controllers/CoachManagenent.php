@@ -7,7 +7,8 @@ class CoachManagenent extends Welcome {
     $this->load->model('CoachModel');  
     $this->load->model('LoungeModel'); 
     $this->load->model('FacilityModel'); 
-    $this->is_not_logged_in(); 
+    $this->is_not_logged_in();
+    $this->restrictPageAccess(array('14'));  
   }
 
   /* Staff Listing page call */

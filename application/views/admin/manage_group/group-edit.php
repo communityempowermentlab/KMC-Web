@@ -1,5 +1,20 @@
+<?php 
+$sessionData = $this->session->userdata('adminData'); 
+$userPermittedMenuData = array();
+$userPermittedMenuData = $this->session->userdata('userPermission');
 
-
+if(($sessionData['Type']==2) && (in_array(44, $userPermittedMenuData) && !in_array(90, $userPermittedMenuData))){
+  $pageHeading = "View";
+  $inputDisable = "readonly";
+  $checkboxDisable = "disabled";
+  $buttonDisable = "display:none;";
+}else{
+  $pageHeading = "Update";
+  $inputDisable = "";
+  $checkboxDisable = "";
+  $buttonDisable = "";
+}
+?>
    
     <!-- BEGIN: Content-->
   <div class="app-content content">
@@ -8,9 +23,6 @@
         
       <div class="content-body">
 
-
-
-
 <!-- Input Validation start -->
 <section class="input-validation">
   <div class="row">
@@ -18,14 +30,14 @@
       <div class="card">
         <div class="card-header">
           <div class="col-12">
-            <h5 class="content-header-title float-left pr-1 mb-0">Edit Menu Group</h5>
+            <h5 class="content-header-title float-left pr-1 mb-0"><?php echo $pageHeading; ?> Menu Group</h5>
             <div class="breadcrumb-wrapper col-12">
               <ol class="breadcrumb p-0 mb-0 breadcrumb-white">
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>admin/dashboard"><i class="fa fa-home" aria-hidden="true"></i></a>
                 </li>
                 <li class="breadcrumb-item"><a href="<?php echo base_url(); ?>Miscellaneous/viewMenuGroup">Menu Group</a>
                 </li>
-                <li class="breadcrumb-item active">Edit Menu Group
+                <li class="breadcrumb-item active"><?php echo $pageHeading; ?> Menu Group
                 </li>
               </ol>
             </div>
@@ -46,7 +58,7 @@
                     </div>
                     <div class="col-md-9">
                       <div class="controls">
-                        <input type="text" class="form-control" name="name" id="group_name" placeholder="Group Name" required="" data-validation-required-message="This field is required" value="<?= $get_group['groupName']; ?>">
+                        <input type="text" class="form-control" name="name" id="group_name" placeholder="Group Name" required="" data-validation-required-message="This field is required" value="<?= $get_group['groupName']; ?>" <?php echo $inputDisable; ?>>
                       </div>
                     </div>
                   </div>
@@ -59,7 +71,7 @@
                     </div>
                     <div class="col-md-9">
                       <div class="controls">
-                        <select class="select2 form-control" id="status" name="status" required="" data-validation-required-message="This field is required">
+                        <select class="select2 form-control" id="status" name="status" required="" data-validation-required-message="This field is required" <?php echo $checkboxDisable; ?>>
                           <option value="">Select Status</option>
                           <option value="1" <?php if($get_group['status'] == 1) { echo 'selected'; } ?>>Active</option>
                           <option value="2" <?php if($get_group['status'] == 2) { echo 'selected'; } ?>>Deactive</option>
@@ -88,7 +100,7 @@
                                                 <div class="col-sm-4 pl-0">
                                                   <fieldset>
                                                     <div class="checkbox">
-                                                      <input type="checkbox" class="checkbox-input set_heads" name="view_head[]" id="view_head_<?= $value['id']; ?>" value="<?php echo $value['id']; ?>" data-id="<?= $value['id']; ?>" title="Permission" onclick="getMenuChild(<?php echo $value['id']; ?>, '<?php echo base_url('Miscellaneous/getMenuChild');?>');">
+                                                      <input type="checkbox" class="checkbox-input set_heads" name="view_head[]" id="view_head_<?= $value['id']; ?>" value="<?php echo $value['id']; ?>" data-id="<?= $value['id']; ?>" title="Permission" onclick="getMenuChild(<?php echo $value['id']; ?>, '<?php echo base_url('Miscellaneous/getMenuChild');?>');" <?php echo $checkboxDisable; ?>>
                                                       <input type="hidden" name="head_id[]" id="head_id_<?= $i; ?>" value="<?= $value['id']; ?>-off" data-id="<?= $i; ?>"  class="id_heads">
                                                       <label for="view_head_<?= $value['id']; ?>"><?= $value['levelName']; ?></label>
                                                     </div>
@@ -107,7 +119,7 @@
                                                 <div class="col-sm-12 divPadding panel mg">
                                                     <div class="col-sm-4">
                                                         <div class="col-sm-1 divPadding">
-                                                            <input type="checkbox" name="view_head[]" id="view_head_<?= $value['id']; ?>" value="<?php echo $value['id']; ?>" data-id="<?= $value['id']; ?>" title="Permission" class="set_heads" data-value="<?= $value['id']; ?>" onclick="getMenuChild(<?php echo $value['id']; ?>, '<?php echo base_url('Miscellaneous/getMenuChild');?>');">
+                                                            <input type="checkbox" name="view_head[]" id="view_head_<?= $value['id']; ?>" value="<?php echo $value['id']; ?>" data-id="<?= $value['id']; ?>" title="Permission" class="set_heads" data-value="<?= $value['id']; ?>" onclick="getMenuChild(<?php echo $value['id']; ?>, '<?php echo base_url('Miscellaneous/getMenuChild');?>');" <?php echo $checkboxDisable; ?>>
                                                             <input type="hidden" name="head_id[]" id="head_id_<?= $i; ?>" value="<?= $value['id']; ?>-off" data-id="<?= $i; ?>"  class="id_heads">
                                                         </div>
                                                         <div class="col-sm-11 divPadding">
@@ -130,7 +142,7 @@
                   
               </div>
               
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary" style="<?php echo $buttonDisable; ?>">Submit</button>
             </form>
           </div>
         </div>

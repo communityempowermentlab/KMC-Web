@@ -105,7 +105,7 @@ define('SIGN_URL', 'http://'.$_SERVER['HTTP_HOST'].'/mncu/assets/images/sign/');
 define('NurseProfile', 'http://'.$_SERVER['HTTP_HOST'].'/mncu/assets/nurse/');*/
 
 define('APP_NAME', 'kmcV2');
-define('folderName', 'kmcV2Development');
+define('folderName', 'KMC-Web');
 
 define('sehmatiPatra', $_SERVER['DOCUMENT_ROOT'].'/'.folderName.'/assets/images/sehmatiPatra/');
 define('imageDirectory', $_SERVER['DOCUMENT_ROOT'].'/'.folderName.'/assets/images/');

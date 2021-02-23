@@ -6,6 +6,8 @@ class EmployeeManagenent extends Welcome {
     parent::__construct();
     $this->load->model('EmployeeModel');  
     $this->load->model('FacilityModel'); 
+    $this->is_not_logged_in(); 
+    $this->restrictPageAccess(array('20'));
   }
 
   /* Staff Listing page call */

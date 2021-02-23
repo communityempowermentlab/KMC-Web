@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="keywords" content="">
     <meta name="author" content="KMC">
-    <title><?php echo $title; ?> | Admin Panel Login</title>
+    <title><?php echo $title; ?> | Lounge Login</title>
     <link rel="apple-touch-icon" href="<?php echo base_url(); ?>app-assets/images/ico/apple-icon-120.html">
     <link rel="shortcut icon" type="image/x-icon" href="<?php echo base_url('assets/kmc_favicon.png'); ?>">
     <link href="https://fonts.googleapis.com/css?family=Rubik:300,400,500,600%7CIBM+Plex+Sans:300,400,500,600,700" rel="stylesheet">
@@ -116,14 +116,14 @@
                                 
                                 <div class="divider mt-0">
                                     <div class="divider-text text-uppercase text-muted">
-                                        <small>login with email/mobile</small>
+                                        <small>login with lounge</small>
                                     </div>
                                 </div>
                                 <?php echo $this->session->flashdata('login_message'); ?>
                                 <form action="<?php echo site_url().'Welcome/doLogin'; ?>" method="post" id="loginForm">
                                     <div class="form-group mb-50">
                                         <div class="controls">
-                                            <label class="text-bold-600" for="email_address">Email Id / Mobile No.</label>
+                                            <label class="text-bold-600" for="email_address">Facility</label>
                                             <input type="text" class="form-control" id="email_address" placeholder="Email Id / Mobile No." name="email">
                                             <span id="email_address_error" class="error_style"></span>
                                         </div>
@@ -153,7 +153,7 @@
                                     <button type="submit" class="btn btn-primary glow w-100 position-relative" id="login_button">Login<i id="icon-arrow" class="bx bx-right-arrow-alt"></i></button>
                                 </form>
                                 <hr>
-                                <!-- <div class="text-center" style="margin-top:-12px;"><small class="mr-25">Login as Lounge</small><a href="<?php echo base_url() ?>Admin/loungeLogin"><small>Click Here</small></a></div> -->
+                                <div class="text-center" style="margin-top:-12px;"><small class="mr-25">Login as Lounge</small><a href="<?php echo base_url() ?>Admin/loungeLogin"><small>Click Here</small></a></div>
                             </div>
                         </div>
                     </div>
