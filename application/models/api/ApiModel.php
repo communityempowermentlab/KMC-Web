@@ -728,9 +728,74 @@ class ApiModel extends CI_Model
 
     }
 
+    // get monthly nutrition total data of lounge
+    public function getTotalMonthlyNutrition($loungeId){
+        $fluidString = '"'."Mother's own milk".'"';
+
+        $totalFeedingList = $this->db->query("SELECT `babyDailyNutrition`.id, babyDailyNutrition.babyAdmissionId,babyAdmission.babyId, count(*) as totalFeedCount, COUNT(IF(fluid = ".$fluidString." || fluid = 'Other Human Milk', 1, NULL)) as totalExclusiveCount FROM `babyDailyNutrition` INNER JOIN babyAdmission on `babyDailyNutrition`.`babyAdmissionId` = babyAdmission.`id` WHERE babyAdmission.`loungeId` = ".$loungeId." AND (YEAR(`feedDate`) = YEAR(CURRENT_DATE()) AND MONTH(`feedDate`) = MONTH(CURRENT_DATE())) GROUP BY 2 HAVING count(*) > 1")->result_array();
+        $totalExclusive = 0;
+        foreach($totalFeedingList as $totalFeedingData){
+            $totalRemain = $totalFeedingData['totalFeedCount']-$totalFeedingData['totalExclusiveCount'];
+            if($totalRemain == 0){
+                $totalExclusive = $totalExclusive+1;
+            }
+        }
+
+        if(!empty($totalFeedingList)){
+            $percentageOfExpressed = ($totalExclusive / count($totalFeedingList)) * 100;
+        } else {
+            $percentageOfExpressed = 0;
+        }
+
+        $response = array();
+        $response['totalFeedingList'] = $totalFeedingList;
+        $response['totalFeedingCount'] = count($totalFeedingList);
+        $response['totalExclusive'] = $totalExclusive;
+        $response['percentageOfExpressed'] = round($percentageOfExpressed);
+        return $response;
+    } 
+
+    // get daily nutrition total data of lounge
+    public function getTotalDailyNutrition($loungeId){
+        $currentTime = date('H');
+        if ($currentTime >= 8 && $currentTime <= 24) {
+            $from = date('Y-m-d');
+            $to = date('Y-m-d', strtotime('+1 day'));
+            $startTime = "08:00:00";
+            $endTime = "08:00:00";
+        } else {
+            $from = date('Y-m-d',strtotime("-1 days"));
+            $to = date('Y-m-d');
+            $startTime = "08:00:00";
+            $endTime = "08:00:00";
+        }
+
+        $currentDate = date('Y-m-d');
+        $nextDate = date('Y-m-d', strtotime('+1 day'));
+        $time = "08:00:00";
+
+        $fluidString = '"'."Mother's own milk".'"';
+
+        $totalFeedingList = $this->db->query("SELECT `babyDailyNutrition`.id, babyDailyNutrition.babyAdmissionId,babyAdmission.babyId, count(*) as totalFeedCount, COUNT(IF(fluid = ".$fluidString." || fluid = 'Other Human Milk', 1, NULL)) as totalExclusiveCount FROM `babyDailyNutrition` INNER JOIN babyAdmission on `babyDailyNutrition`.`babyAdmissionId` = babyAdmission.`id` WHERE babyAdmission.`loungeId` = ".$loungeId." AND ((feedDate = '".$from."' AND feedTime >= '".$startTime."') OR (feedDate = '".$to."' AND feedTime < '".$endTime."')) GROUP BY 2 HAVING count(*) > 1")->result_array();
+        
+        $totalExclusive = 0;
+        foreach($totalFeedingList as $totalFeedingData){
+            $totalRemain = $totalFeedingData['totalFeedCount']-$totalFeedingData['totalExclusiveCount'];
+            if($totalRemain == 0){
+                $totalExclusive = $totalExclusive+1;
+            }
+        }
+
+        $response = array();
+        $response['totalFeedingList'] = $totalFeedingList;
+        $response['totalFeedingCount'] = count($totalFeedingList);
+        $response['totalExclusive'] = $totalExclusive;
+        return $response;
+    }
+
 
     public function getMonthlyDashboardData($request)
-    {
+    {   
         $loungeId = $request['loungeId'];
 
         $getTotalAdmission = $this
@@ -799,28 +864,21 @@ class ApiModel extends CI_Model
 
         $totalKmc = $this
                 ->db
-                ->query("SELECT @totsec:=sum(TIME_TO_SEC(subtime(babyDailyKMC.`endTime`,babyDailyKMC.`startTime`))) as kmcTimeLatest from `babyDailyKMC` INNER JOIN `babyAdmission` on babyDailyKMC.`babyAdmissionId` = babyAdmission.`id` where babyDailyKMC.`startTime` < babyDailyKMC.`endTime` AND babyAdmission.`loungeId` = ".$loungeId." AND (YEAR(babyDailyKMC.`startDate`) = YEAR(CURRENT_DATE()) AND MONTH(babyDailyKMC.`startDate`) = MONTH(CURRENT_DATE()))")
+                ->query("SELECT @totsec:=sum(TIME_TO_SEC(subtime(babyDailyKMC.`endTime`,babyDailyKMC.`startTime`))) as kmcTimeLatest from `babyDailyKMC` INNER JOIN `babyAdmission` on babyDailyKMC.`babyAdmissionId` = babyAdmission.`id` where babyDailyKMC.`startTime` < babyDailyKMC.`endTime` AND babyAdmission.`loungeId` = ".$loungeId." AND babyDailyKMC.`isDataValid`=1 AND (YEAR(babyDailyKMC.`startDate`) = YEAR(CURRENT_DATE()) AND MONTH(babyDailyKMC.`startDate`) = MONTH(CURRENT_DATE()))")
                 ->row_array();
 
         $hours = floor($totalKmc['kmcTimeLatest'] / 3600);
         
         $avgTotalKmc = $hours / $denominator;
 
-        $totalFeeding = $this
-                ->db
-                ->query("SELECT `babyDailyNutrition`.* FROM `babyDailyNutrition` INNER JOIN babyAdmission on `babyDailyNutrition`.`babyAdmissionId` = babyAdmission.`id` WHERE babyAdmission.`loungeId` = ".$loungeId." AND (YEAR(`feedDate`) = YEAR(CURRENT_DATE()) AND MONTH(`feedDate`) = MONTH(CURRENT_DATE()))")
-                ->num_rows();
+        $totalFeeding = $this->getTotalMonthlyNutrition($loungeId);
 
-        $totalExclusiveFeeding = $this
-                ->db
-                ->query("SELECT `babyDailyNutrition`.* FROM `babyDailyNutrition` INNER JOIN babyAdmission on `babyDailyNutrition`.`babyAdmissionId` = babyAdmission.`id` WHERE babyAdmission.`loungeId` = ".$loungeId." AND `babyDailyNutrition`.`breastFeedMethod` = 'EBF' AND (YEAR(`feedDate`) = YEAR(CURRENT_DATE()) AND MONTH(`feedDate`) = MONTH(CURRENT_DATE()))")
-                ->num_rows();
+        // $totalExclusiveFeeding = $this
+        //         ->db
+        //         ->query("SELECT `babyDailyNutrition`.* FROM `babyDailyNutrition` INNER JOIN babyAdmission on `babyDailyNutrition`.`babyAdmissionId` = babyAdmission.`id` WHERE babyAdmission.`loungeId` = ".$loungeId." AND `babyDailyNutrition`.`breastFeedMethod` = 'EBF' AND (YEAR(`feedDate`) = YEAR(CURRENT_DATE()) AND MONTH(`feedDate`) = MONTH(CURRENT_DATE()))")
+        //         ->num_rows();
 
-        if($totalExclusiveFeeding != 0){
-            $percentageOfExpressed = ($totalExclusiveFeeding / $totalFeeding) * 100;
-        } else {
-            $percentageOfExpressed = 0;
-        }
+        $percentageOfExpressed = $totalFeeding['percentageOfExpressed'];
 
         if($getLoungeStatus['countDailyWeight'] != 0){
             $percentageOfDailyWeight = ($getLoungeStatus['countDailyWeight'] / $getTotalAdmission) * 100;
@@ -847,7 +905,7 @@ class ApiModel extends CI_Model
 
             $totalKmcRank = $this
                 ->db
-                ->query("SELECT @totsec:=sum(TIME_TO_SEC(subtime(babyDailyKMC.`endTime`,babyDailyKMC.`startTime`))) as kmcTimeLatest from `babyDailyKMC` INNER JOIN `babyAdmission` on babyDailyKMC.`babyAdmissionId` = babyAdmission.`id` where babyDailyKMC.`startTime` < babyDailyKMC.`endTime` AND babyAdmission.`loungeId` = ".$value['loungeId']." AND (YEAR(babyDailyKMC.`startDate`) = YEAR(CURRENT_DATE()) AND MONTH(babyDailyKMC.`startDate`) = MONTH(CURRENT_DATE()))")
+                ->query("SELECT @totsec:=sum(TIME_TO_SEC(subtime(babyDailyKMC.`endTime`,babyDailyKMC.`startTime`))) as kmcTimeLatest from `babyDailyKMC` INNER JOIN `babyAdmission` on babyDailyKMC.`babyAdmissionId` = babyAdmission.`id` where babyDailyKMC.`startTime` < babyDailyKMC.`endTime` AND babyAdmission.`loungeId` = ".$value['loungeId']." AND babyDailyKMC.`isDataValid`=1 AND (YEAR(babyDailyKMC.`startDate`) = YEAR(CURRENT_DATE()) AND MONTH(babyDailyKMC.`startDate`) = MONTH(CURRENT_DATE()))")
                 ->row_array();
 
             $hoursRank = floor($totalKmcRank['kmcTimeLatest'] / 3600);
@@ -858,21 +916,20 @@ class ApiModel extends CI_Model
             $kmcRankArr[$key]['loungeId'] = $value['loungeId'];
             $kmcRankArr[$key]['avgTotalKmc'] = $avgTotalKmcRank;
 
-            $totalFeedingRank = $this
-                ->db
-                ->query("SELECT `babyDailyNutrition`.* FROM `babyDailyNutrition` INNER JOIN babyAdmission on `babyDailyNutrition`.`babyAdmissionId` = babyAdmission.`id` WHERE babyAdmission.`loungeId` = ".$value['loungeId']." AND (YEAR(`feedDate`) = YEAR(CURRENT_DATE()) AND MONTH(`feedDate`) = MONTH(CURRENT_DATE()))")
-                ->num_rows();
+            $totalFeedingRank = $this->getTotalMonthlyNutrition($value['loungeId']);
 
-            $totalExclusiveFeedingRank = $this
-                ->db
-                ->query("SELECT `babyDailyNutrition`.* FROM `babyDailyNutrition` INNER JOIN babyAdmission on `babyDailyNutrition`.`babyAdmissionId` = babyAdmission.`id` WHERE babyAdmission.`loungeId` = ".$value['loungeId']." AND `babyDailyNutrition`.`breastFeedMethod` = 'EBF' AND (YEAR(`feedDate`) = YEAR(CURRENT_DATE()) AND MONTH(`feedDate`) = MONTH(CURRENT_DATE()))")
-                ->num_rows();
+            // $totalExclusiveFeedingRank = $this
+            //     ->db
+            //     ->query("SELECT `babyDailyNutrition`.* FROM `babyDailyNutrition` INNER JOIN babyAdmission on `babyDailyNutrition`.`babyAdmissionId` = babyAdmission.`id` WHERE babyAdmission.`loungeId` = ".$value['loungeId']." AND `babyDailyNutrition`.`breastFeedMethod` = 'EBF' AND (YEAR(`feedDate`) = YEAR(CURRENT_DATE()) AND MONTH(`feedDate`) = MONTH(CURRENT_DATE()))")
+            //     ->num_rows();
 
-            if($totalExclusiveFeedingRank != 0){
-                $percentageOfExpressedRank = ($totalExclusiveFeeding / $totalFeedingRank) * 100;
-            } else {
-                $percentageOfExpressedRank = 0;
-            }
+            // if($totalExclusiveFeedingRank != 0){
+            //     $percentageOfExpressedRank = ($totalExclusiveFeeding / $totalFeedingRank) * 100;
+            // } else {
+            //     $percentageOfExpressedRank = 0;
+            // }
+
+            $percentageOfExpressedRank = $totalFeedingRank['percentageOfExpressed'];
 
             $expressedFeedRankArr[$key]['loungeId'] = $value['loungeId'];
             $expressedFeedRankArr[$key]['percentageOfExpressed'] = $percentageOfExpressedRank;
@@ -914,7 +971,7 @@ class ApiModel extends CI_Model
         array_multisort(array_column($dischargeRankArr, 'dischargePercentage'), SORT_DESC, $dischargeRankArr);  
         array_multisort(array_column($timelyAssessmentArr, 'timelyAssessment'), SORT_DESC, $timelyAssessmentArr);
 
-
+        //print_r($expressedFeedRankArr);exit;
         $weightGainRank = array_search($loungeId, array_column($weightRankArr, 'loungeId')); 
         $avgKMCRank = array_search($loungeId, array_column($kmcRankArr, 'loungeId'));
         $expressedFeedRank = array_search($loungeId, array_column($expressedFeedRankArr, 'loungeId')); 
@@ -1874,10 +1931,7 @@ class ApiModel extends CI_Model
                 $bedCount = 0;
             }
 
-            $totalExclusiveFeeding = $this
-                ->db
-                ->query("SELECT `babyDailyNutrition`.* FROM `babyDailyNutrition` INNER JOIN babyAdmission on `babyDailyNutrition`.`babyAdmissionId` = babyAdmission.`id` WHERE babyAdmission.`loungeId` = ".$loungeId." AND `babyDailyNutrition`.`breastFeedMethod` = 'EBF' AND `babyDailyNutrition`.`feedDate` = '".$curr_date."' GROUP by `babyDailyNutrition`.babyAdmissionId")
-                ->num_rows();
+            $totalExclusiveFeeding = $this->getTotalDailyNutrition($loungeId);
 
              $infantsWeightCount = $this
                 ->db
@@ -2027,7 +2081,7 @@ class ApiModel extends CI_Model
             $result['kmcStatus']                    = $count;
             $result['bedCount']                     = $bedCount;
             
-            $result['totalExclusiveFeeding']        = $totalExclusiveFeeding;
+            $result['totalExclusiveFeeding']        = $totalExclusiveFeeding['totalExclusive'];
             $result['infantsWeightCount']           = $infantsWeightCount;
             $result['infantsAssessedByDoctor']      = $infantsAssessedByDoctor;
 
@@ -2101,6 +2155,39 @@ class ApiModel extends CI_Model
         $this->db->join('babyAdmission','babyAdmission.babyId=babyCounsellingPosterLog.babyId');
         $this->db->where(array('counsellingMaster.videoType'=>3,'counsellingMaster.status'=>1,'babyAdmission.status'=>1));
         return $this->db->get_where('babyCounsellingPosterLog',array('babyCounsellingPosterLog.loungeId'=>$data['loungeId']))->result_array();
+    }
+
+    // get medicine list
+    public function GetMedicines($resquest)
+    {
+        if ($resquest['timestamp'] != '')
+        {
+            $this
+                ->db
+                ->order_by('id', 'asc');
+            return $this
+                ->db
+                ->get_where('masterData', array(
+                'type' => 5,
+                'status' => 1,
+                'modifyDate >=' => $resquest['timestamp']
+            ))->result_array();
+        }
+        else
+        {
+            $this
+                ->db
+                ->order_by('id', 'asc');
+            return $this
+                ->db
+                ->get_where('masterData', array(
+                'type' => 5,
+                'status' => 1
+            ))
+                ->result_array();
+
+        }
+
     }
 
 }

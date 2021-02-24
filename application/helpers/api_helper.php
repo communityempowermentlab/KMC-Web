@@ -588,6 +588,7 @@ function messages($resMsg = '', $dynamicValue = '')
         '233' => 'Lounge amenities data not available.',
         '234' => 'Lounge already loggedin in another device.',
         '235' => 'Invalid Poster Id.',
+        '236' => 'Medicine List',
         'E' => 'Data Not Found',
         'W' => 'Something Went Wrong',
         'S' => 'Success',
