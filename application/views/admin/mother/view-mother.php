@@ -534,7 +534,7 @@
                                         <label>Country </label>
                                         <div class="controls">
                                           <?php  if(empty($motherData['presentCountry'])){?>
-                                            <input type="text" class="form-control" value="<?php echo 'Other'; ?>" readonly>
+                                            <input type="text" class="form-control" value="<?php //echo 'Other'; ?>" readonly>
                                           <?php } else { ?>
                                             <input type="text" class="form-control" value="<?php echo empty($motherData['presentCountry']) ? '' : $motherData['presentCountry']; ?>" readonly >
                                           <?php } ?>
@@ -546,7 +546,7 @@
                                         <label>State</label>
                                         <div class="controls">
                                           <?php  if(empty($motherData['presentCountry'])){?>
-                                            <input type="text" class="form-control" value="<?php echo 'Other'; ?>" readonly>
+                                            <input type="text" class="form-control" value="<?php //echo 'Other'; ?>" readonly>
                                           <?php } else { ?>
                                             <input type="text" class="form-control" value="<?php echo empty($motherData['presentState']) ? '' : $motherData['presentState'];?>" readonly>
                                           <?php } ?>
@@ -565,27 +565,47 @@
                                         </div>
                                       </div>
                                     </div>
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label>Block </label>
-                                        <div class="controls">
-                                          <?php $PresentBlockName = $this->load->MotherModel->GetPresentBlockName($motherData['presentBlockName']);?> 
-                                          <input type="text" class="form-control" value="<?php echo empty($PresentBlockName['BlockPRINameProperCase']) ? '' : $PresentBlockName['BlockPRINameProperCase']; ?>" readonly >
+                                    <?php if($motherData['presentResidenceType'] == "Rural"){ ?>
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>Block </label>
+                                          <div class="controls">
+                                            <?php $PresentBlockName = $this->load->MotherModel->GetPresentBlockName($motherData['presentBlockName']);?> 
+                                            <input type="text" class="form-control" value="<?php echo empty($PresentBlockName['BlockPRINameProperCase']) ? '' : $PresentBlockName['BlockPRINameProperCase']; ?>" readonly >
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label>Gram Sabha/Town or City</label>
-                                        <div class="controls">
-                                          <?php $PresentVillageName = $this->load->MotherModel->GetPresentVillageName($motherData['presentVillageName']);?> 
-                                          <input type="text" class="form-control" value="<?php echo empty($PresentVillageName['GPNameProperCase']) ? '' : $PresentVillageName['GPNameProperCase']; ?>" readonly>
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>Gram Sabha/Town or City</label>
+                                          <div class="controls">
+                                            <?php $PresentVillageName = $this->load->MotherModel->GetPresentVillageName($motherData['presentVillageName']);?> 
+                                            <input type="text" class="form-control" value="<?php echo empty($PresentVillageName['GPNameProperCase']) ? '' : $PresentVillageName['GPNameProperCase']; ?>" readonly>
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
+                                    <?php }else{ ?>
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>Address </label>
+                                          <div class="controls">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['presentAddress']) ? '' : $motherData['presentAddress'];?>" readonly>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>Pincode </label>
+                                          <div class="controls">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['presentPinCode']) ? '' : $motherData['presentPinCode']; ?>" readonly >
+                                          </div>
+                                        </div>
+                                      </div>
+                                    <?php } ?>
                                 </div>
 
                                 <div class="row col-12">
+                                  <?php if($motherData['presentResidenceType'] == "Rural"){ ?>
                                     <div class="col-md-4">
                                       <div class="form-group">
                                         <label>Address </label>
@@ -602,6 +622,7 @@
                                         </div>
                                       </div>
                                     </div>
+                                  <?php } ?>
                                     <div class="col-md-4">
                                       <div class="form-group">
                                         <label>Near By Location</label>
@@ -630,7 +651,7 @@
                                         <label>Country </label>
                                         <div class="controls">
                                           <?php  if(empty($motherData['permanentCountry'])){?>
-                                            <input type="text" class="form-control" value="<?php echo 'Other'; ?>" readonly>
+                                            <input type="text" class="form-control" value="<?php //echo 'Other'; ?>" readonly>
                                           <?php } else { ?>
                                             <input type="text" class="form-control" value="<?php echo empty($motherData['permanentCountry']) ? '' : $motherData['permanentCountry']; ?>" readonly >
                                           <?php } ?>
@@ -642,9 +663,9 @@
                                         <label>State</label>
                                         <div class="controls">
                                           <?php  if(empty($motherData['permanentState'])){?>
-                                            <input type="text" class="form-control" value="<?php echo 'Other'; ?>" readonly>
+                                            <input type="text" class="form-control" value="<?php //echo 'Other'; ?>" readonly>
                                           <?php } else { ?>
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['permanentState']) ? '' : $motherData['permanentState']; ?>">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['permanentState']) ? '' : $motherData['permanentState']; ?>" readonly>
                                           <?php } ?>
                                         </div>
                                       </div>
@@ -661,27 +682,48 @@
                                         </div>
                                       </div>
                                     </div>
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label>Block </label>
-                                        <div class="controls">
-                                          <?php $PermanentBlockName = $this->load->MotherModel->GetPermanentBlockName($motherData['permanentBlockName']);?> 
-                                          <input type="text" class="form-control" value="<?php echo empty($PermanentBlockName['BlockPRINameProperCase']) ? '' : $PermanentBlockName['BlockPRINameProperCase'];?>" readonly >
+
+                                    <?php if($motherData['permanentResidenceType'] == "Rural"){ ?>
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>Block </label>
+                                          <div class="controls">
+                                            <?php $PermanentBlockName = $this->load->MotherModel->GetPermanentBlockName($motherData['permanentBlockName']);?> 
+                                            <input type="text" class="form-control" value="<?php echo empty($PermanentBlockName['BlockPRINameProperCase']) ? '' : $PermanentBlockName['BlockPRINameProperCase'];?>" readonly >
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label>Gram Sabha/Town or City</label>
-                                        <div class="controls">
-                                          <?php $PermanentVillageName = $this->load->MotherModel->GetPermanentVillageName($motherData['permanentVillageName']);?> 
-                                          <input type="text" class="form-control" value="<?php echo empty($PermanentVillageName['GPNameProperCase']) ? '' : $PermanentVillageName['GPNameProperCase']; ?>" readonly>
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>Gram Sabha/Town or City</label>
+                                          <div class="controls">
+                                            <?php $PermanentVillageName = $this->load->MotherModel->GetPermanentVillageName($motherData['permanentVillageName']);?> 
+                                            <input type="text" class="form-control" value="<?php echo empty($PermanentVillageName['GPNameProperCase']) ? '' : $PermanentVillageName['GPNameProperCase']; ?>" readonly>
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
+                                    <?php }else{ ?>
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>Address </label>
+                                          <div class="controls">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['permanentAddress']) ? '' : $motherData['permanentAddress']; ?>" readonly>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>Pincode </label>
+                                          <div class="controls">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['permanentPinCode']) ? '' : $motherData['permanentPinCode']; ?>" readonly>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    <?php } ?>
                                 </div>
 
                                 <div class="row col-12">
+                                  <?php if($motherData['permanentResidenceType'] == "Rural"){ ?>
                                     <div class="col-md-4">
                                       <div class="form-group">
                                         <label>Address </label>
@@ -698,6 +740,7 @@
                                         </div>
                                       </div>
                                     </div>
+                                  <?php } ?>
                                     <div class="col-md-4">
                                       <div class="form-group">
                                         <label>Near By Location </label>
@@ -709,9 +752,9 @@
                                     </div>
                                 </div>
 
-                                <div class="col-12">
+                                <!-- <div class="col-12">
                                   <h5 class="float-left mb-2 mt-1 pr-1">Delivery Address</h5>
-                                </div>
+                                </div> -->
 
                                 <!-- <div class="row col-12">
                                     <div class="col-md-4">
@@ -771,7 +814,7 @@
                                     </div>
                                 </div> -->
 
-                                <div class="row col-12">
+                                <!-- <div class="row col-12">
                                     <div class="col-md-4">
                                       <div class="form-group">
                                         <label>Place Of Birth </label>
@@ -806,9 +849,9 @@
                                         </div>
                                       </div>
                                     </div>
-                                </div>
+                                </div> -->
 
-                                <div class="row col-12">
+                                <!-- <div class="row col-12">
                                     <div class="col-md-4">
                                       <div class="form-group">
                                         <label>Place Of Delivery </label>
@@ -819,7 +862,7 @@
                                         </div>
                                       </div>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                             
                             <div class="tab-pane fade" id="nav-past" role="tabpanel" aria-labelledby="nav-past-tab">

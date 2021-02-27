@@ -119,7 +119,7 @@
 	$(".dataex-html5-selectors-mother").DataTable(
 		{	
 			"paging": false,
-			"ordering": false,
+			"ordering": true,
         	"info":     false,
 			dom:"Brtip",
 			buttons:
@@ -142,7 +142,7 @@
 	$(".dataex-html5-selectors-baby").DataTable(
 		{	
 			"paging": false,
-			"ordering": false,
+			"ordering": true,
         	"info":     false,
 			dom:"Brtip",
 			buttons:

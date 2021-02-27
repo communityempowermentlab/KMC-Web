@@ -928,7 +928,7 @@ class Cronjob extends CI_Controller {
       $objWorkSheet->setCellValue('F4', 'Total Duration');
       $objWorkSheet->setCellValue('G4', 'Shift No.');
 
-      $objWorkSheet->setCellValue('A1', 'KMC App Usage Ranking');
+      $objWorkSheet->setCellValue('A1', 'KMC App Daily Usage Report');
       $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate." ".$timeNotes);
 
       $getReportSettings = $this->cmodel->getReportSettings(1);
@@ -1077,7 +1077,7 @@ class Cronjob extends CI_Controller {
 
           $objWorkSheet->getStyle('A1:G'.$a.'')->applyFromArray($styleArray);
 
-          $objWorkSheet->setTitle('KMC App Usage Ranking');
+          $objWorkSheet->setTitle('KMC App Daily Usage Report');
           $dataCount++;   
       }
 
@@ -1115,6 +1115,522 @@ class Cronjob extends CI_Controller {
 
       // baby nutrition report
       $this->babyNutritionReport();
+
+      // Daily baby Admition & discharge report
+      $this->sendNurseAdmitionReport();
+
+      // Baby & Mother all details
+      $this->getMotherBabyDischargeFeedbackReport();
+    }
+
+    // Mother Baby discharge details for feedback calling report
+    public function getMotherBabyDischargeFeedbackReport(){
+      
+      // set loop for all teams
+      $filename = "";
+      $dataCount = 0;
+      $a=0;
+      for($team_row=7;$team_row<=14;$team_row++){
+
+          $objPHPExcel = new PHPExcel();
+
+          $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+          $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+          $objWorkSheet->mergeCells('A1:G1');
+          $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+          $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+
+          $objWorkSheet->getStyle('A3:CL3')->getFont()->setBold(true)->setSize(10);
+          $objWorkSheet->getStyle('A3:CL3')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+          $objWorkSheet->getStyle('A3:CL3')->getAlignment()->setWrapText(true);
+
+          $objWorkSheet->getColumnDimension('A')->setWidth(8);
+          $objWorkSheet->getColumnDimension('B')->setWidth(18);
+          $objWorkSheet->getColumnDimension('C')->setWidth(24);
+          $objWorkSheet->getColumnDimension('D')->setWidth(15);
+          $objWorkSheet->getColumnDimension('E')->setWidth(15);
+          $objWorkSheet->getColumnDimension('F')->setWidth(20);
+          $objWorkSheet->getColumnDimension('G')->setWidth(13);
+          $objWorkSheet->getColumnDimension('H')->setWidth(13);
+          $objWorkSheet->getColumnDimension('I')->setWidth(10);
+          $objWorkSheet->getColumnDimension('J')->setWidth(14);
+          $objWorkSheet->getColumnDimension('K')->setWidth(14);
+          $objWorkSheet->getColumnDimension('L')->setWidth(14);
+          $objWorkSheet->getColumnDimension('M')->setWidth(14);
+          $objWorkSheet->getColumnDimension('N')->setWidth(14);
+          $objWorkSheet->getColumnDimension('O')->setWidth(18);
+          $objWorkSheet->getColumnDimension('P')->setWidth(20);
+          $objWorkSheet->getColumnDimension('Q')->setWidth(16);
+          $objWorkSheet->getColumnDimension('R')->setWidth(16);
+          $objWorkSheet->getColumnDimension('S')->setWidth(14);
+          $objWorkSheet->getColumnDimension('T')->setWidth(10);
+          $objWorkSheet->getColumnDimension('U')->setWidth(13);
+          $objWorkSheet->getColumnDimension('V')->setWidth(20);
+          $objWorkSheet->getColumnDimension('W')->setWidth(16);
+          $objWorkSheet->getColumnDimension('X')->setWidth(16);
+          $objWorkSheet->getColumnDimension('Y')->setWidth(21);
+          $objWorkSheet->getColumnDimension('Z')->setWidth(21);
+          $objWorkSheet->getColumnDimension('AA')->setWidth(21);
+          $objWorkSheet->getColumnDimension('AB')->setWidth(21);
+          $objWorkSheet->getColumnDimension('AC')->setWidth(15);
+          $objWorkSheet->getColumnDimension('AD')->setWidth(18);
+          $objWorkSheet->getColumnDimension('AE')->setWidth(20);
+          $objWorkSheet->getColumnDimension('AF')->setWidth(20);
+          $objWorkSheet->getColumnDimension('AG')->setWidth(23);
+          $objWorkSheet->getColumnDimension('AH')->setWidth(16);
+          $objWorkSheet->getColumnDimension('AI')->setWidth(14);
+          $objWorkSheet->getColumnDimension('AJ')->setWidth(20);
+          $objWorkSheet->getColumnDimension('AK')->setWidth(25);
+          $objWorkSheet->getColumnDimension('AL')->setWidth(25);
+          $objWorkSheet->getColumnDimension('AM')->setWidth(22);
+          $objWorkSheet->getColumnDimension('AN')->setWidth(28);
+          $objWorkSheet->getColumnDimension('AO')->setWidth(28);
+          $objWorkSheet->getColumnDimension('AP')->setWidth(28);
+          $objWorkSheet->getColumnDimension('AQ')->setWidth(28);
+          $objWorkSheet->getColumnDimension('AR')->setWidth(28);
+          $objWorkSheet->getColumnDimension('AS')->setWidth(30);
+          $objWorkSheet->getColumnDimension('AT')->setWidth(30);
+          $objWorkSheet->getColumnDimension('AU')->setWidth(16);
+          $objWorkSheet->getColumnDimension('AV')->setWidth(20);
+          $objWorkSheet->getColumnDimension('AW')->setWidth(20);
+          $objWorkSheet->getColumnDimension('AX')->setWidth(20);
+          $objWorkSheet->getColumnDimension('AY')->setWidth(20);
+          $objWorkSheet->getColumnDimension('AZ')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BA')->setWidth(15);
+          $objWorkSheet->getColumnDimension('BB')->setWidth(16);
+          $objWorkSheet->getColumnDimension('BC')->setWidth(16);
+          $objWorkSheet->getColumnDimension('BD')->setWidth(16);
+          $objWorkSheet->getColumnDimension('BE')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BF')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BG')->setWidth(16);
+          $objWorkSheet->getColumnDimension('BH')->setWidth(16);
+          $objWorkSheet->getColumnDimension('BI')->setWidth(18);
+          $objWorkSheet->getColumnDimension('BJ')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BK')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BL')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BM')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BN')->setWidth(16);
+          $objWorkSheet->getColumnDimension('BO')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BP')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BQ')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BR')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BS')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BT')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BU')->setWidth(15);
+          $objWorkSheet->getColumnDimension('BV')->setWidth(15);
+          $objWorkSheet->getColumnDimension('BW')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BX')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BY')->setWidth(20);
+          $objWorkSheet->getColumnDimension('BZ')->setWidth(20);
+          $objWorkSheet->getColumnDimension('CA')->setWidth(14);
+          $objWorkSheet->getColumnDimension('CB')->setWidth(20);
+          $objWorkSheet->getColumnDimension('CC')->setWidth(20);
+          $objWorkSheet->getColumnDimension('CD')->setWidth(20);
+          $objWorkSheet->getColumnDimension('CE')->setWidth(20);
+          $objWorkSheet->getColumnDimension('CF')->setWidth(20);
+          $objWorkSheet->getColumnDimension('CG')->setWidth(20);
+          $objWorkSheet->getColumnDimension('CH')->setWidth(20);
+          $objWorkSheet->getColumnDimension('CI')->setWidth(20);
+          $objWorkSheet->getColumnDimension('CJ')->setWidth(20);
+          $objWorkSheet->getColumnDimension('CK')->setWidth(18);
+          $objWorkSheet->getColumnDimension('CL')->setWidth(20);
+
+          $objWorkSheet->getStyle('A:CL')->getFont()->setSize(10);
+          $objWorkSheet->getStyle('A:CL')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+          $objWorkSheet->getStyle('A:CL')->getAlignment()->setWrapText(true);
+
+          $objWorkSheet->setCellValue('A3', 'Sr. No.');
+          $objWorkSheet->setCellValue('B3', 'Facility Name');
+          $objWorkSheet->setCellValue('C3', 'Lounge Name');
+          $objWorkSheet->setCellValue('D3', "Mother's Name");
+          $objWorkSheet->setCellValue('E3', 'Mother accompanied during admission?');
+          $objWorkSheet->setCellValue('F3', 'Mother Mobile Number');
+          $objWorkSheet->setCellValue('G3', 'Delivery Date');
+          $objWorkSheet->setCellValue('H3', 'Delivery Time');
+          $objWorkSheet->setCellValue('I3', 'Gender');
+          $objWorkSheet->setCellValue('J3', 'Birth Weight(gm)');
+          $objWorkSheet->setCellValue('K3', 'Inborn/Outborn');
+          $objWorkSheet->setCellValue('L3', 'Type of Delivery');
+          $objWorkSheet->setCellValue('M3', 'Admission Date');
+          $objWorkSheet->setCellValue('N3', 'Admission Time');
+          $objWorkSheet->setCellValue('O3', 'Admission Weight(gm)');
+          $objWorkSheet->setCellValue('P3', 'Assessment Date & time');
+          $objWorkSheet->setCellValue('Q3', 'Thermometer Value');
+          $objWorkSheet->setCellValue('R3', 'Respiratory Count');
+          $objWorkSheet->setCellValue('S3', 'Pulse Oximeter');
+          $objWorkSheet->setCellValue('T3', 'SpO2');
+          $objWorkSheet->setCellValue('U3', 'Pulse Rate');
+          $objWorkSheet->setCellValue('V3', 'Reason if Pulse Oximeter not available');
+          $objWorkSheet->setCellValue('W3', 'Daily Weight Date');
+          $objWorkSheet->setCellValue('X3', 'Daily Weight(gm)');
+          $objWorkSheet->setCellValue('Y3', 'KMC Position Start Date');
+          $objWorkSheet->setCellValue('Z3', 'KMC Position Start Time');
+          $objWorkSheet->setCellValue('AA3', 'KMC Position Stop Date');
+          $objWorkSheet->setCellValue('AB3', 'KMC Position Stop Time');
+          $objWorkSheet->setCellValue('AC3', 'KMC Provider');
+          $objWorkSheet->setCellValue('AD3', 'KMC Nurse Name');
+          $objWorkSheet->setCellValue('AE3', 'Nutrition Feeding Date');
+          $objWorkSheet->setCellValue('AF3', 'Nutrition Feeding Time');
+          $objWorkSheet->setCellValue('AG3', 'Nutrition Feeding Method');
+          $objWorkSheet->setCellValue('AH3', 'Nutrition Type');
+          $objWorkSheet->setCellValue('AI3', 'Nutrition Quantity(ml)');
+          $objWorkSheet->setCellValue('AJ3', 'Nutrition Nurse Name');
+          $objWorkSheet->setCellValue('AK3', 'Doctor Round Doctor Name');
+          $objWorkSheet->setCellValue('AL3', 'Doctor Round Treatment Time');
+          $objWorkSheet->setCellValue('AM3', 'Doctor Round Treatment');
+          $objWorkSheet->setCellValue('AN3', 'Doctor Round Treatment Remarks');
+          $objWorkSheet->setCellValue('AO3', 'Counselling Poster What Is KMC');
+          $objWorkSheet->setCellValue('AP3', 'Counselling Poster KMC Position');
+          $objWorkSheet->setCellValue('AQ3', 'Counselling Poster KMC Nutrition');
+          $objWorkSheet->setCellValue('AR3', 'Counselling Poster KMC Hygiene');
+          $objWorkSheet->setCellValue('AS3', 'Counselling Poster KMC Monitoring');
+          $objWorkSheet->setCellValue('AT3', 'Counselling Poster KMC Respect');
+          $objWorkSheet->setCellValue('AU3', 'Discharge Type');
+          $objWorkSheet->setCellValue('AV3', 'Discharge Date and Time');
+          $objWorkSheet->setCellValue('AW3', 'Profile - Nurse Name');
+          $objWorkSheet->setCellValue('AX3', "Father's Name");
+          $objWorkSheet->setCellValue('AY3', 'Mother Aadhaar Number');
+          $objWorkSheet->setCellValue('AZ3', 'Father Aadhaar Number');
+          $objWorkSheet->setCellValue('BA3', 'MCTS Number');
+          $objWorkSheet->setCellValue('BB3', "Mother's Weight(Kg)");
+          $objWorkSheet->setCellValue('BC3', "Mother's DOB");
+          $objWorkSheet->setCellValue('BD3', "Mother's Age(in case DOB not known)");
+          $objWorkSheet->setCellValue('BE3', "Age at Marriage(years)");
+          $objWorkSheet->setCellValue('BF3', "Mother's Education");
+          $objWorkSheet->setCellValue('BG3', "Religion");
+          $objWorkSheet->setCellValue('BH3', "Caste");
+          $objWorkSheet->setCellValue('BI3', "Have you ever had multiple births?");
+          $objWorkSheet->setCellValue('BJ3', "Total Pregnancies (gravida)");
+          $objWorkSheet->setCellValue('BK3', "No. of births (para)");
+          $objWorkSheet->setCellValue('BL3', "No. of miscarriage or abortion");
+          $objWorkSheet->setCellValue('BM3', "Total no. of children who are currently alive");
+          $objWorkSheet->setCellValue('BN3', "Birth Spacing");
+          $objWorkSheet->setCellValue('BO3', "Father Mobile Number");
+          $objWorkSheet->setCellValue('BP3', "Guardian Name");
+          $objWorkSheet->setCellValue('BQ3', "Relationship with Child");
+          $objWorkSheet->setCellValue('BR3', "Guardian Phone Number");
+          $objWorkSheet->setCellValue('BS3', "Family ration card type");
+          $objWorkSheet->setCellValue('BT3', "Present Address Type");
+          $objWorkSheet->setCellValue('BU3', "Country");
+          $objWorkSheet->setCellValue('BV3', "State");
+          $objWorkSheet->setCellValue('BW3', "District");
+          $objWorkSheet->setCellValue('BX3', "Rural Block");
+          $objWorkSheet->setCellValue('BY3', "Rural Gram");
+          $objWorkSheet->setCellValue('BZ3', "Address");
+          $objWorkSheet->setCellValue('CA3', "Pincode");
+          $objWorkSheet->setCellValue('CB3', "Nearby Location");
+          $objWorkSheet->setCellValue('CC3', "Permanent address same as present address");
+          $objWorkSheet->setCellValue('CD3', "Permanent Address type");
+          $objWorkSheet->setCellValue('CE3', "Permanent Country");
+          $objWorkSheet->setCellValue('CF3', "Permanent State");
+          $objWorkSheet->setCellValue('CG3', "Permanent District");
+          $objWorkSheet->setCellValue('CH3', "Permanent Rural Block");
+          $objWorkSheet->setCellValue('CI3', "Permanent Rural Gram");
+          $objWorkSheet->setCellValue('CJ3', "Permanent Address");
+          $objWorkSheet->setCellValue('CK3', "Permanent Pincode");
+          $objWorkSheet->setCellValue('CL3', "Permanent Nearby Location");
+
+          $objWorkSheet->setCellValue('A1', 'Mother Baby Details For Feedback Calling');
+
+
+
+          $getReportSettings = $this->cmodel->getReportSettings($team_row);
+          $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+          if(!empty($loungeArray)){
+
+              // Get all baby of lounge
+              $getAllBabyAdmission = $this->cmodel->getBabyAdmissionDischargeData($loungeArray);
+              $dataCount = 1;
+              $a=4;
+
+              foreach($getAllBabyAdmission as $key_baby => $getAllBabyAdmissionData){
+
+                $babyListArray    = [];
+                $babyListArray[]  = $dataCount;
+                $babyListArray[]  = $getAllBabyAdmissionData['FacilityName'];
+                $babyListArray[]  = $getAllBabyAdmissionData['loungeName'];
+                $babyListArray[]  = $getAllBabyAdmissionData['motherName'];
+                $babyListArray[]  = $getAllBabyAdmissionData['isMotherAdmitted'];
+                $babyListArray[]  = $getAllBabyAdmissionData['motherMobileNumber'];
+                $babyListArray[]  = date('jS M',strtotime($getAllBabyAdmissionData['deliveryDate']));
+                $babyListArray[]  = date('h:i A',strtotime($getAllBabyAdmissionData['deliveryTime']));
+                $babyListArray[]  = ($getAllBabyAdmissionData['babyGender'] == "Male") ? "M" : (($getAllBabyAdmissionData['babyGender'] == "Female") ? "F" : "Others");
+                $babyListArray[]  = $getAllBabyAdmissionData['babyWeight'];
+                $babyListArray[]  = $getAllBabyAdmissionData['typeOfBorn'];
+                $babyListArray[]  = $getAllBabyAdmissionData['deliveryType'];
+                $babyListArray[]  = date('jS M',strtotime($getAllBabyAdmissionData['admissionDateTime']));
+                $babyListArray[]  = date('h:i A',strtotime($getAllBabyAdmissionData['admissionDateTime']));
+                $babyListArray[]  = $getAllBabyAdmissionData['babyAdmissionWeight'];
+
+                $objWorkSheet->fromArray($babyListArray, null, 'A'.$a);
+                $sortMaxElement = $a;
+                /****************baby assessment list*****************/
+                $getAllBabyAssessmentList = $this->cmodel->getBabyDailyMonitoring($getAllBabyAdmissionData['babyAdmissionId']);
+                $assessment_row = $a;
+                foreach($getAllBabyAssessmentList as $key_assessment => $getAllBabyAssessmentData){
+
+                  // thermometer value
+                  if($getAllBabyAssessmentData['isThermometerAvailable']=="Yes"){
+                    $thermometerValue = $getAllBabyAssessmentData['temperatureValue']." ".$getAllBabyAssessmentData['temperatureUnit'];
+                  }else{
+                    if(!empty($getAllBabyAssessmentData['reasonValue']) && $getAllBabyAssessmentData['reasonValue'] != "Other"){
+                     $thermometerValue = $getAllBabyAssessmentData['reasonValue']; 
+                    }elseif($getAllBabyAssessmentData['reasonValue'] == "Other"){ 
+                      $thermometerValue = $getAllBabyAssessmentData['otherValue']; 
+                    }else{ 
+                      $thermometerValue = ""; 
+                    }
+                  }
+
+                  // pulse oximeter value
+                  if($getAllBabyAssessmentData['isPulseOximatoryDeviceAvail'] == "Yes"){ 
+                    $spO2Value = $getAllBabyAssessmentData['spo2']."%";
+                    $pulseRateValue = $getAllBabyAssessmentData['pulseRate']." bpm";
+                    $oximeterNotAvailReason = "";
+                  }else{
+                    $spO2Value = "";
+                    $pulseRateValue = "";
+                    if(!empty($getAllBabyAssessmentData['pulseReasonValue']) && $getAllBabyAssessmentData['pulseReasonValue'] != "Other"){
+                     $oximeterNotAvailReason = $getAllBabyAssessmentData['pulseReasonValue']; 
+                    }elseif($getAllBabyAssessmentData['pulseReasonValue'] == "Other"){ 
+                      $oximeterNotAvailReason = $getAllBabyAssessmentData['pulseOtherValue']; 
+                    }else{ 
+                      $oximeterNotAvailReason = ""; 
+                    }
+                  }
+
+                  $assessmentListArray    = [];
+                  $assessmentListArray[]    = date('jS M',strtotime($getAllBabyAssessmentData['assesmentDate']))." ".date('h:i A',strtotime($getAllBabyAssessmentData['assesmentTime']));
+                  $assessmentListArray[]    = $thermometerValue;
+                  $assessmentListArray[]    = $getAllBabyAssessmentData['respiratoryRate']."/min";
+                  $assessmentListArray[]    = $getAllBabyAssessmentData['isPulseOximatoryDeviceAvail'];
+                  $assessmentListArray[]    = $spO2Value;
+                  $assessmentListArray[]    = $pulseRateValue;
+                  $assessmentListArray[]    = $oximeterNotAvailReason;
+
+                  $objWorkSheet->fromArray($assessmentListArray, null, 'P'.$assessment_row);
+                  $assessment_row = $assessment_row+1;
+                }
+
+                /****************baby daily weight list*****************/
+                $getAllBabyDailyWeightList = $this->cmodel->getBabyDailyWeightById($getAllBabyAdmissionData['babyAdmissionId']);
+                $dailyweight_row = $a;
+                foreach($getAllBabyDailyWeightList as $key_weight => $getAllBabyDailyWeightData){
+                  $weightListArray    = [];
+                  $weightListArray[]    = date('jS M',strtotime($getAllBabyDailyWeightData['weightDate']));
+                  $weightListArray[]    = $getAllBabyDailyWeightData['babyWeight'];
+
+                  $objWorkSheet->fromArray($weightListArray, null, 'W'.$dailyweight_row);
+                  $dailyweight_row = $dailyweight_row+1;
+                }
+
+                /****************baby kmc position list*****************/
+                $getAllBabyKmcPositionList = $this->cmodel->getBabyKmcPositionById($getAllBabyAdmissionData['babyAdmissionId']);
+                $kmcposition_row = $a;
+                foreach($getAllBabyKmcPositionList as $key_kmc => $getAllBabyKmcPositionData){
+                  $kmcListArray    = [];
+                  $kmcListArray[]    = date('jS M',strtotime($getAllBabyKmcPositionData['startDate']));
+                  $kmcListArray[]    = date('h:i A',strtotime($getAllBabyKmcPositionData['startTime']));
+                  $kmcListArray[]    = date('jS M',strtotime($getAllBabyKmcPositionData['endDate']));
+                  $kmcListArray[]    = date('h:i A',strtotime($getAllBabyKmcPositionData['endTime']));
+                  $kmcListArray[]    = $getAllBabyKmcPositionData['provider'];
+                  $kmcListArray[]    = $getAllBabyKmcPositionData['nurseName'];
+
+                  $objWorkSheet->fromArray($kmcListArray, null, 'Y'.$kmcposition_row);
+                  $kmcposition_row = $kmcposition_row+1;
+                }
+
+                /****************baby nutrition list*****************/
+                $getAllBabyNutritionList = $this->cmodel->getBabyNutritionById($getAllBabyAdmissionData['babyAdmissionId']);
+                $nutrition_row = $a;
+                foreach($getAllBabyNutritionList as $key_nutrition => $getAllBabyNutritionData){
+                  $nutritionListArray    = [];
+                  $nutritionListArray[]    = date('jS M',strtotime($getAllBabyNutritionData['feedDate']));
+                  $nutritionListArray[]    = date('h:i A',strtotime($getAllBabyNutritionData['feedTime']));
+                  $nutritionListArray[]    = $getAllBabyNutritionData['breastFeedMethod'];
+                  $nutritionListArray[]    = $getAllBabyNutritionData['fluid'];
+                  $nutritionListArray[]    = $getAllBabyNutritionData['milkQuantity'];
+                  $nutritionListArray[]    = $getAllBabyNutritionData['nurseName'];
+
+                  $objWorkSheet->fromArray($nutritionListArray, null, 'AE'.$nutrition_row);
+                  $nutrition_row = $nutrition_row+1;
+                }
+
+                /****************doctor prescription list*****************/
+                $getAllBabyPrescriptionList = $this->cmodel->getBabyPrescriptionById($getAllBabyAdmissionData['babyAdmissionId']);
+                $prescription_row = $a;
+                foreach($getAllBabyPrescriptionList as $key_prescription => $getAllBabyPrescriptionData){
+                  $prescriptionListArray    = [];
+                  $prescriptionListArray[]    = $getAllBabyPrescriptionData['doctorName'];
+                  $prescriptionListArray[]    = date('jS M h:i A',strtotime($getAllBabyPrescriptionData['addDate']));
+                  $prescriptionListArray[]    = $getAllBabyPrescriptionData['prescriptionName'];
+                  $prescriptionListArray[]    = $getAllBabyPrescriptionData['comment'];
+                  
+                  $objWorkSheet->fromArray($prescriptionListArray, null, 'AK'.$prescription_row);
+                  $prescription_row = $prescription_row+1;
+                }
+
+                /****************counselling time*****************/
+                $counsellingListArray = [];
+                $getCounsellingWhatisKmc = $this->cmodel->getBabyCounsellingTimeById($getAllBabyAdmissionData['babyId'],1);
+                if(!empty($getCounsellingWhatisKmc)){
+                  $explodeTimeFormat = explode(":",$getCounsellingWhatisKmc['totalSeconds']);
+                  $counsellingListArray[]    = (($explodeTimeFormat[0] != "0") ? ($explodeTimeFormat[0]."h "):"").(($explodeTimeFormat[1] != "0") ? ($explodeTimeFormat[1]."m "):"").(($explodeTimeFormat[2] != "0") ? (round($explodeTimeFormat[2])."s"):""); 
+                }else{
+                  $counsellingListArray[] = "";
+                }
+                
+
+                $getCounsellingKmcPosition = $this->cmodel->getBabyCounsellingTimeById($getAllBabyAdmissionData['babyId'],2);
+                if(!empty($getCounsellingKmcPosition)){
+                  $explodeTimeFormat = explode(":",$getCounsellingKmcPosition['totalSeconds']);
+                  $counsellingListArray[]    = (($explodeTimeFormat[0] != "0") ? ($explodeTimeFormat[0]."h "):"").(($explodeTimeFormat[1] != "0") ? ($explodeTimeFormat[1]."m "):"").(($explodeTimeFormat[2] != "0") ? (round($explodeTimeFormat[2])."s"):""); 
+                }else{
+                  $counsellingListArray[] = "";
+                }
+
+                $getCounsellingKmcNutrition = $this->cmodel->getBabyCounsellingTimeById($getAllBabyAdmissionData['babyId'],3);
+                if(!empty($getCounsellingKmcNutrition)){
+                  $explodeTimeFormat = explode(":",$getCounsellingKmcNutrition['totalSeconds']);
+                  $counsellingListArray[]    = (($explodeTimeFormat[0] != "0") ? ($explodeTimeFormat[0]."h "):"").(($explodeTimeFormat[1] != "0") ? ($explodeTimeFormat[1]."m "):"").(($explodeTimeFormat[2] != "0") ? (round($explodeTimeFormat[2])."s"):""); 
+                }else{
+                  $counsellingListArray[] = "";
+                }
+
+                $getCounsellingKmcHygiene = $this->cmodel->getBabyCounsellingTimeById($getAllBabyAdmissionData['babyId'],4);
+                if(!empty($getCounsellingKmcHygiene)){
+                  $explodeTimeFormat = explode(":",$getCounsellingKmcHygiene['totalSeconds']);
+                  $counsellingListArray[]    = (($explodeTimeFormat[0] != "0") ? ($explodeTimeFormat[0]."h "):"").(($explodeTimeFormat[1] != "0") ? ($explodeTimeFormat[1]."m "):"").(($explodeTimeFormat[2] != "0") ? (round($explodeTimeFormat[2])."s"):""); 
+                }else{
+                  $counsellingListArray[] = "";
+                }
+
+                $getCounsellingKmcMonitoring = $this->cmodel->getBabyCounsellingTimeById($getAllBabyAdmissionData['babyId'],5);
+                if(!empty($getCounsellingKmcMonitoring)){
+                  $explodeTimeFormat = explode(":",$getCounsellingKmcMonitoring['totalSeconds']);
+                  $counsellingListArray[]    = (($explodeTimeFormat[0] != "0") ? ($explodeTimeFormat[0]."h "):"").(($explodeTimeFormat[1] != "0") ? ($explodeTimeFormat[1]."m "):"").(($explodeTimeFormat[2] != "0") ? (round($explodeTimeFormat[2])."s"):""); 
+                }else{
+                  $counsellingListArray[] = "";
+                }
+
+                $getCounsellingKmcRespect = $this->cmodel->getBabyCounsellingTimeById($getAllBabyAdmissionData['babyId'],6);
+                if(!empty($getCounsellingKmcRespect)){
+                  $explodeTimeFormat = explode(":",$getCounsellingKmcRespect['totalSeconds']);
+                  $counsellingListArray[]    = (($explodeTimeFormat[0] != "0") ? ($explodeTimeFormat[0]."h "):"").(($explodeTimeFormat[1] != "0") ? ($explodeTimeFormat[1]."m "):"").(($explodeTimeFormat[2] != "0") ? (round($explodeTimeFormat[2])."s"):""); 
+                }else{
+                  $counsellingListArray[] = "";
+                }
+
+                $objWorkSheet->fromArray($counsellingListArray, null, 'AO'.$a);
+                
+                /**************Discharge & Mother Profile Data*****************/
+                $motherProfileDataArray = [];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['typeOfDischarge'];
+                $motherProfileDataArray[]  = date('jS M h:i A',strtotime($getAllBabyAdmissionData['dateOfDischarge']));
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['motherProfileUpdateNurse'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['fatherName'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['motherAadharNumber'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['fatherAadharNumber'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['motherMCTSNumber'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['motherWeight'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['motherDOB'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['motherAge'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['ageAtMarriage'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['motherEducation'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['motherReligion'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['motherCaste'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['multipleBirth'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['gravida'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['para'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['abortion'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['live'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['birthSpacing'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['fatherMobileNumber'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['guardianName'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['guardianRelation'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['guardianNumber'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['rationCardType'];
+
+                $PresentDistrictName = $this->cmodel->GetPresentDistrictName($getAllBabyAdmissionData['presentDistrictName']);
+                $PresentBlockName = $this->cmodel->GetPresentBlockName($getAllBabyAdmissionData['presentBlockName']);
+                $PresentVillageName = $this->cmodel->GetPresentVillageName($getAllBabyAdmissionData['presentVillageName']);
+
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['presentResidenceType'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['presentCountry'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['presentState'];
+                $motherProfileDataArray[]  = $PresentDistrictName['DistrictNameProperCase'];
+                $motherProfileDataArray[]  = $PresentBlockName['BlockPRINameProperCase'];
+                $motherProfileDataArray[]  = $PresentVillageName['GPNameProperCase'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['presentAddress'];
+
+                $PermanentDistrictName = $this->cmodel->GetPresentDistrictName($getAllBabyAdmissionData['permanentDistrictName']);
+                $PermanentBlockName = $this->cmodel->GetPresentBlockName($getAllBabyAdmissionData['permanentBlockName']);
+                $PermanentVillageName = $this->cmodel->GetPresentVillageName($getAllBabyAdmissionData['permanentVillageName']);
+
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['presentPinCode'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['presentAddNearByLocation'];
+                $motherProfileDataArray[]  = ($getAllBabyAdmissionData['sameAddress'] == "1")?"Yes":"No";
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['permanentResidenceType'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['permanentCountry'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['permanentState'];
+                $motherProfileDataArray[]  = $PermanentDistrictName['DistrictNameProperCase'];
+                $motherProfileDataArray[]  = $PermanentBlockName['BlockPRINameProperCase'];
+                $motherProfileDataArray[]  = $PermanentVillageName['GPNameProperCase'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['permanentAddress'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['permanentPinCode'];
+                $motherProfileDataArray[]  = $getAllBabyAdmissionData['permanentAddNearByLocation'];
+
+                $objWorkSheet->fromArray($motherProfileDataArray, null, 'AU'.$a);
+
+                /************************/
+                $maximumRowsArray = array(count($getAllBabyAssessmentList),count($getAllBabyDailyWeightList),count($getAllBabyKmcPositionList),count($getAllBabyNutritionList),count($getAllBabyPrescriptionList));
+                $sortMaxElement = max($maximumRowsArray);
+
+                // increment next row
+                $a = $a+$sortMaxElement+1;
+
+                $styleArray = array(
+                  'borders' => array(
+                  'allborders' => array(
+                  'style' => PHPExcel_Style_Border::BORDER_THIN
+                  )
+                  )
+                );
+                $objWorkSheet->getStyle('A1:CL'.$a.'')->applyFromArray($styleArray);
+
+                $dataCount++;
+              }
+
+              $objWorkSheet->setTitle('Mother Baby Details');
+
+              $folderArray = array('7'=>'Team1','8'=>'Team2','9'=>'Team3','10'=>'Team4','11'=>'Team5','12'=>'Team6','13'=>'Team7','14'=>'Team8');
+              $folderName = "motherBabyDetailsForFeedback/".$folderArray[$team_row]."/";
+              $file = "Mother-Baby-Details-For-Feedback-".$folderArray[$team_row]."-".date('Y-m-d',strtotime("-1 days"));
+              $filename = $file.'.xls';
+              
+              header('Content-Type: application/vnd.ms-excel');
+              header('Content-Disposition: attachment;filename="'.$filename.'"');
+              header('Cache-Control: max-age=0');
+
+              $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+              //$objWriter->save('php://output');
+              $objWriter->save(str_replace(__FILE__,'assets/Reports/'.$folderName.$filename,__FILE__));
+              chmod('assets/Reports/'.$folderName.$filename, 0777);
+
+              // save file log
+              if(!empty($getReportSettings)){
+                $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+                if(empty($checkFileExist)){
+                  $logData['reportSettingId']      = $getReportSettings['id'];
+                  $logData['fileName']             = $filename;
+                  $logData['addDate']              = date('Y-m-d',strtotime("-1 days"));
+                  $this->db->insert('reportLogs',$logData);
+                }
+              }
+          }
+
+      }
+
     }
 
     /**************************************************Old code start***********************************************/
@@ -1765,7 +2281,7 @@ class Cronjob extends CI_Controller {
           $babyListArray[]  = $getAllBabyAdmissionData['breastFeedMethod'];
           $babyListArray[]  = $getAllBabyAdmissionData['fluid'];
           $babyListArray[]  = $getAllBabyAdmissionData['milkQuantity'];
-          if($getAllBabyAdmissionData['fluid']=="Mother's own milk")
+          if($getAllBabyAdmissionData['fluid']=="Mother's own milk" || $getAllBabyAdmissionData['fluid']=="Other Human Milk")
           {
           	$babyListArray[]  = "Exclusive";
           }
@@ -1821,6 +2337,363 @@ class Cronjob extends CI_Controller {
         }
       }
   }
+
+
+  //Daily Admition report by nurse
+    public function nurseAdmitionReport(){
+      $reportDate = date('jS F Y, l',strtotime("-1 days"));
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->mergeCells('A1:AA1');
+      $objWorkSheet->mergeCells('A2:AA2');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
+
+      for($col = ord('A'); $col <= ord('AA'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."3")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
+      $objWorkSheet->getColumnDimension('B')->setWidth(18);
+      $objWorkSheet->getColumnDimension('C')->setWidth(24);
+      $objWorkSheet->getColumnDimension('D')->setWidth(15);
+      $objWorkSheet->getColumnDimension('E')->setWidth(16);
+      $objWorkSheet->getColumnDimension('F')->setWidth(20);
+      $objWorkSheet->getColumnDimension('G')->setWidth(15);
+      $objWorkSheet->getColumnDimension('H')->setWidth(20);
+      $objWorkSheet->getColumnDimension('I')->setWidth(20);
+      $objWorkSheet->getColumnDimension('J')->setWidth(20);
+      $objWorkSheet->getColumnDimension('K')->setWidth(20);
+      $objWorkSheet->getColumnDimension('L')->setWidth(20);
+      $objWorkSheet->getColumnDimension('M')->setWidth(20);
+      $objWorkSheet->getColumnDimension('N')->setWidth(24);
+      $objWorkSheet->getColumnDimension('O')->setWidth(15);
+      $objWorkSheet->getColumnDimension('P')->setWidth(16);
+      $objWorkSheet->getColumnDimension('Q')->setWidth(20);
+      $objWorkSheet->getColumnDimension('R')->setWidth(15);
+      $objWorkSheet->getColumnDimension('S')->setWidth(15);
+      $objWorkSheet->getColumnDimension('T')->setWidth(18);
+      $objWorkSheet->getColumnDimension('U')->setWidth(20);
+      $objWorkSheet->getColumnDimension('V')->setWidth(20);
+      $objWorkSheet->getColumnDimension('W')->setWidth(8);
+      $objWorkSheet->getColumnDimension('X')->setWidth(8);
+      $objWorkSheet->getColumnDimension('Y')->setWidth(15);
+      $objWorkSheet->getColumnDimension('Z')->setWidth(10);
+      $objWorkSheet->getColumnDimension('AA')->setWidth(8);
+      
+
+      for($col = ord('A'); $col <= ord('AA'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->setCellValue('A3', 'Sr. No.');
+      $objWorkSheet->setCellValue('B3', 'Lounge Name');
+      $objWorkSheet->setCellValue('C3', 'Staf Name');
+      $objWorkSheet->setCellValue('D3', 'Total Admission');
+      $objWorkSheet->setCellValue('E3', 'Refferal');
+      $objWorkSheet->setCellValue('F3', 'Mother is accompanying');
+      $objWorkSheet->setCellValue('G3', 'Dead');
+      $objWorkSheet->setCellValue('H3', 'Baby was referred but mother did not accompanying');
+      $objWorkSheet->setCellValue('I3', 'Mother is in a different ward in same hospital');
+      $objWorkSheet->setCellValue('J3', 'Unknown / Baby is an orphan');
+      $objWorkSheet->setCellValue('K3', 'Others');
+      $objWorkSheet->setCellValue('L3', 'Total Baby Discharge');
+      $objWorkSheet->setCellValue('M3', 'Normal Discharge');
+      $objWorkSheet->setCellValue('N3', 'Referral');
+      $objWorkSheet->setCellValue('O3', 'LAMA');
+      $objWorkSheet->setCellValue('P3', 'DOPR');
+      $objWorkSheet->setCellValue('Q3', 'Doctor Discretion');
+      $objWorkSheet->setCellValue('R3', 'Absconded');
+      $objWorkSheet->setCellValue('S3', 'Died');
+      $objWorkSheet->setCellValue('T3', 'Total Mother Discharge');
+      $objWorkSheet->setCellValue('U3', 'Normal Discharge');
+      $objWorkSheet->setCellValue('V3', 'Referral');
+      $objWorkSheet->setCellValue('W3', 'LAMA');
+      $objWorkSheet->setCellValue('X3', 'DOPR');
+      $objWorkSheet->setCellValue('Y3', 'Doctor Discretion');
+      $objWorkSheet->setCellValue('Z3', 'Absconded');
+      $objWorkSheet->setCellValue('AA3', 'Died');
+
+      $previousDate = date('Y-m-d',strtotime("-1 days"));
+    $currentDate = date('Y-m-d');
+
+    // $previousDate = "2021-01-27";
+    // $currentDate = "2021-01-28";
+
+    $previous = "'".$previousDate.' 8:00:00'."'";
+    $current = "'".$currentDate.' 8:00:00'."'";
+      
+    $getReportSettings = $this->cmodel->getReportSettings(6);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+      echo "<pre>";
+       print_r($loungeArray);
+       echo $loung = implode(',', $loungeArray);
+
+      $query = $this->db->query('SELECT babyAdmission.staffId as admitionStaf, babyAdmission.dischargeByNurse as babydischargenurse, motherRegistration.isMotherAdmitted as moteradmissionwithbaby, 
+        staffMaster.name as nurseName,
+        motherAdmission.dischargeByNurse as motherDischargeNurse
+         FROM staffMaster 
+          JOIN babyAdmission 
+            on staffMaster.staffId=babyAdmission.staffId 
+            left JOIN motherAdmission 
+            on staffMaster.staffId=motherAdmission.dischargeByNurse
+            left JOIN motherRegistration 
+            on motherRegistration.motherId=motherAdmission.motherId
+          WHERE (
+           (babyAdmission.admissionDateTime BETWEEN '.$previous.' AND '.$current.') 
+           OR (babyAdmission.dateOfDischarge BETWEEN '.$previous.' AND '.$current.') 
+           OR (motherAdmission.dateOfDischarge BETWEEN '.$previous.' AND '.$current.')
+         ) group by babyAdmission.staffId,motherAdmission.dischargeByNurse')->result_array();
+
+
+print_r($query);
+
+
+
+
+
+
+// timestampdiff(hour, c.admissionDateTime, timestamp(CURRENT_DATE, '08:00:00'))
+//       echo $query = $this->db->query('SELECT stafId,
+//         count(if(babyAdmission.admissionDateTime in last 24 hour, 1, NULL)),
+// count(if(babyAdmission.dateOfDischarge in last 24 hour, 1, NULL)),
+// count(if(motherAdmission.dateOfDischarge in last 24 hour, 1, NULL))
+// from staffMaster a 
+// join loungeMaster m 
+//   on a.facilityId = m.facilityId
+// left join babyAdmission b
+//   on a.stafId = b.staffId
+//   and (datediff(CURRENT_DATE, a.`admissionDateTime`) <= 24 hour or datediff(CURRENT_DATE, a.`dateOfDischarge`) <= 24 hour)
+// left join motherAdmission c
+//   on a.stafId = c.dischargeByNurse
+//   and  motherAdmission.dateOfDischarge within 24 hour
+// where m.loungeId in('.$loung.')')->result_array();
+      
+      // Get all lounges
+      //$getAllLounges = $this->cmodel->getAllLounges($loungeArray);
+  }
+
+
+
+
+  //duplicate admition by nurse
+  public function sendNurseAdmitionReport(){
+
+      $reportDate = date('jS F Y, l',strtotime("-1 days"));
+      //$reportDate = date('jS F Y, l',strtotime("2021-01-29"));
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->getRowDimension('2')->setRowHeight(20);
+      $objWorkSheet->mergeCells('A1:Z1');
+      $objWorkSheet->mergeCells('A2:Z2');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
+
+      for($col = ord('A'); $col <= ord('Z'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."4")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
+      $objWorkSheet->getColumnDimension('B')->setWidth(40);
+      $objWorkSheet->getColumnDimension('C')->setWidth(24);
+      $objWorkSheet->getColumnDimension('D')->setWidth(12);
+      $objWorkSheet->getColumnDimension('E')->setWidth(12);
+      $objWorkSheet->getColumnDimension('F')->setWidth(12);
+      $objWorkSheet->getColumnDimension('G')->setWidth(12);
+      $objWorkSheet->getColumnDimension('H')->setWidth(12);
+      $objWorkSheet->getColumnDimension('I')->setWidth(12);
+      $objWorkSheet->getColumnDimension('J')->setWidth(12);
+      $objWorkSheet->getColumnDimension('K')->setWidth(12);
+      $objWorkSheet->getColumnDimension('L')->setWidth(12);
+      $objWorkSheet->getColumnDimension('M')->setWidth(12);
+      $objWorkSheet->getColumnDimension('N')->setWidth(12);
+      $objWorkSheet->getColumnDimension('O')->setWidth(12);
+      $objWorkSheet->getColumnDimension('P')->setWidth(12);
+      $objWorkSheet->getColumnDimension('Q')->setWidth(12);
+      $objWorkSheet->getColumnDimension('R')->setWidth(12);
+      $objWorkSheet->getColumnDimension('S')->setWidth(12);
+      $objWorkSheet->getColumnDimension('T')->setWidth(12);
+      $objWorkSheet->getColumnDimension('U')->setWidth(12);
+      $objWorkSheet->getColumnDimension('V')->setWidth(12);
+      $objWorkSheet->getColumnDimension('W')->setWidth(12);
+      $objWorkSheet->getColumnDimension('X')->setWidth(12);
+      $objWorkSheet->getColumnDimension('Y')->setWidth(12);
+      $objWorkSheet->getColumnDimension('Z')->setWidth(12);
+      
+
+      $timeNotes = "("."8:00 am ".date('jS F',strtotime(date('Y-m-d',strtotime("-1 days"))))." to 8:00 am  ".date('jS F',strtotime(date('Y-m-d'))).")";
+      
+
+      for($col = ord('A'); $col <= ord('Z'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->setCellValue('A4', 'Sr. No.');
+      $objWorkSheet->setCellValue('B4', 'Lounge Name');
+      $objWorkSheet->setCellValue('C4', 'Nurse Name');
+      $objWorkSheet->setCellValue('D4', 'Total Admission');
+      $objWorkSheet->setCellValue('E4', 'Refferal');
+      $objWorkSheet->setCellValue('F4', 'Mother is accompanying');
+      $objWorkSheet->setCellValue('G4', 'Dead');
+      $objWorkSheet->setCellValue('H4', 'Baby was referred but mother did not accompanying');
+      $objWorkSheet->setCellValue('I4', 'Mother is in a different ward in same hospital');
+      $objWorkSheet->setCellValue('J4', 'Unknown / Baby is an orphan');
+      $objWorkSheet->setCellValue('K4', 'Others');
+      $objWorkSheet->setCellValue('L4', 'Total Baby Discharge');
+      $objWorkSheet->setCellValue('M4', 'Referral');
+      $objWorkSheet->setCellValue('N4', 'LAMA');
+      $objWorkSheet->setCellValue('O4', 'DOPR');
+      $objWorkSheet->setCellValue('P4', 'Doctor Discretion');
+      $objWorkSheet->setCellValue('Q4', 'Absconded');
+      $objWorkSheet->setCellValue('R4', 'Died');
+      $objWorkSheet->setCellValue('S4', 'Total Mother Discharge');
+      $objWorkSheet->setCellValue('T4', 'Normal Discharge');
+      $objWorkSheet->setCellValue('U4', 'Referral');
+      $objWorkSheet->setCellValue('V4', 'LAMA');
+      $objWorkSheet->setCellValue('W4', 'DOPR');
+      $objWorkSheet->setCellValue('X4', 'Doctor Discretion');
+      $objWorkSheet->setCellValue('Y4', 'Absconded');
+      $objWorkSheet->setCellValue('Z4', 'Died');
+
+      $objWorkSheet->setCellValue('A1', 'KMC App Nurse Admition And Discharge Report');
+      $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate." ".$timeNotes);
+
+      $getReportSettings = $this->cmodel->getReportSettings(6);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+      
+      // Get all lounges
+      $getAllLounges = $this->cmodel->getAllLounges($loungeArray);
+      $dataCount = 1;
+      $a=5;
+      
+      foreach($getAllLounges as $key_lounge => $getAllLoungesData){
+
+          $loungeListArray    = [];
+          $loungeListArray[]  = $dataCount;
+          $loungeListArray[]  = $getAllLoungesData['loungeName'];
+
+          $getNurseAttendanceList = $this->cmodel->getNurseAdmitionList($getAllLoungesData['loungeId']); 
+
+          $objWorkSheet->fromArray($loungeListArray, null, 'A'.$a);
+          $innerRow = $a;
+
+          $previousDate = date('Y-m-d',strtotime("-1 days"));
+          $currentDate = date('Y-m-d');
+          
+
+          if(!empty($getNurseAttendanceList)){
+            foreach($getNurseAttendanceList as $key_nurse => $getNurseAttendanceListData){
+
+                  
+
+                  $nurseListArray   = [];
+                  $nurseListArray[] = $getNurseAttendanceListData['nurseName'];
+                   $rec = $this->cmodel->totalAdmissionByNurse($getAllLoungesData['loungeId'],$getNurseAttendanceListData['staffId']);
+
+                   $recDisBaby = $this->cmodel->totalBabyDischargeByNurse($getAllLoungesData['loungeId'],$getNurseAttendanceListData['staffId']);
+                   $recDisMother = $this->cmodel->totalMotherDischargeByNurse($getAllLoungesData['loungeId'],$getNurseAttendanceListData['staffId']);
+
+                  $nurseListArray[] = $rec['total'];
+                  $nurseListArray[] = $rec['referral'];
+                  $nurseListArray[] = $rec['withmothers'];
+                  $nurseListArray[] = $rec['dethmothers'];
+                  $nurseListArray[] = $rec['notmothers'];
+                  $nurseListArray[] = $rec['samehospitalmothers'];
+                  $nurseListArray[] = $rec['unknownmothers'];
+                  $nurseListArray[] = $rec['othermothers'];
+
+                  $nurseListArray[] = $recDisBaby['total'];
+                  $nurseListArray[] = $recDisBaby['referral'];
+                  $nurseListArray[] = $recDisBaby['LAMA'];
+                  $nurseListArray[] = $recDisBaby['DOPR'];
+                  $nurseListArray[] = $recDisBaby['Doctor'];
+                  $nurseListArray[] = $recDisBaby['Absconded'];
+                  $nurseListArray[] = $recDisBaby['Died'];
+
+                  $nurseListArray[] = $recDisMother['total'];
+                  $nurseListArray[] = $recDisMother['Normal'];
+                  $nurseListArray[] = $recDisMother['referral'];
+                  $nurseListArray[] = $recDisMother['LAMA'];
+                  $nurseListArray[] = $recDisMother['DOPR'];
+                  $nurseListArray[] = $recDisMother['Doctor'];
+                  $nurseListArray[] = $recDisMother['Absconded'];
+                  $nurseListArray[] = $recDisMother['Died'];
+
+                  $objWorkSheet->fromArray($nurseListArray, null, 'C'.$innerRow);
+                  
+                  $innerRow = $innerRow+1;
+
+              
+            }
+            $a = $innerRow+1;
+          }
+          else{
+            $nurseListArray   = [];
+            $nurseListArray[] = "";
+            $nurseListArray[] = "";
+            $nurseListArray[] = "";
+            $nurseListArray[] = "";
+            $nurseListArray[] = "";
+            $objWorkSheet->fromArray($nurseListArray, null, 'C'.$innerRow);
+
+            $a = $innerRow+2;
+          }
+          
+
+          $styleArray = array(
+            'borders' => array(
+            'allborders' => array(
+            'style' => PHPExcel_Style_Border::BORDER_THIN
+            )
+            )
+          );
+
+          $objWorkSheet->getStyle('A1:Z'.$a.'')->applyFromArray($styleArray);
+
+          $objWorkSheet->setTitle('Nurse Admition Report');
+          $dataCount++;   
+      }
+
+      $file = "Nurse-Admition-Report-".date('d-m-Y',strtotime("-1 days")); 
+       
+      $filename=$file.'.xls';
+      header('Content-Type: application/vnd.ms-excel');
+      header('Content-Disposition: attachment;filename="'.$filename.'"');
+      header('Cache-Control: max-age=0');
+
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+      $objWriter->save('php://output');
+      $objWriter->save(str_replace(__FILE__,'assets/Reports/babyadmission/'.$filename,__FILE__));
+      chmod('assets/Reports/babyadmission/'.$filename, 0777);
+
+      // save file log
+      if(!empty($getReportSettings)){
+        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+        if(empty($checkFileExist)){
+          $logData['reportSettingId']      = $getReportSettings['id'];
+          $logData['fileName']             = $filename;
+          $logData['addDate']              = date('Y-m-d',strtotime("-1 days"));
+          $this->db->insert('reportLogs',$logData);
+        }
+      }
+
+    }
 
 
 

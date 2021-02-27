@@ -400,7 +400,7 @@ class MotherModel extends CI_Model
         $arrayName['permanentPinCode'] = ($request['permanentPinCode'] != '') ? $request['permanentPinCode'] : NULL;
         $arrayName['presentPinCode'] = ($request['presentPinCode'] != '') ? $request['presentPinCode'] : NULL;
 
-        // $arrayName['staffId'] = ($request['staffId'] != '') ? $request['staffId'] : NULL;
+        $arrayName['profileUpdateNurseId'] = ($request['staffId'] != '') ? $request['staffId'] : NULL;
 
         $arrayName['para'] = ($request['para'] != '') ? $request['para'] : NULL;
         $arrayName['live'] = ($request['live'] != '') ? $request['live'] : NULL;

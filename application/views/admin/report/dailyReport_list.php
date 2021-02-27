@@ -139,8 +139,31 @@
                                       $folder_name = "weightReports";
                                     }else if($value['reportSettingId'] == "3"){
                                       $folder_name = "kmcPositionDuplicateReports";
-                                    }else{
+                                    }else if($value['reportSettingId'] == "4"){
                                       $folder_name = "baselineReports";
+                                    }else if($value['reportSettingId'] == "5"){
+                                      $folder_name = "nutritionReports";
+                                    }else if($value['reportSettingId'] == "6"){
+                                      $folder_name = "babyadmission";
+                                    }else if($value['reportSettingId'] == "7"){
+                                      $folder_name = "motherBabyDetailsForFeedback/Team1";
+                                    }else if($value['reportSettingId'] == "8"){
+                                      $folder_name = "motherBabyDetailsForFeedback/Team2";
+                                    }else if($value['reportSettingId'] == "9"){
+                                      $folder_name = "motherBabyDetailsForFeedback/Team3";
+                                    }else if($value['reportSettingId'] == "10"){
+                                      $folder_name = "motherBabyDetailsForFeedback/Team4";
+                                    }else if($value['reportSettingId'] == "11"){
+                                      $folder_name = "motherBabyDetailsForFeedback/Team5";
+                                    }else if($value['reportSettingId'] == "12"){
+                                      $folder_name = "motherBabyDetailsForFeedback/Team6";
+                                    }else if($value['reportSettingId'] == "13"){
+                                      $folder_name = "motherBabyDetailsForFeedback/Team7";
+                                    }else if($value['reportSettingId'] == "14"){
+                                      $folder_name = "motherBabyDetailsForFeedback/Team8";
+                                    }
+                                    else{
+                                      $folder_name = "babyadmission";
                                     }
                                   ?>
                                   <tr>
