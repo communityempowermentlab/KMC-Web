@@ -932,7 +932,7 @@ class NurseModel extends CI_Model {
 					}	
 					$arrayName1['type'] 		       	= 1;
 					$arrayName1['status'] 		      	= 1;
-					$arrayName1['addDate']             	= date('Y-m-d H:i:s');
+					//$arrayName1['addDate']             	= $request['localDateTime'];
 					
 					$arrayName1['latitude']  		   	= $request['latitude'];
 					$arrayName1['longitude']  		   	= $request['longitude'];
@@ -949,17 +949,30 @@ class NurseModel extends CI_Model {
 						$getNurseName = $this->db->get_where('staffMaster',array('staffId'=>$request['nurseId']))->row_array();
 
 	                 	// generate log history
-			            $paramArray                 		= array();
-			            $paramArray['tableReference']       = '1';
+			   //          $paramArray                 		= array();
+			   //          $paramArray['tableReference']       = '1';
 			            
+			   //          $paramArray['remark']             	= $getNurseName['name']." has checked in at ".date('d M Y, g:i A',strtotime($request['localDateTime'])).".";
+			            
+						// $paramArray['latitude']  		  	= $request['latitude'];
+						// $paramArray['longitude']  		  	= $request['longitude'];
+						// $paramArray['addDate'] 				= $request['localDateTime'];
+						// $paramArray['lastSyncedTime']      	= date('Y-m-d H:i:s');
+			   //          $this->db->where(array('tableReferenceId' => $lastID['id'], 'tableReference' => '1'));
+						// $this->db->update('logHistory', $paramArray);	
+
+
+						$paramArray                 		= array();
+			            $paramArray['tableReference']       = '1';
+			            $paramArray['tableReferenceId']     = $lastID['id'];
+			           
 			            $paramArray['remark']             	= $getNurseName['name']." has checked in at ".date('d M Y, g:i A',strtotime($request['localDateTime'])).".";
 			            
 						$paramArray['latitude']  		  	= $request['latitude'];
 						$paramArray['longitude']  		  	= $request['longitude'];
 						$paramArray['addDate'] 				= $request['localDateTime'];
 						$paramArray['lastSyncedTime']      	= date('Y-m-d H:i:s');
-			            $this->db->where(array('tableReferenceId' => $lastID['id'], 'tableReference' => '1'));
-						$this->db->update('logHistory', $paramArray);	
+			            $this->db->insert('logHistory',$paramArray);
 					}
 
 
@@ -1095,17 +1108,29 @@ class NurseModel extends CI_Model {
 
 	               	if(!empty($lastID['id'])){
 		               	// generate log history
-			            $paramArray                 		= array();
-			            $paramArray['tableReference']       = '1';
+			   //          $paramArray                 		= array();
+			   //          $paramArray['tableReference']       = '1';
 			            
+			   //          $paramArray['remark']             	= $getNurseName['name']." has checked out at ".date('d M Y, g:i A',strtotime($request['localDateTime'])).".";
+			            
+						// $paramArray['latitude']  		  	= $request['latitude'];
+						// $paramArray['longitude']  		  	= $request['longitude'];
+						// $paramArray['addDate'] 				= $request['localDateTime'];
+						// $paramArray['lastSyncedTime']      	= date('Y-m-d H:i:s');
+			   //          $this->db->where(array('tableReferenceId' => $lastID['id'], 'tableReference' => '1'));
+						// $this->db->update('logHistory', $paramArray);
+
+						$paramArray                 		= array();
+			            $paramArray['tableReference']       = '1';
+			            $paramArray['tableReferenceId']     = $lastID['id'];
+			           
 			            $paramArray['remark']             	= $getNurseName['name']." has checked out at ".date('d M Y, g:i A',strtotime($request['localDateTime'])).".";
 			            
 						$paramArray['latitude']  		  	= $request['latitude'];
 						$paramArray['longitude']  		  	= $request['longitude'];
 						$paramArray['addDate'] 				= $request['localDateTime'];
 						$paramArray['lastSyncedTime']      	= date('Y-m-d H:i:s');
-			            $this->db->where(array('tableReferenceId' => $lastID['id'], 'tableReference' => '1'));
-						$this->db->update('logHistory', $paramArray);	
+			            $this->db->insert('logHistory',$paramArray);	
 					}
 
 					$listID['id']      = $lastID['id'];
@@ -1448,7 +1473,7 @@ class NurseModel extends CI_Model {
 	       		$validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => trim($val['babyId'])))->row_array();
                 $validateNurseId = $this->db->get_where('staffMaster', array('staffId' => trim($val['nurseId']),'staffType'=>2))->row_array();
 
-                if(!empty($validateBabyId)){
+                //if(!empty($validateBabyId)){
 
 	            	$checkDuplicateData =  $this->db->get_where('prescriptionNurseWise',array('androidUuid'=>$val['localId']))->num_rows();
 	            	$DuplicateData      =  $this->db->get_where('prescriptionNurseWise',array('androidUuid'=>$val['localId']))->row_array();
@@ -1526,7 +1551,7 @@ class NurseModel extends CI_Model {
 						$listID['localId'] = $val['localId']; 
 						$param1[] = $listID;  
 	            	}
-	            }
+	            //}
        		} 	
    		} 
    		if($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2){

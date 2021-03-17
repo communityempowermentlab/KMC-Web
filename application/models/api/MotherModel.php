@@ -402,10 +402,10 @@ class MotherModel extends CI_Model
 
         $arrayName['profileUpdateNurseId'] = ($request['staffId'] != '') ? $request['staffId'] : NULL;
 
-        $arrayName['para'] = ($request['para'] != '') ? $request['para'] : NULL;
-        $arrayName['live'] = ($request['live'] != '') ? $request['live'] : NULL;
-        $arrayName['abortion'] = ($request['abortion'] != '') ? $request['abortion'] : NULL;
-        $arrayName['gravida'] = ($request['gravida'] != '') ? $request['gravida'] : NULL;
+        $arrayName['para'] = (($request['para'] != '') || ($request['para'] == '0')) ? $request['para'] : NULL;
+        $arrayName['live'] = (($request['live'] != '') || ($request['live'] == '0')) ? $request['live'] : NULL;
+        $arrayName['abortion'] = (($request['abortion'] != '') || ($request['abortion'] == '0')) ? $request['abortion'] : NULL;
+        $arrayName['gravida'] = (($request['gravida'] != '') || ($request['gravida'] == '0')) ? $request['gravida'] : NULL;
 
         $arrayName['multipleBirth'] = ($request['multipleBirth'] != '') ? $request['multipleBirth'] : NULL;
 

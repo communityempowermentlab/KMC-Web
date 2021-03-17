@@ -110,6 +110,7 @@ public function getLounge(){
     // $data['facility_id']    = $facility_id;
 
     $data['GetDistrict'] = $this->FacilityModel->selectquery(); 
+    $data['menuGroup']   = $this->LoungeModel->GetDataOrderByAsc('manageMenuGroupSetting', array('status' => 1), 'groupName');
 
     if($this->input->post()){
       // print_r($this->input->post());die;
@@ -126,7 +127,7 @@ public function getLounge(){
       } else { 
         $data2 = $this->input->post();
         $facility_id = $this->input->post('facility_id');
-        $AddLounge = $this->LoungeModel ->AddLounge($data2);
+        $AddLounge = $this->LoungeModel->AddLounge($data2);
         if($AddLounge == 0){
             $this->session->set_flashdata('activate', getCustomAlert('W','IMEI Number Already Exist!!'));
             redirect('loungeM/addLounge/'.$facility_id);
@@ -167,6 +168,15 @@ public function getLounge(){
     $data['GetFacilities'] = $this->LoungeModel->GetFacilityByDistrict($facilityData['PRIDistrictCode']); 
     $data['district_id'] = $facilityData['PRIDistrictCode'];
     $data['GetDistrict'] = $this->FacilityModel->selectquery(); 
+    $data['menuGroup'] = $this->LoungeModel->GetDataOrderByAsc('manageMenuGroupSetting', array('status' => 1), 'groupName');
+
+    $GetLoungeMenuGroup = $this->LoungeModel->GetData('employeeMenuGroup', array('employeeId' => $id, 'userType'=>3, 'status' => 1));
+      
+    $key_arr = array();
+    $data['key_arr'] = $key_arr;
+    foreach ($GetLoungeMenuGroup as $key => $value) {
+      $data['key_arr'][] = $value['groupId'];
+    }
     
     $this->load->view('admin/include/header-new',$data);
     $this->load->view('admin/lounge/lounge-edit');
@@ -202,7 +212,7 @@ public function getLounge(){
     $id = $this->uri->segment(3);
     $facility_id = $this->uri->segment(4);
     $data = $this->input->post(); 
-    $AddLounge = $this->LoungeModel ->UpdateLounge($data,$id);
+    $AddLounge = $this->LoungeModel->UpdateLounge($data,$id);
 
     if($AddLounge == 0){
       $this->session->set_flashdata('activate', getCustomAlert('W','IMEI Number Already Exist!!'));

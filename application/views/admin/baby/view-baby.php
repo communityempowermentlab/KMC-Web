@@ -92,6 +92,7 @@
                                     <a class="nav-item nav-link" id="nav-treatment-tab" data-toggle="tab" href="#nav-treatment" role="tab" aria-controls="nav-treatment" aria-selected="false">Treatment</a>
                                     <a class="nav-item nav-link" id="nav-vaccination-tab" data-toggle="tab" href="#nav-vaccination" role="tab" aria-controls="nav-vaccination" aria-selected="false">Vaccine</a>
                                     <a class="nav-item nav-link" id="nav-doctor-round-tab" data-toggle="tab" href="#nav-doctor-round" role="tab" aria-controls="nav-doctor-round" aria-selected="false">Doc Round</a>
+                                    <a class="nav-item nav-link" id="nav-checklist-tab" data-toggle="tab" href="#nav-checklist" role="tab" aria-controls="nav-checklist" aria-selected="false">Checklist</a>
                                     <a class="nav-item nav-link" id="nav-comment-tab" data-toggle="tab" href="#nav-comment" role="tab" aria-controls="nav-comment" aria-selected="false">Comment</a>
                                   <?php if($getPdfLink['status'] == '2'){ ?>
                                     <a class="nav-item nav-link" id="nav-discharge-tab" data-toggle="tab" href="#nav-discharge" role="tab" aria-controls="nav-discharge" aria-selected="false">Discharge</a>
@@ -160,7 +161,7 @@
                                       <div class="form-group">
                                         <label>Delivery Time </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo date('g:i A',strtotime($babyData['deliveryTime'])); ?>" readonly placeholder="Delivery Time">
+                                          <input type="text" class="form-control" value="<?php if(!empty($babyData['deliveryTime'])){ echo date('g:i A',strtotime($babyData['deliveryTime'])); } ?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -186,7 +187,7 @@
                                       <div class="form-group">
                                         <label>Delivery Date (dd-mm-yyyy) </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo date("d-m-Y",strtotime($babyData['deliveryDate'])); ?>" readonly placeholder="Delivery Date (dd-mm-yyyy)">
+                                          <input type="text" class="form-control" value="<?php if(!empty($babyData['deliveryDate'])){ echo date("d-m-Y",strtotime($babyData['deliveryDate'])); } ?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -202,7 +203,7 @@
                                       <div class="form-group">
                                         <label>Delivery Type</label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo $babyData['deliveryType']?>" readonly placeholder="Delivery Type">
+                                          <input type="text" class="form-control" value="<?php echo $babyData['deliveryType']?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -389,15 +390,15 @@
                                   </tr>
 
                                   <tr>
-                                    <td><b>Temperature (<sup>0</sup>F)</b></td>
+                                    <td><b>Temperature</b></td>
                                     <?php $c = 1; foreach($getBaby as $key => $value) { 
                                       if(!empty($value['temperatureValue'])){
-                                      if (($value['temperatureUnit'] == "F") && ($value['temperatureValue'] < 95.9 || $value['temperatureValue'] > 99.5)) { ?>
-                                        <td style="color:red;"> <?php echo $value['temperatureValue'].'&nbsp;<sup>0</sup>'.$value['temperatureUnit'].'';?> </td>
-                                    <?php }elseif (($value['temperatureUnit'] == "C") && ($value['temperatureValue'] < 32.2 || $value['temperatureValue'] > 41.6)) { ?>
-                                        <td style="color:red;"> <?php echo $value['temperatureValue'].'&nbsp;<sup>0</sup>'.$value['temperatureUnit'].'';?> </td>
+                                      if ((($value['temperatureUnit'] == "° F") || ($value['temperatureUnit'] == "°F") || ($value['temperatureUnit'] == "F")) && ($value['temperatureValue'] < 95.9 || $value['temperatureValue'] > 99.5)) { ?>
+                                        <td style="color:red;"> <?php echo $value['temperatureValue'].'&nbsp;'.$value['temperatureUnit'].'';?> </td>
+                                    <?php }elseif ((($value['temperatureUnit'] == "° C") || ($value['temperatureUnit'] == "°C") || ($value['temperatureUnit'] == "C")) && ($value['temperatureValue'] < 36.4 || $value['temperatureValue'] > 38)) { ?>
+                                        <td style="color:red;"> <?php echo $value['temperatureValue'].'&nbsp;'.$value['temperatureUnit'].'';?> </td>
                                     <?php } else { ?>
-                                      <td> <?php echo ($value['temperatureValue'] != "") ? $value['temperatureValue']."&nbsp;<sup>0</sup>".$value['temperatureUnit']."" : "N/A";?></td>
+                                      <td> <?php echo ($value['temperatureValue'] != "") ? $value['temperatureValue']."&nbsp;".$value['temperatureUnit']."" : "N/A";?></td>
                                     <?php } }else{ ?>
                                       <td> <?php echo "N/A";?></td>
                                     <?php } } ?>
@@ -482,8 +483,14 @@
 
                                   <tr>
                                     <td><b>Is&nbsp;CRT&nbsp;Greater&nbsp;than 3 secs</b></td>
-                                    <?php foreach($getBaby as $key => $value) { ?>
-                                      <td><?php echo !empty($value['isCrtGreaterThree']) ? $value['isCrtGreaterThree'] : 'N/A'; ?></td>
+                                    <?php foreach($getBaby as $key => $value) { 
+                                      if($value['isCrtGreaterThree'] == "Yes"){
+                                        $crtGreaterThreeRed = "style='color:red;'";
+                                      }else{
+                                        $crtGreaterThreeRed = "";
+                                      }
+                                    ?>
+                                      <td <?php echo $crtGreaterThreeRed; ?>><?php echo !empty($value['isCrtGreaterThree']) ? $value['isCrtGreaterThree'] : 'N/A'; ?></td>
                                     <?php } ?>
                                   </tr>
 
@@ -501,8 +508,14 @@
 
                                   <tr>
                                     <td><b>Alertness</b></td>
-                                    <?php foreach($getBaby as $key => $value) { ?>
-                                      <td><?php echo !empty($value['alertness']) ? $value['alertness'] : 'N/A'; ?></td>
+                                    <?php foreach($getBaby as $key => $value) { 
+                                      if($value['alertness'] == "Comatose"){
+                                        $alertnessRed = "style='color:red;'";
+                                      }else{
+                                        $alertnessRed = "";
+                                      }
+                                    ?>
+                                      <td <?php echo $alertnessRed; ?>><?php echo !empty($value['alertness']) ? $value['alertness'] : 'N/A'; ?></td>
                                     <?php } ?>
                                   </tr>
 
@@ -1203,7 +1216,8 @@
                                         <th>Vaccination&nbsp;Date</th>
                                         <th>Vaccination&nbsp;Time</th>
                                         <th>Vaccination&nbsp;Name</th>
-                                        <th>Quantity(ml)</th>
+                                        <th>ANM&nbsp;Name</th>
+                                        <!-- <th>Quantity(ml)</th> -->
                                       </tr>
                                     </thead>
                                     <tbody>
@@ -1216,7 +1230,8 @@
                                           <td><?php echo date('d-m-Y',strtotime($value['vaccinationDate']));?></td>
                                           <td><?php echo date('g:i A',strtotime($value['vaccinationTime']));?></td>
                                           <td><?php echo $value['vaccinationName'];?></td>
-                                          <td><?php echo $value['quantity'].'&nbsp;ml';?></td>
+                                          <td><?php echo $value['anmName'];?></td>
+                                          <!-- <td><?php echo $value['quantity'].'&nbsp;ml';?></td> -->
                                         </tr>
                                       <?php }?>
                                     </tbody>
@@ -1225,8 +1240,8 @@
                             </div>
                             <div class="tab-pane fade" id="nav-doctor-round" role="tabpanel" aria-labelledby="nav-doctor-round-tab">
                               <?php  
-                                $getTreatmentRecord     = $this->db->get_where('doctorBabyPrescription',array('babyAdmissionId'=>$babyAdmissionData['id']))->result_array();
-                                $getInvestigationRecord = $this->db->get_where('investigation',array('babyAdmissionId'=>$babyAdmissionData['id']))->result_array();
+                                $getTreatmentRecord     = $this->db->get_where('doctorBabyPrescription',array('babyAdmissionId'=>$babyAdmissionData['id'],'status'=>1))->result_array();
+                                $getInvestigationRecord = $this->db->get_where('investigation',array('babyAdmissionId'=>$babyAdmissionData['id'],'status'=>1))->result_array();
                               ?>
                               <div class="table-responsive">
                                   <table class="table table-striped dataex-html5-selectors-log">
@@ -1237,7 +1252,7 @@
                                         <!--<th>Baby&nbsp;Of</th>-->
                                         <th>Treatment</th>
                                         <th>Comment</th>
-                                        <th>Photo&nbsp;of&nbsp;Note</th>
+                                        <!-- <th>Photo&nbsp;of&nbsp;Note</th> -->
                                         <th>Date&nbsp;&&nbsp;Time</th>
                                       </tr>
                                     </thead>
@@ -1255,7 +1270,7 @@
                                           <td><?php echo !empty($doctorName) ? $doctorName : 'N/A';?></td>
                                           <td><?php echo !empty($value['prescriptionName']) ? $value['prescriptionName'] : 'N/A'; ?></td>
                                           <td><?php echo !empty($value['comment']) ? $value['comment'] : 'N/A'; ?></td>
-                                          <td><?php echo !empty($value['image']) ? "<img src='".investigationDirectoryUrl.$value['image']."' width='100' height='120'>" : 'N/A'; ?></td>
+                                          <!-- <td><?php echo !empty($value['image']) ? "<img src='".investigationDirectoryUrl.$value['image']."' width='100' height='120'>" : 'N/A'; ?></td> -->
                                           <td><?php echo date("d-m-Y g:i A", strtotime($value['addDate']));?></td>         
                                         </tr>
                                       <?php }?>
@@ -1271,6 +1286,7 @@
                                         <th>Doctor&nbsp;Name</th>
                                         <!--<th>Baby&nbsp;Of</th>-->
                                         <th>Investigation</th>
+                                        <th>Type</th>
                                         <th>Comment</th>
                                         <th>Date&nbsp;&&nbsp;Time</th>
                                       </tr>
@@ -1287,6 +1303,7 @@
                                           <td><?php echo !empty($doctorName) ? $doctorName : 'N/A';?></td>
                                           <!--<td><?php echo !empty($motherName['MotherName']) ? $motherName['MotherName'] : 'N/A'; ?></td>-->
                                           <td><?php echo !empty($value['investigationName']) ? $value['investigationName'] : 'N/A'; ?></td>
+                                          <td><?php echo !empty($value['investigationType']) ? $value['investigationType'] : 'N/A'; ?></td>
                                           <td><?php echo !empty($value['doctorComment']) ? $value['doctorComment'] : 'N/A'; ?></td>
                                           
                                           <td><?php echo date("d-m-Y g:i A", strtotime($value['addDate']));?></td>         
@@ -1296,6 +1313,70 @@
                                   </table>
                               </div>
                             </div>
+
+
+                            <div class="tab-pane fade show" id="nav-checklist" role="tabpanel" aria-labelledby="nav-checklist-tab">
+                                <div class="col-12">
+                                  <h5 class="float-left mb-2 mt-1 pr-1">Checklist</h5>
+                                </div>
+                                <?php
+                                $getAdmissionChecklist = $this->load->BabyModel->getAdmissionChecklist($babyAdmissionData['id']);
+                                ?>
+                                <div class="row col-12">
+                                    <div class="col-md-4">
+                                      <div class="form-group">
+                                        <label>Nurse Name </label>
+                                        <div class="controls">
+                                          <input type="text" class="form-control" value="<?php echo $getAdmissionChecklist['nurseName']; ?>" readonly placeholder="">
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                      <div class="form-group">
+                                        <label>Checklist </label>
+                                        <div class="controls">
+                                          <?php if(!empty($getAdmissionChecklist['checkList'])){ 
+                                            $checklistDecode = json_decode($getAdmissionChecklist['checkList'],true);
+                                          ?>
+                                            <ul style="margin-left:-25px;">
+                                            <?php foreach($checklistDecode as $checklistDecodeData){ ?>
+                                              <li><?= $checklistDecodeData['name']; ?></li>
+                                            <?php } ?>
+                                            </ul>
+                                          <?php }else{ echo "N/A"; } ?>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                  <div class="col-md-4">
+                                    <div class="col-12">
+                                      <h5 class="float-left mb-2 mt-1 pr-1">Consent Form </h5>
+                                    </div>
+
+                                    <div class="row col-12">
+                                        <div class="col-md-12">
+                                          <div class="form-group">
+                                            <label>Consent Form </label>
+                                            <div class="controls">
+                                              <?php if(!empty($babyAdmissionData['sehmatiPatr'])){ ?>
+                                                <span class="hover-image cursor-pointer" onclick="showZoomImage('<?php echo sehmatiPatraUrl.$babyAdmissionData['sehmatiPatr'];?>','Consent Form')">
+                                                  <img src="<?php echo sehmatiPatraUrl.$babyAdmissionData['sehmatiPatr'];?>" style="width:100%;height:200px;border:1px;border: 1px solid gray;">
+                                                </span>
+                                              <?php }else{ echo "N/A"; } ?>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                            </div>
+
+
                             <div class="tab-pane fade" id="nav-comment" role="tabpanel" aria-labelledby="nav-comment-tab">
                               <?php $getCommentData = $this->BabyModel->getCommentList(1,2,$babyData['babyId'],$babyAdmissionData['id']); ?>
                               <div class="table-responsive">

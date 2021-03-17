@@ -20,6 +20,26 @@ class UserModel extends CI_Model {
 
   }
 
+  // get lounge data when login
+  public function loungeLogin($data) {
+      
+    $this->db->select("loungeId as id,loungeName as name, status");
+    $query = $this->db->get_where('loungeMaster', array('loungeId' => $data['lounge_id'],'loungePassword'=>md5($data['password'])))->row_array();
+    return $query;
+  }
+
+  // get facility list by district id
+  public function getDistrictFacility($district_id){
+    $this->db->order_by('FacilityName','asc');
+    return $this->db->get_where('facilitylist',array('PRIDistrictCode'=>$district_id,'Status'=>1))->result_array(); 
+  }
+
+  // get lounge list by facility id
+  public function getFacilityLounge($facility_id){
+    $this->db->order_by('loungeName','asc');
+    return $this->db->get_where('loungeMaster',array('facilityId'=>$facility_id,'status'=>1))->result_array(); 
+  }
+
   public function EmployeeLogin($username,$password) {
       
     $this->db->select("id, name,email,contactNumber");
@@ -167,63 +187,30 @@ class UserModel extends CI_Model {
                   ->from('facilitylist')
                   ->get()
                   ->num_rows();
-    if ($adminData['Type']=='1') {
-      $query2 = $this->db
+    $query2 = $this->db
                   ->select('*')
                   ->from('loungeMaster')
                   ->where(array('status ='=>1))
                   ->get()
                   ->num_rows();
-    } else if ($adminData['Type']=='2') {
-      $query2 = $this->db
-                  ->select('*')
-                  ->from('loungeMaster')
-                  ->where(array('status ='=>1))
-                  ->get()
-                  ->num_rows();
-    }
 
-    if ($adminData['Type']=='1') {
-      $query3 = $this->db
+    $query3 = $this->db
                   ->select('*')
                   ->from('staffMaster')
                   ->get()
                   ->num_rows();
-    } else if ($adminData['Type']=='2') {
-      $query3 = $this->db
-                  ->select('*')
-                  ->from('staffMaster')
-                  ->get()
-                  ->num_rows();
-    }
 
-    if ($adminData['Type']=='1') {
-      $query4 = $this->db
+    $query4 = $this->db
                   ->select('*')
                   ->from('babyRegistration')
                   ->get()
                   ->num_rows();
-    } else if ($adminData['Type']=='2') {
-      $query4 = $this->db
-                  ->select('*')
-                  ->from('babyRegistration')
-                  ->get()
-                  ->num_rows();
-    }
 
-    if($adminData['Type']=='1') { 
-      $query5 = $this->db
+    $query5 = $this->db
                   ->select('*')
                   ->from('motherRegistration')
                   ->get()
-                  ->num_rows();
-    } else if ($adminData['Type']=='2') {
-      $query5 = $this->db
-                  ->select('*')
-                  ->from('motherRegistration')
-                  ->get()
-                  ->num_rows();
-    } 
+                  ->num_rows(); 
 
 
     $data['facility']                        = $query1;
@@ -301,8 +288,17 @@ class UserModel extends CI_Model {
       $coachDistrictArray  = array_unique(array_column($getCoachFacilityLoungeList, 'districtId'));
       $coachFacilityArray  = array_unique(array_column($getCoachFacilityLoungeList, 'facilityId'));
       $coachLoungeArray  = array_column($getCoachFacilityLoungeList, 'loungeId');
-    }
+    }elseif($adminData['Type'] == 3){
 
+      $this->db->select('loungeMaster.loungeId,facilitylist.FacilityID,facilitylist.PRIDistrictCode');
+      $this->db->join('facilitylist','facilitylist.FacilityID=loungeMaster.facilityId');
+      $getFacilityLoungeList = $this->db->get_where('loungeMaster',array('loungeMaster.loungeId'=>$adminData['Id'],'loungeMaster.status'=>1))->row_array();
+      
+      $coachDistrictArray  = array('0'=>$getFacilityLoungeList['PRIDistrictCode']);
+      $coachFacilityArray  = array('0'=>$getFacilityLoungeList['FacilityID']);
+      $coachLoungeArray  = array('0'=>$getFacilityLoungeList['loungeId']);
+    }
+    //print_r($coachLoungeArray);exit;
     $response['coachDistrictArray'] = $coachDistrictArray;
     $response['coachDistrictArrayString'] = "(".implode(",", $coachDistrictArray).")";
     $response['coachFacilityArray'] = $coachFacilityArray;

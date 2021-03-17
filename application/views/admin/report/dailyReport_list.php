@@ -144,7 +144,7 @@
                                     }else if($value['reportSettingId'] == "5"){
                                       $folder_name = "nutritionReports";
                                     }else if($value['reportSettingId'] == "6"){
-                                      $folder_name = "babyadmission";
+                                      $folder_name = "admitiondischarge";
                                     }else if($value['reportSettingId'] == "7"){
                                       $folder_name = "motherBabyDetailsForFeedback/Team1";
                                     }else if($value['reportSettingId'] == "8"){
@@ -161,6 +161,13 @@
                                       $folder_name = "motherBabyDetailsForFeedback/Team7";
                                     }else if($value['reportSettingId'] == "14"){
                                       $folder_name = "motherBabyDetailsForFeedback/Team8";
+                                    }else if($value['reportSettingId'] == "15"){
+                                      $folder_name = "lbwCountReports";
+                                    }else if($value['reportSettingId'] == "16"){
+                                      $folder_name = "babyadmission";
+                                    }
+                                    else if($value['reportSettingId'] == "17"){
+                                      $folder_name = "discharge";
                                     }
                                     else{
                                       $folder_name = "babyadmission";

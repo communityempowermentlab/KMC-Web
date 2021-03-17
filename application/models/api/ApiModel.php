@@ -1242,7 +1242,7 @@ class ApiModel extends CI_Model
     }
 
     public function getAdmittedDataByLoungeV2($request){
-        $getAdmittedBaby = $this->db->query('SELECT ba.*,br.motherId,ma.id as motherAdmissionId FROM `babyAdmission` as ba JOIN babyRegistration as br ON br.babyId=ba.babyId JOIN motherAdmission as ma ON ma.motherId=br.motherId WHERE ba.loungeId='.$request['loungeId'].' AND (ba.status=1 OR ma.status=1)')->result_array();
+        $getAdmittedBaby = $this->db->query('SELECT ba.*,br.motherId,ma.id as motherAdmissionId FROM `babyAdmission` as ba LEFT JOIN babyRegistration as br ON br.babyId=ba.babyId LEFT JOIN motherAdmission as ma ON ma.motherId=br.motherId WHERE ba.loungeId='.$request['loungeId'].' AND (ba.status=1 OR ma.status=1)')->result_array();
 
         $response = array();
 

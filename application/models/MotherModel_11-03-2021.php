@@ -57,11 +57,11 @@ class MotherModel extends CI_Model {
     $getCoachLounge = $this->UserModel->getCoachFacilities();
     $where_lounge_baby = "";
     if(!empty($getCoachLounge['coachLoungeArray'])){ 
-      $where_lounge_baby = 'AND (ba.loungeId in '.$getCoachLounge['coachLoungeArrayString'].')';
+      $where_lounge_baby = 'AND (ma.loungeId in '.$getCoachLounge['coachLoungeArrayString'].')';
     }
 
     //return $this->db->query("SELECT distinct ma.motherId, mr.* FROM `motherRegistration` as mr left join motherAdmission as ma on mr.`motherId` = ma.`motherId` where mr.`type` != 2 ".$where_lounge_baby." ")->num_rows(); 
-    return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join `babyRegistration` as br on mr.`motherId` = br.`motherId` inner join `babyAdmission` as ba on br.`babyId` = ba.`babyId` where ba.`status` != 4 ".$where_lounge_baby."")->num_rows();
+    return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join `babyRegistration` as br on mr.`motherId` = br.`motherId` inner join `babyAdmission` as ba on br.`babyId` = ba.`babyId` where mr.`type` != 2 and ba.`status` != 4 ".$where_lounge_baby."")->num_rows();
   }
 
   public function getAllMotherList($limit,$offset){
@@ -71,7 +71,7 @@ class MotherModel extends CI_Model {
       $where_lounge_baby = 'AND (ba.loungeId in '.$getCoachLounge['coachLoungeArrayString'].')';
     }
 
-    return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join `babyRegistration` as br on mr.`motherId` = br.`motherId` inner join `babyAdmission` as ba on br.`babyId` = ba.`babyId` where ba.`status` != 4 ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
+    return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join `babyRegistration` as br on mr.`motherId` = br.`motherId` inner join `babyAdmission` as ba on br.`babyId` = ba.`babyId` where mr.`type` != 2 and ba.`status` != 4 ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
     // echo $this->db->last_query();die;
   }
 
@@ -139,7 +139,7 @@ class MotherModel extends CI_Model {
     }
   }
 
-  public function totalMotherRecordsSearch($loungeID,$fromDate,$toDate,$district,$keyword,$facilityname,$nurseid,$motherStatus,$dischargeType=false,$admissionType=false,$admitType=false){
+  public function totalMotherRecordsSearch($loungeID,$fromDate,$toDate,$district,$keyword,$facilityname,$nurseid,$motherStatus,$dischargeType=false){
 
     if(!empty($this->input->get('fromDate'))){ 
       $startDate = explode('-',$this->input->get('fromDate'));  
@@ -161,49 +161,15 @@ class MotherModel extends CI_Model {
     $getCoachLounge = $this->UserModel->getCoachFacilities();
     $where_lounge_mother = "";$where_lounge_baby = "";
     if(!empty($getCoachLounge['coachLoungeArray'])){ 
-      $where_lounge_mother = 'AND (ba.loungeId in '.$getCoachLounge['coachLoungeArrayString'].')';
+      $where_lounge_mother = 'AND (ma.loungeId in '.$getCoachLounge['coachLoungeArrayString'].')';
       $where_lounge_baby = 'AND (ba.loungeId in '.$getCoachLounge['coachLoungeArrayString'].')';
     }
 
     if($motherStatus == 'admitted'){
-
-      if($motherStatus == "isAdmit"){
-        $babyAdmitStatus = "ba.`status`=1";
-        $motherAdmitStatus = "ma.`status`=1";
-      }else{
-        $babyAdmitStatus = "ba.`status`!=4";
-        $motherAdmitStatus = "ma.`status` !=4 AND ma.`status` !=3";
-      }
-
-      if($admissionType == "1" || $admitType == "1"){
-        $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='3' AND mr.`type` = 1 AND ";
-      }elseif($admissionType == "2" || $admitType == "2"){
-        $statusQry = "mr.`isMotherAdmitted`='Yes' and ".$motherAdmitStatus." AND mr.`type` = 1 AND ";
-      }elseif($admissionType == "3"){
-        $statusQry2 = "mr.`isMotherAdmitted`='No' and ".$babyAdmitStatus." AND mr.`type` = 3 and ( mr.`notAdmittedReason` Like 'Dead%' OR mr.`notAdmittedReason` Like 'मृत%') AND ";
-      }elseif($admissionType == "4"){
-        $statusQry2 = "mr.`isMotherAdmitted`='No' and ".$babyAdmitStatus." AND mr.`type` = 3 and ( mr.`notAdmittedReason` Like 'Baby was referred%' OR mr.`notAdmittedReason` Like 'बेबी को रेफर किया%') AND ";
-      }elseif($admissionType == "5"){
-        $statusQry2 = "mr.`isMotherAdmitted`='No' and ".$babyAdmitStatus." AND mr.`type` = 3 and ( mr.`notAdmittedReason` Like 'Mother is in a different%' OR mr.`notAdmittedReason` Like 'माँ एक ही अस्पताल%') AND ";
-      }elseif($admissionType == "6"){
-        $statusQry2 = "mr.`isMotherAdmitted`='No' and ".$babyAdmitStatus." AND mr.`type` = 2 AND ";
-      }elseif($admissionType == "7"){
-        $statusQry2 = "mr.`isMotherAdmitted`='No' and ".$babyAdmitStatus." AND mr.`type` = 3 and ( mr.`notAdmittedReason` Like 'Other%' OR mr.`notAdmittedReason` Like 'अन्य%') AND ";
-      }else{
-        $statusQry2 = "".$babyAdmitStatus." AND ";
-      }
-
-    }elseif($motherStatus == 'isAdmit'){
-
-      if($admitType == "1"){
-        $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='3' AND mr.`type` = 1 AND ";
-      }elseif($admitType == "2"){
-        $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`=1 AND mr.`type` = 1 AND ";
-      }else{
-        $statusQry = "mr.`isMotherAdmitted`='Yes' and (ma.`status`=1 OR ma.`status`='3') AND ";
-      }
-
-    } elseif($motherStatus == 'dischargedMother'){
+      $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='1' AND mr.`type` != 2 AND";
+    } else if($motherStatus == 'referred'){
+      $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='3' AND mr.`type` != 2 AND";
+    } else if($motherStatus == 'dischargedMother'){
 
       // search by discharge type
       if(!empty($dischargeType)){
@@ -213,11 +179,12 @@ class MotherModel extends CI_Model {
         $dischargeTypeFilter = "";
       }
 
-      $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='2' ".$dischargeTypeFilter." AND";
+      $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='2' AND mr.`type` != 2 ".$dischargeTypeFilter." AND";
     } else if($motherStatus == ''){
-      $statusQry2 = " ba.`status`!='4' AND ";
+      $statusQry2 = " mr.`type` != 2 AND ba.`status`!='4' AND ";
+    } else if($motherStatus == 'notAdmtted'){
+      $statusQry2 = " mr.`isMotherAdmitted` = 'No' AND mr.`type` = 3 AND ";
     }
-    
 
     if(!empty($selectedFromDate) && !empty($selectedToDate) && ($motherStatus == 'dischargedMother')){
       $dateFilter = " ma.`dateOfDischarge` between '".$selectedFromDate."' AND '".$selectedToDate."' ";
@@ -227,13 +194,13 @@ class MotherModel extends CI_Model {
 
     if(!empty($loungeID) && !empty($nurseid)){
       if(!empty($keyword)){ 
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+        if($motherStatus == 'notAdmtted' || $motherStatus == ''){
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." ba.`staffId` = ".$nurseid." AND mr.`addDate` between '".$fromDate."' AND '".$toDate."' and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') order By mr.`motherId` desc ")->num_rows();
         } else {
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ma.`loungeId` = ".$loungeID." AND ".$statusQry." ba.`staffId` = ".$nurseid." AND ".$dateFilter." and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') order By mr.`motherId` desc")->num_rows();
         }      
       } else {
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+        if($motherStatus == 'notAdmtted' || $motherStatus == ''){
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." ba.`staffId` = ".$nurseid." AND mr.`addDate` between '".$fromDate."' AND '".$toDate."' order By mr.`motherId` desc")->num_rows();
         } else {
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ma.`loungeId` = ".$loungeID." AND ".$statusQry." ba.`staffId` = ".$nurseid." AND ".$dateFilter." order By mr.`motherId` desc ")->num_rows();
@@ -241,19 +208,19 @@ class MotherModel extends CI_Model {
       }
     } else if(!empty($loungeID) && empty($nurseid)){
       if(!empty($keyword)){ 
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+        if($motherStatus == 'notAdmtted' || $motherStatus == ''){
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') order By mr.`motherId` desc")->num_rows();
         } else {
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ma.`loungeId` = ".$loungeID." AND ".$statusQry." ".$dateFilter." and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') order By mr.`motherId` desc")->num_rows();
         }
       } else {
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-            //$motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'No' order By mr.`motherId` desc")->num_rows();
+        if($motherStatus == 'notAdmtted' || $motherStatus == ''){ 
+          if($motherStatus == '') {
+            $motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'No' order By mr.`motherId` desc")->num_rows();
 
-            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr left join `motherAdmission` as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where (ma.`loungeId` = ".$loungeID." OR ba.`loungeId` = ".$loungeID.") AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' order By mr.`motherId` desc")->num_rows();
+            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join `motherAdmission` as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ma.`loungeId` = ".$loungeID." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'Yes' order By mr.`motherId` desc")->num_rows();
 
-            return $motherAdmit;
+            return intval($motherNotAdmit)+intval($motherAdmit);
 
           } else {
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' order By mr.`motherId` desc")->num_rows();
@@ -264,13 +231,13 @@ class MotherModel extends CI_Model {
       }
     } else if(empty($loungeID) && !empty($nurseid)){
       if(!empty($keyword)){ 
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+        if($motherStatus == 'notAdmtted '|| $motherStatus == ''){
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`staffId` = ".$nurseid." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_baby." order By mr.`motherId` desc")->num_rows();
         } else { 
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`staffId` = ".$nurseid." AND ".$statusQry." ".$dateFilter." and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_baby." order By mr.`motherId` desc")->num_rows(); 
         }
       } else {
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+        if($motherStatus == 'notAdmtted' || $motherStatus == ''){
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`staffId` = ".$nurseid." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' ".$where_lounge_baby." order By mr.`motherId` desc")->num_rows();
         } else { 
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`staffId` = ".$nurseid." AND ".$statusQry." ".$dateFilter." ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows();
@@ -279,12 +246,12 @@ class MotherModel extends CI_Model {
     } else {
       if(!empty($facilityname)) { 
         if(!empty($keyword)){ 
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-            //$motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc")->num_rows(); 
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){
+            $motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc")->num_rows(); 
 
-            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` left join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows(); 
+            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'Yes' ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows(); 
 
-            return $motherAdmit;
+            return intval($motherNotAdmit)+intval($motherAdmit);
 
           } else {
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows(); 
@@ -292,8 +259,8 @@ class MotherModel extends CI_Model {
             
           }
         } else {
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-            return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows();
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){
+            return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows();
 
           } else {
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry." ".$dateFilter." ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows(); 
@@ -303,23 +270,23 @@ class MotherModel extends CI_Model {
         }
       } else if(!empty($district)) { 
         if(!empty($keyword)){ 
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-            //$motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc")->num_rows(); 
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){
+            $motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc")->num_rows(); 
 
-            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` left join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` left join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows(); 
+            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'Yes' ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows(); 
 
-            return $motherAdmit;
+            return intval($motherNotAdmit)+intval($motherAdmit);
 
           } else { 
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows(); 
           }
         } else { 
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-            //$motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc")->num_rows();
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){ 
+            $motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc")->num_rows();
 
-            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` left join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` left join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows();
+            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'Yes' ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows();
 
-            return $motherAdmit;
+            return intval($motherNotAdmit)+intval($motherAdmit);
               
           } else { 
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry." ".$dateFilter." ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows(); 
@@ -328,13 +295,13 @@ class MotherModel extends CI_Model {
         }
       } else {
         if(!empty($keyword)){ 
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_baby." order By mr.`motherId` desc")->num_rows();
           } else {
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ".$statusQry." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows(); 
           }
         } else {
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' ".$where_lounge_baby." order By mr.`motherId` desc")->num_rows();
           } else {
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ".$statusQry." ".$dateFilter." ".$where_lounge_mother." order By mr.`motherId` desc")->num_rows();
@@ -403,7 +370,7 @@ class MotherModel extends CI_Model {
   }
 
 
-  public function getMotherRecordSearch($loungeID,$limit,$offset,$fromDate,$toDate,$district,$keyword,$facilityname,$nurseid,$motherStatus,$dischargeType=false,$admissionType=false,$admitType=false){
+  public function getMotherRecordSearch($loungeID,$limit,$offset,$fromDate,$toDate,$district,$keyword,$facilityname,$nurseid,$motherStatus,$dischargeType=false){
 
     if(!empty($this->input->get('fromDate'))){ 
       $startDate = explode('-',$this->input->get('fromDate'));  
@@ -425,49 +392,15 @@ class MotherModel extends CI_Model {
     $getCoachLounge = $this->UserModel->getCoachFacilities();
     $where_lounge_mother = "";$where_lounge_baby = "";
     if(!empty($getCoachLounge['coachLoungeArray'])){ 
-      $where_lounge_mother = 'AND (ba.loungeId in '.$getCoachLounge['coachLoungeArrayString'].')';
+      $where_lounge_mother = 'AND (ma.loungeId in '.$getCoachLounge['coachLoungeArrayString'].')';
       $where_lounge_baby = 'AND (ba.loungeId in '.$getCoachLounge['coachLoungeArrayString'].')';
     }
 
     if($motherStatus == 'admitted'){
-
-      if($motherStatus == "isAdmit"){
-        $babyAdmitStatus = "ba.`status`=1";
-        $motherAdmitStatus = "ma.`status`=1";
-      }else{
-        $babyAdmitStatus = "ba.`status`!=4";
-        $motherAdmitStatus = "ma.`status` !=4 AND ma.`status` !=3";
-      }
-
-      if($admissionType == "1" || $admitType == "1"){
-        $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='3' AND mr.`type` = 1 AND ";
-      }elseif($admissionType == "2" || $admitType == "2"){
-        $statusQry = "mr.`isMotherAdmitted`='Yes' and ".$motherAdmitStatus." AND mr.`type` = 1 AND ";
-      }elseif($admissionType == "3"){
-        $statusQry2 = "mr.`isMotherAdmitted`='No' and ".$babyAdmitStatus." AND mr.`type` = 3 and ( mr.`notAdmittedReason` Like 'Dead%' OR mr.`notAdmittedReason` Like 'मृत%') AND ";
-      }elseif($admissionType == "4"){
-        $statusQry2 = "mr.`isMotherAdmitted`='No' and ".$babyAdmitStatus." AND mr.`type` = 3 and ( mr.`notAdmittedReason` Like 'Baby was referred%' OR mr.`notAdmittedReason` Like 'बेबी को रेफर किया%') AND ";
-      }elseif($admissionType == "5"){
-        $statusQry2 = "mr.`isMotherAdmitted`='No' and ".$babyAdmitStatus." AND mr.`type` = 3 and ( mr.`notAdmittedReason` Like 'Mother is in a different%' OR mr.`notAdmittedReason` Like 'माँ एक ही अस्पताल%') AND ";
-      }elseif($admissionType == "6"){
-        $statusQry2 = "mr.`isMotherAdmitted`='No' and ".$babyAdmitStatus." AND mr.`type` = 2 AND ";
-      }elseif($admissionType == "7"){
-        $statusQry2 = "mr.`isMotherAdmitted`='No' and ".$babyAdmitStatus." AND mr.`type` = 3 and ( mr.`notAdmittedReason` Like 'Other%' OR mr.`notAdmittedReason` Like 'अन्य%') AND ";
-      }else{
-        $statusQry2 = "".$babyAdmitStatus." AND ";
-      }
-
-    } elseif($motherStatus == 'isAdmit'){
-
-      if($admitType == "1"){
-        $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='3' AND mr.`type` = 1 AND ";
-      }elseif($admitType == "2"){
-        $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`=1 AND mr.`type` = 1 AND ";
-      }else{
-        $statusQry = "mr.`isMotherAdmitted`='Yes' and (ma.`status`=1 OR ma.`status`='3') AND ";
-      }
-
-    } elseif($motherStatus == 'dischargedMother'){
+      $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='1' AND mr.`type` != 2 AND";
+    } else if($motherStatus == 'referred'){
+      $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='3' AND mr.`type` != 2 AND";
+    } else if($motherStatus == 'dischargedMother'){
 
       // search by discharge type
       if(!empty($dischargeType)){
@@ -477,9 +410,11 @@ class MotherModel extends CI_Model {
         $dischargeTypeFilter = "";
       }
 
-      $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='2' ".$dischargeTypeFilter." AND";
+      $statusQry = "mr.`isMotherAdmitted`='Yes' and ma.`status`='2' AND mr.`type` != 2 ".$dischargeTypeFilter." AND";
     } else if($motherStatus == ''){
-      $statusQry2 = " ba.`status`!='4' AND ";
+      $statusQry2 = " mr.`type` != 2 AND ba.`status`!='4' AND ";
+    } else if($motherStatus == 'notAdmtted'){
+      $statusQry2 = " mr.`isMotherAdmitted` = 'No' AND mr.`type` = 3 AND ";
     }
 
     // search by discharge date
@@ -491,13 +426,13 @@ class MotherModel extends CI_Model {
 
     if(!empty($loungeID) && !empty($nurseid)){
       if(!empty($keyword)){ 
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+        if($motherStatus == 'notAdmtted' || $motherStatus == ''){
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." ba.`staffId` = ".$nurseid." AND mr.`addDate` between '".$fromDate."' AND '".$toDate."' and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
         } else {
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ma.`loungeId` = ".$loungeID." AND ".$statusQry." ba.`staffId` = ".$nurseid." AND ".$dateFilter." and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
         }      
       } else {
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+        if($motherStatus == 'notAdmtted' || $motherStatus == ''){
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." ba.`staffId` = ".$nurseid." AND mr.`addDate` between '".$fromDate."' AND '".$toDate."' order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
         } else {
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ma.`loungeId` = ".$loungeID." AND ".$statusQry." ba.`staffId` = ".$nurseid." AND ".$dateFilter." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
@@ -505,19 +440,19 @@ class MotherModel extends CI_Model {
       }
     } else if(!empty($loungeID) && empty($nurseid)){
       if(!empty($keyword)){ 
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+        if($motherStatus == 'notAdmtted' || $motherStatus == ''){
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
         } else {
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ma.`loungeId` = ".$loungeID." AND ".$statusQry." ".$dateFilter." and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
         }
       } else {
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-            //$motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'No' order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
+        if($motherStatus == 'notAdmtted' || $motherStatus == ''){ 
+          if($motherStatus == '') {
+            $motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'No' order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
 
-            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr left join `motherAdmission` as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where (ma.`loungeId` = ".$loungeID." OR ba.`loungeId` = ".$loungeID.") AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
+            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join `motherAdmission` as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ma.`loungeId` = ".$loungeID." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'Yes' order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
 
-            return $motherAdmit;
+            return array_merge($motherNotAdmit, $motherAdmit);
 
           } else {
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`loungeId` = ".$loungeID." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
@@ -528,13 +463,13 @@ class MotherModel extends CI_Model {
       }
     } else if(empty($loungeID) && !empty($nurseid)){
       if(!empty($keyword)){ 
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+        if($motherStatus == 'notAdmtted '|| $motherStatus == ''){
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`staffId` = ".$nurseid." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
         } else { 
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`staffId` = ".$nurseid." AND ".$statusQry." ".$dateFilter." and ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
         }
       } else {
-        if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+        if($motherStatus == 'notAdmtted' || $motherStatus == ''){
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`staffId` = ".$nurseid." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
         } else { 
           return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ba.`staffId` = ".$nurseid." AND ".$statusQry." ".$dateFilter." ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
@@ -543,12 +478,12 @@ class MotherModel extends CI_Model {
     } else {
       if(!empty($facilityname)) { 
         if(!empty($keyword)){ 
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-            //$motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){
+            $motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
 
-            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` left join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
+            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'Yes' ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
 
-            return $motherAdmit;
+            return array_merge($motherNotAdmit, $motherAdmit);
 
           } else {
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
@@ -556,8 +491,8 @@ class MotherModel extends CI_Model {
             
           }
         } else {
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-            return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){
+            return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
 
           } else {
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` where lm.`facilityId` = ".$facilityname." AND ".$statusQry." ".$dateFilter." ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
@@ -567,23 +502,23 @@ class MotherModel extends CI_Model {
         }
       } else if(!empty($district)) { 
         if(!empty($keyword)){ 
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-            //$motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){
+            $motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
 
-            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` left join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` left join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
+            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') AND mr.`isMotherAdmitted` = 'Yes' ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
 
-            return $motherAdmit;
+            return array_merge($motherNotAdmit, $motherAdmit);
 
           } else { 
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
           }
         } else { 
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
-            //$motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){ 
+            $motherNotAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'No' ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
 
-            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` left join loungeMaster as lm on ba.`loungeId` = lm.`loungeId` left join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
+            $motherAdmit = $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' AND mr.`isMotherAdmitted` = 'Yes' ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
 
-            return $motherAdmit;
+            return array_merge($motherNotAdmit, $motherAdmit);
               
           } else { 
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` inner join loungeMaster as lm on ma.`loungeId` = lm.`loungeId` INNER join facilitylist as fl on lm.`facilityId` = fl.`FacilityID` where fl.`PRIDistrictCode` = ".$district." AND ".$statusQry." ".$dateFilter." ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
@@ -592,13 +527,13 @@ class MotherModel extends CI_Model {
         }
       } else {
         if(!empty($keyword)){ 
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on  mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ".$statusQry2." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
           } else {
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ".$statusQry." ( mr.`motherMCTSNumber` Like '%{$keyword}%' OR mr.`addDate` Like '%{$keyword}%' OR mr.`motherName` Like '%{$keyword}%' OR mr.`motherMobileNumber` Like '%{$keyword}%') ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array(); 
           }
         } else {
-          if(($motherStatus != 'dischargedMother') && ($motherStatus != 'isAdmit') && ($admissionType != "1" && $admissionType != "2")){
+          if($motherStatus == 'notAdmtted' || $motherStatus == ''){
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join babyRegistration as br on mr.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ".$statusQry2." mr.`addDate` between '".$fromDate."' AND '".$toDate."' ".$where_lounge_baby." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();
           } else {
             return $this->db->query("SELECT distinct mr.motherId,mr.* FROM `motherRegistration` as mr inner join motherAdmission as ma on mr.`motherId` = ma.`motherId` inner join babyRegistration as br on  ma.`motherId` = br.`motherId` inner join babyAdmission as ba on br.`babyId` = ba.`babyId` where ".$statusQry." ".$dateFilter." ".$where_lounge_mother." order By mr.`motherId` desc LIMIT ".$offset.", ".$limit."")->result_array();

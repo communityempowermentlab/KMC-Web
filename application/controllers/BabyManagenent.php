@@ -30,33 +30,37 @@ class BabyManagenent extends Welcome {
         $limit         = DATA_PER_PAGE;
         $pageNo        = '1';
        
-
         if($this->input->get()) {
-            if(!empty($this->input->get('fromDate'))){
-              $startDate = explode(',',$this->input->get('fromDate')); 
-              $fromDate = $startDate[0].$startDate[1];
-              $fromDate = date("Y-m-d H:i:s", strtotime($fromDate)); 
+
+            if(!empty($this->input->get('fromDate'))){ 
+              $startDate = explode('-',$this->input->get('fromDate'));  
+              $explodeStartDate = explode(" ",trim($startDate[0]));
+              $explodeDate =  explode("/",$explodeStartDate[0]);
+              $fromDate = date("Y-m-d H:i:s", strtotime($explodeDate[1]."-".$explodeDate[0]."-".$explodeDate[2]." ".$explodeStartDate[1]." ".$explodeStartDate[2])); 
             } else {
               $fromDate = date('Y-m-d H:i:s', strtotime('1970-01-01 00:00:00')); 
             }
-            if(!empty($this->input->get('toDate'))){
-              $endDate = explode(',',$this->input->get('toDate')); 
-              $toDate = $endDate[0].$endDate[1];
-              $toDate = date("Y-m-d H:i:s", strtotime($toDate.' 23:59:59'));  
+            if(!empty($this->input->get('fromDate'))){
+              $endDate = explode('-',$this->input->get('fromDate'));  
+              $explodeEndDate = explode(" ",trim($endDate[1]));
+              $explodeDate =  explode("/",$explodeEndDate[0]);
+              $toDate = date("Y-m-d H:i:s", strtotime($explodeDate[1]."-".$explodeDate[0]."-".$explodeDate[2]." ".$explodeEndDate[1]." ".$explodeEndDate[2]));
             } else {
               $toDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d').' 23:59:59')); 
             }
+
             $district     = $this->input->get('district');
             $facilityname = $this->input->get('facilityname'); 
             $loungeid     = $this->input->get('loungeid');
             $nurseid      = $this->input->get('nurseid'); 
             $babyStatus   = $this->input->get('babyStatus');
+            $admissionTypeFilterValue   = $this->input->get('admissionTypeFilterValue');
+            $dischargeTypeFilterValue   = $this->input->get('dischargeTypeFilterValue');
             $keyword      = $this->input->get('keyword'); 
 
-           
-            $totalRecords = $this->BabyModel->countBabyWhereSearching($loungeid,$keyword,$babyStatus,$fromDate,$toDate,$facilityname,$nurseid,$district);
+            $totalRecords = $this->BabyModel->countBabyWhereSearching($loungeid,$keyword,$babyStatus,$fromDate,$toDate,$facilityname,$nurseid,$district,$dischargeTypeFilterValue,$admissionTypeFilterValue);
             
-            $config["base_url"] = base_url('babyM/registeredBaby/'.$this->uri->segment(3).'/all?fromDate='.$this->input->get('fromDate').'&toDate='.$this->input->get('toDate').'&district='.$district.'&keyword='.$keyword.'&facilityname='.$facilityname.'&loungeid='.$loungeid.'&nurseid='.$nurseid.'&babyStatus='.$babyStatus);
+            $config["base_url"] = base_url('babyM/registeredBaby/'.$this->uri->segment(3).'/all?fromDate='.$this->input->get('fromDate').'&toDate='.$this->input->get('toDate').'&district='.$district.'&keyword='.$keyword.'&facilityname='.$facilityname.'&loungeid='.$loungeid.'&nurseid='.$nurseid.'&babyStatus='.$babyStatus.'&admissionTypeFilterValue='.$admissionTypeFilterValue.'&dischargeTypeFilterValue='.$dischargeTypeFilterValue);
             
           } else { 
             $fromDate = date('Y-m-d H:i:s', strtotime('1970-01-01 00:00:00')); 
@@ -96,7 +100,7 @@ class BabyManagenent extends Welcome {
           }
 
           if($this->input->get()) { 
-            $AllRecord = $this->BabyModel->getBabyWhereSearching($loungeid,$keyword,$babyStatus,$fromDate,$toDate,$facilityname,$nurseid,$district,$limit,$offset); 
+            $AllRecord = $this->BabyModel->getBabyWhereSearching($loungeid,$keyword,$babyStatus,$fromDate,$toDate,$facilityname,$nurseid,$district,$limit,$offset,$dischargeTypeFilterValue,$admissionTypeFilterValue); 
           } else {
             if($type == 'particularMother'){ 
               $AllRecord = $this->MotherModel->GetBabiesViaMotherID($motherRegID);
@@ -131,6 +135,62 @@ class BabyManagenent extends Welcome {
         $this->load->view('admin/include/datatable-new');  
       }
 
+      public function getFacility(){
+        if($this->input->post()){
+          $district = $this->input->post('districtId');
+          $facility = $this->input->post('facility');
+          $getDistrict = $this->LoungeModel->GetFacilityByDistrict($district); 
+          $html = ''; 
+          if(!empty($getDistrict)){
+            $html.='<option value="">Select Facility</option>';
+            foreach ($getDistrict as $key => $value) {
+              $Select = ($facility==$value['FacilityID'])?'SELECTED':'' ;
+              $html.='<option value="'.$value['FacilityID'].'" '.$Select.'>'.$value['FacilityName'].'</option>';
+            }
+          } else {
+            $html.='<option value="">No Records Found</option>';
+          }
+          echo $html;die;
+        }
+      }
+
+      public function getLounge(){
+        if($this->input->post()){
+          $facility = $this->input->post('facility');
+          $loungeid = $this->input->post('loungeid');
+          $getLounge = $this->LoungeModel->GetLoungeByFAcility($facility); 
+          $html = ''; 
+          if(!empty($getLounge)){
+            $html.='<option value="">Select Lounge</option>';
+            foreach ($getLounge as $key => $value) {
+              $Select = ($loungeid==$value['loungeId'])?'SELECTED':'' ;
+              $html.='<option value="'.$value['loungeId'].'" '.$Select.'>'.$value['loungeName'].'</option>';
+            }
+          } else {
+            $html.='<option value="">No Records Found</option>';
+          }
+          echo $html;die;
+        }
+      }
+
+      public function getNurse(){
+        if($this->input->post()){
+          $facility = $this->input->post('facility');
+          $nurseid = $this->input->post('nurseid');
+          $getNurse = $this->LoungeModel->GetNurseByFacility($facility); 
+          $html = ''; 
+          if(!empty($getNurse)){
+            $html.='<option value="">Select Nurse</option>';
+            foreach ($getNurse as $key => $value) {
+              $Select = ($nurseid==$value['staffId'])?'SELECTED':'' ;
+              $html.='<option value="'.$value['staffId'].'" '.$Select.'>'.$value['name'].'</option>';
+            }
+          } else {
+            $html.='<option value="">No Records Found</option>';
+          }
+          echo $html;die;
+        }
+      }
 
       public function registeredBabyBKUP(){ 
         $type          = $this->uri->segment(3);  //type 1=>All Babies, 2=>Admitted, 3=>discharged

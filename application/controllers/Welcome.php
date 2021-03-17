@@ -135,69 +135,91 @@ class Welcome extends CI_Controller {
     }
   }  
 
-  // check admin login and redirect to dashboard
+  // check admin/coach login and redirect to dashboard
 	public function doLogin(){
     $login_array    = $this->input->post();
     $email          = $login_array['email'];
     $password       = $login_array['password'];
 
+    $admin          = $this->UserModel->login($email, $password);
     
-    // $captcha=$_POST['g-recaptcha-response'];
-    // if(empty($captcha)){
-    //   $this->session->set_flashdata('login_message', generateAdminAlert('D', 9));
-    //   redirect('Admin/');
-    // }
+    if (!empty($admin['id'])){
+      $adminData = array(
+        'is_logged_in'  => true,
+        'Type'      => $admin['type'],
+        'Id'        => $admin['id'],
+        'Name'      => ucwords($admin['name']),
+        'Email'     => $admin['email'],
+        'Mobile'    => $admin['mobile']
+      );
+      $this->session->set_userdata('adminData', $adminData);
+
+      // maintain login history
+      if($admin['type'] == 2){
+        $updateArr = array( 'employeeId'  => $admin['id'],
+                            'userType'    => 2,
+                            'ipAddress'   => $this->input->ip_address(),
+                            'type'        => 1,
+                            'loginTime'   => date('Y-m-d H:i:s'),
+                            'status'      => 1
+                           );
+        $this->db->insert('employeeLoginMaster', $updateArr);
+      }
+
+      $message = 'Welcome <strong>'.ucwords($admin['username']).'</strong>.You have successfully logged in.';
+      $this->session->set_flashdata('login_message', getCustomAlert('S', $message));
+
+      redirect('Admin/dashboard');
+    } else {
+      $this->session->set_flashdata('login_message', generateAdminAlert('D', 1));
+      redirect('Admin');
+    }     
+  }
+
+  // check Lounge login and redirect to dashboard
+  public function loungeLogin(){
+    $login_array    = $this->input->post();
+    $data['district_id']    = $login_array['district_id'];
+    $data['facility_id']    = $login_array['facility_id'];
+    $data['lounge_id']      = $login_array['lounge_id'];
+    $data['password']       = $login_array['password'];
+
+    $login = $this->UserModel->loungeLogin($data);
     
-    $secretKey = "6LfdpcYUAAAAADRv4qggKBFscozrHLGVfd8SRxGt";
-    $ip = $_SERVER['REMOTE_ADDR'];
-    // post request to server
-    //$url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
-    //$response = file_get_contents($url);
-    //$responseKeys = json_decode($response,true);
-    // should return JSON with success as true
-    // if($responseKeys["success"]) {
-      $admin          = $this->UserModel->login($email, $password);
-      
-      if (!empty($admin['id'])){
-   
+    if (!empty($login)){
+      if($login['status'] == 1){
         $adminData = array(
           'is_logged_in'  => true,
-          'Type'      => $admin['type'],
-          'Id'        => $admin['id'],
-          'Name'      => ucwords($admin['name']),
-          'Email'     => $admin['email'],
-          'Mobile'    => $admin['mobile']
+          'Type'      => 3,
+          'Id'        => $login['id'],
+          'Name'      => ucwords($login['name']),
+          'Email'     => "",
+          'Mobile'    => ""
         );
         $this->session->set_userdata('adminData', $adminData);
 
         // maintain login history
-        if($admin['type'] == 2){
-          $updateArr = array( 'employeeId'  => $admin['id'],
-                              'userType'    => 2,
-                              'ipAddress'   => $this->input->ip_address(),
-                              'type'        => 1,
-                              'loginTime'   => date('Y-m-d H:i:s'),
-                              'status'      => 1
-                             );
-          $this->db->insert('employeeLoginMaster', $updateArr);
-        }
-
-        $message = 'Welcome <strong>'.ucwords($admin['username']).'</strong>.You have successfully logged in.';
+        $updateArr = array( 'employeeId'  => $login['id'],
+                            'userType'    => 3,
+                            'ipAddress'   => $this->input->ip_address(),
+                            'type'        => 1,
+                            'loginTime'   => date('Y-m-d H:i:s'),
+                            'status'      => 1
+                           );
+        $this->db->insert('employeeLoginMaster', $updateArr);
+        
+        $message = 'Welcome <strong>'.ucwords($admin['name']).'</strong>.You have successfully logged in.';
         $this->session->set_flashdata('login_message', getCustomAlert('S', $message));
 
         redirect('Admin/dashboard');
-        
-      } else {
-        $this->session->set_flashdata('login_message', generateAdminAlert('D', 1));
-        redirect('Admin/');
+      }else{
+        $this->session->set_flashdata('login_message', generateAdminAlert('D', 11));
+        redirect('Admin/loungeLogin'); 
       }
-    // } else {
-    //   $this->session->set_flashdata('login_message', generateAdminAlert('D', 10));
-    //   redirect('Admin/');
-    // }
-    
-    
-          
+    } else {
+      $this->session->set_flashdata('login_message', generateAdminAlert('D', 12));
+      redirect('Admin/loungeLogin');
+    }     
   }
 
 
@@ -288,5 +310,24 @@ class Welcome extends CI_Controller {
     $this->session->unset_userdata('userPermission');
     $this->session->set_flashdata('login_message', generateAdminAlert('S', 8));
     redirect(base_url());
+  }
+
+  // logout lounge and redirect to index page
+  public function loungeLogout() {
+    $loungeId = $this->session->userdata('adminData')['Id'];
+
+    $updateArr = array(     
+                            'type'        => 2,
+                            'logoutTime'  => date('Y-m-d H:i:s'),
+                            'status'      => 1
+                           );  
+
+    $this->db->where(array('employeeId' => $loungeId, 'type' => 1,'userType'=>3));
+    $this->db->update('employeeLoginMaster',$updateArr); 
+
+    $this->session->unset_userdata('adminData');
+    $this->session->unset_userdata('userPermission');
+    $this->session->set_flashdata('login_message', generateAdminAlert('S', 8));
+    redirect(base_url('Admin/loungeLogin'));
   }
 } 

@@ -58,7 +58,9 @@
                 </li>
               </ol>
               <h5 style="float: right; font-size: 1.2rem;"><?= ucwords($motherData['motherName']); ?>
+              <?php if($Type['type'] != "2"){ ?>
                 <span style="font-size: 1rem;">[MCTS No:&nbsp;<?php  if(empty($motherData['motherMCTSNumber'])){ echo"--";} else { echo $motherData['motherMCTSNumber'];  }?>]</span>
+              <?php } ?>
               </h5>
             </div>
           </div>
@@ -74,17 +76,24 @@
                                 <a class="nav-item nav-link active" id="nav-registration-tab" data-toggle="tab" href="#nav-registration" role="tab" aria-controls="nav-registration" aria-selected="true">Registration</a>
                                 
 
-                              <?php if ($Type['type'] == '1' || $Type['type'] == '3') { ?>
-                                <a class="nav-item nav-link" id="nav-basic-tab" data-toggle="tab" href="#nav-basic" role="tab" aria-controls="nav-basic" aria-selected="true">Basic Information</a>
-                                <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Contact Information</a> 
-                                <!-- <a class="nav-item nav-link" id="nav-past-tab" data-toggle="tab" href="#nav-past" role="tab" aria-controls="nav-past" aria-selected="false">Mother Past Information</a> -->
-                                <a class="nav-item nav-link" id="nav-assessment-tab" data-toggle="tab" href="#nav-assessment" role="tab" aria-controls="nav-assessment" aria-selected="false">Mother Assessment</a>
-                                <a class="nav-item nav-link" id="nav-comment-tab" data-toggle="tab" href="#nav-comment" role="tab" aria-controls="nav-comment" aria-selected="false">Comments</a>
+                                <?php if($Type['type'] != "2"){ ?>
+                                  <a class="nav-item nav-link" id="nav-basic-tab" data-toggle="tab" href="#nav-basic" role="tab" aria-controls="nav-basic" aria-selected="true">Basic Information</a>
+                                  <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Contact Information</a> 
+
+                                  <!-- <a class="nav-item nav-link" id="nav-past-tab" data-toggle="tab" href="#nav-past" role="tab" aria-controls="nav-past" aria-selected="false">Mother Past Information</a> -->
+                                  <?php $searchEng = 'Other'; 
+                                    $searchHindi = 'अन्य'; 
+                                    if(!preg_match("/{$searchEng}/i", $Type['notAdmittedReason']) && !preg_match("/{$searchHindi}/i", $Type['notAdmittedReason'])) {
+                                  ?>
+                                    <a class="nav-item nav-link" id="nav-assessment-tab" data-toggle="tab" href="#nav-assessment" role="tab" aria-controls="nav-assessment" aria-selected="false">Mother Assessment</a>
+                                    <a class="nav-item nav-link" id="nav-comment-tab" data-toggle="tab" href="#nav-comment" role="tab" aria-controls="nav-comment" aria-selected="false">Comments</a>
+                                  <?php } } ?>
+
                                 <a class="nav-item nav-link" id="nav-counselling-tab" data-toggle="tab" href="#nav-counselling" role="tab" aria-controls="nav-counselling" aria-selected="false">Counselling</a>
                                 <?php 
                                   if($dischargeData['status'] == '2'){?>
                                     <a class="nav-item nav-link" id="nav-discharge-tab" data-toggle="tab" href="#nav-discharge" role="tab" aria-controls="nav-discharge" aria-selected="false">Discharged</a>
-                                <?php  } } ?> 
+                                <?php  } ?> 
                             </div>
                         </nav>
                         <div class="tab-content" id="nav-tabContent">
@@ -100,7 +109,7 @@
                                         <div class="form-group">
                                           <label>Mother's Name </label>
                                           <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherName']) ? 'UNKNOWN' : $motherData['motherName'];?>" readonly placeholder="Mother Name">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherName']) ? 'UNKNOWN' : $motherData['motherName'];?>" readonly placeholder="">
                                           </div>
                                         </div>
                                       </div>
@@ -110,7 +119,7 @@
                                         <div class="form-group">
                                           <label>Mother's Mobile Number </label>
                                           <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherMobileNumber']) ? '' : $motherData['motherMobileNumber'];?>" readonly placeholder="Mother Mobile Number">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherMobileNumber']) ? '' : $motherData['motherMobileNumber'];?>" readonly placeholder="">
                                           </div>
                                         </div>
                                       </div>
@@ -121,9 +130,9 @@
                                           <label>Mother to be admitted? </label>
                                           <div class="controls">
                                             <?php if($motherData['isMotherAdmitted'] =='Yes' || $motherData['isMotherAdmitted'] == 'yes'){?>
-                                              <input type="text" class="form-control" value="<?php echo $motherData['isMotherAdmitted'];?>"readonly placeholder="Mother to be admitted?">
+                                              <input type="text" class="form-control" value="<?php echo $motherData['isMotherAdmitted'];?>"readonly placeholder="">
                                             <?php  } else { ?>
-                                              <input type="text" class="form-control" value="<?php echo $motherData['isMotherAdmitted'];?>"readonly placeholder="Mother to be admitted?">
+                                              <input type="text" class="form-control" value="<?php echo $motherData['isMotherAdmitted'];?>"readonly placeholder="">
                                               <br/>
                                               <textarea cols="9" rows="3" readonly class="form-control"><?php echo empty($motherData['notAdmittedReason']) ? '' : $motherData['notAdmittedReason']; ?></textarea>
                                             <?php  } ?>
@@ -159,7 +168,7 @@
                                         <div class="form-group">
                                           <label>Mother's LMP Date (dd-mm-yyyy) </label>
                                           <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherLmpDate']) ? '' : date("d-m-Y",strtotime($motherData['motherLmpDate'])); ?>" readonly placeholder="Mother LMP Date (dd-mm-yyyy)">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherLmpDate']) ? '' : date("d-m-Y",strtotime($motherData['motherLmpDate'])); ?>" readonly placeholder="">
                                           </div>
                                         </div>
                                       </div>
@@ -171,7 +180,7 @@
                                         <div class="form-group">
                                           <label>Mother Name </label>
                                           <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherName']) ? 'UNKNOWN' : $motherData['motherName'];?>" readonly placeholder="Mother Name">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherName']) ? 'UNKNOWN' : $motherData['motherName'];?>" readonly placeholder="">
                                           </div>
                                         </div>
                                       </div>
@@ -182,9 +191,9 @@
                                           <label>Mother to be admitted? </label>
                                           <div class="controls">
                                             <?php if($motherData['isMotherAdmitted'] =='Yes' || $motherData['isMotherAdmitted'] == 'yes'){?>
-                                              <input type="text" class="form-control" value="<?php echo $motherData['isMotherAdmitted'];?>"readonly placeholder="Mother to be admitted?">
+                                              <input type="text" class="form-control" value="<?php echo $motherData['isMotherAdmitted'];?>"readonly placeholder="">
                                             <?php  } else { ?>
-                                              <input type="text" class="form-control" value="<?php echo $motherData['isMotherAdmitted'];?>"readonly placeholder="Mother to be admitted?">
+                                              <input type="text" class="form-control" value="<?php echo $motherData['isMotherAdmitted'];?>"readonly placeholder="">
                                               <br/>
                                               <textarea cols="9" rows="3" readonly class="form-control"><?php echo empty($motherData['notAdmittedReason']) ? '' : $motherData['notAdmittedReason']; ?></textarea>
                                             <?php  } ?>
@@ -196,7 +205,7 @@
                                         <div class="form-group">
                                           <label>Mother LMP Date (yyyy-mm-dd) </label>
                                           <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherLmpDate']) ? '' : $motherData['motherLmpDate'];?>" readonly placeholder="Mother LMP Date (yyyy-mm-dd)">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherLmpDate']) ? '' : $motherData['motherLmpDate'];?>" readonly placeholder="">
                                           </div>
                                         </div>
                                       </div>
@@ -210,7 +219,7 @@
                                         <div class="form-group">
                                           <label>Guardian Name </label>
                                           <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['guardianName']) ? '' : $motherData['guardianName'];?>" readonly placeholder="Guardian Name">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['guardianName']) ? '' : $motherData['guardianName'];?>" readonly placeholder="">
                                           </div>
                                         </div>
                                       </div>
@@ -219,7 +228,7 @@
                                         <div class="form-group">
                                           <label>Guardian Contact Number </label>
                                           <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['guardianNumber']) ? '' : $motherData['guardianNumber'];?>" readonly placeholder="Guardian Contact Number">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['guardianNumber']) ? '' : $motherData['guardianNumber'];?>" readonly placeholder="">
                                           </div>
                                         </div>
                                       </div>
@@ -228,7 +237,7 @@
                                         <div class="form-group">
                                           <label>Relation With Child </label>
                                           <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['guardianRelation']) ? '' : $motherData['guardianRelation'];?>" readonly placeholder="Relation With Child">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['guardianRelation']) ? '' : $motherData['guardianRelation'];?>" readonly placeholder="">
                                           </div>
                                         </div>
                                       </div>
@@ -254,7 +263,7 @@
                                         <div class="form-group">
                                           <label>Mother's Name </label>
                                           <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherName']) ? 'UNKNOWN' : $motherData['motherName'];?>" readonly placeholder="Mother Name">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherName']) ? 'UNKNOWN' : $motherData['motherName'];?>" readonly placeholder="">
                                           </div>
                                         </div>
                                       </div>
@@ -306,7 +315,7 @@
                                       </div>
                                       <div class="col-md-4">
                                         <div class="form-group">
-                                          <label>Mother's Weight ( in Kgs) </label>
+                                          <label>Mother's Weight (in Kgs) </label>
                                           <div class="controls">
                                             
                                               <input type="text" class="form-control" value="<?php echo empty($motherData['motherWeight']) ? '' : $motherData['motherWeight'];?>"readonly >
@@ -321,7 +330,7 @@
                                         <div class="form-group">
                                           <label>Mother DOB (dd-mm-yyyy) </label>
                                           <div class="controls">
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherDOB']) ? '' : date("d-m-Y",strtotime($motherData['motherDOB'])); ?>" readonly placeholder="Mother DOB (dd-mm-yyyy)">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['motherDOB']) ? '' : date("d-m-Y",strtotime($motherData['motherDOB'])); ?>" readonly placeholder="">
                                           </div>
                                         </div>
                                       </div>
@@ -387,7 +396,7 @@
                                           <label>Have you ever had multiple births? </label>
                                           <div class="controls">
                                             
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['multipleBirth']) ? '' : $motherData['multipleBirth'];?>"readonly >
+                                              <input type="text" class="form-control" value="<?php echo $motherData['multipleBirth'];?>"readonly >
                                             
                                           </div>
                                         </div>
@@ -397,7 +406,7 @@
                                           <label>Total Pregnancies(Gravida) </label>
                                           <div class="controls">
                                             
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['gravida']) ? '' : $motherData['gravida'];?>"readonly >
+                                              <input type="text" class="form-control" value="<?php echo $motherData['gravida'];?>"readonly >
                                             
                                           </div>
                                         </div>
@@ -407,7 +416,7 @@
                                           <label>No. of births?(Para) </label>
                                           <div class="controls">
                                             
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['para']) ? '' : $motherData['para'];?>"readonly>
+                                              <input type="text" class="form-control" value="<?php echo $motherData['para'];?>"readonly>
                                             
                                           </div>
                                         </div>
@@ -420,7 +429,7 @@
                                           <label>No. of miscarriage or abortion</label>
                                           <div class="controls">
                                             
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['abortion']) ? '' : $motherData['abortion'];?>"readonly >
+                                              <input type="text" class="form-control" value="<?php echo $motherData['abortion'];?>"readonly >
                                             
                                           </div>
                                         </div>
@@ -430,7 +439,7 @@
                                           <label>Total no. of children who are currently alive?(Live) </label>
                                           <div class="controls">
                                             
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['live']) ? '' : $motherData['live'];?>"readonly>
+                                              <input type="text" class="form-control" value="<?php echo $motherData['live'];?>"readonly>
                                             
                                           </div>
                                         </div>
@@ -440,7 +449,7 @@
                                           <label>Birth Spacing </label>
                                           <div class="controls">
                                             
-                                              <input type="text" class="form-control" value="<?php echo empty($motherData['birthSpacing']) ? '' :  $motherData['birthSpacing'];?>"readonly >
+                                              <input type="text" class="form-control" value="<?php echo $motherData['birthSpacing'];?>"readonly >
                                             
                                           </div>
                                         </div>
@@ -633,76 +642,102 @@
                                     </div>
                                 </div>
 
-                                <div class="col-12">
-                                  <h5 class="float-left mb-2 mt-1 pr-1">Permanent Address</h5>
-                                </div>
-
                                 <div class="row col-12">
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label>Permanent Address Type </label>
-                                        <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($motherData['permanentResidenceType']) ? '' : $motherData['permanentResidenceType'];?>" readonly >
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label>Country </label>
-                                        <div class="controls">
-                                          <?php  if(empty($motherData['permanentCountry'])){?>
-                                            <input type="text" class="form-control" value="<?php //echo 'Other'; ?>" readonly>
-                                          <?php } else { ?>
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['permanentCountry']) ? '' : $motherData['permanentCountry']; ?>" readonly >
-                                          <?php } ?>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label>State</label>
-                                        <div class="controls">
-                                          <?php  if(empty($motherData['permanentState'])){?>
-                                            <input type="text" class="form-control" value="<?php //echo 'Other'; ?>" readonly>
-                                          <?php } else { ?>
-                                            <input type="text" class="form-control" value="<?php echo empty($motherData['permanentState']) ? '' : $motherData['permanentState']; ?>" readonly>
-                                          <?php } ?>
-                                        </div>
-                                      </div>
-                                    </div>
+                                  <h5 class="float-left mt-1 pr-1 col-md-12">Permanent address same as Present address: &nbsp; <input type="checkbox" name="sameAddress" value="1" <?php if($motherData['sameAddress'] == "1"){ echo "checked"; } ?> disabled> Yes</h5>
                                 </div>
+                                
+                                <?php if($motherData['sameAddress'] == "2"){ ?>
+                                  <div class="col-12">
+                                    <h5 class="float-left mb-2 mt-1 pr-1">Permanent Address</h5>
+                                  </div>
 
-                                <div class="row col-12">
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label>District </label>
-                                        <div class="controls">
-                                          <?php $GetPermanentDistrictName = $this->load->MotherModel->GetPermanentDistrictName($motherData['permanentDistrictName']);?> 
-                                          <input type="text" class="form-control" value="<?php echo empty($GetPermanentDistrictName['DistrictNameProperCase']) ? '' : $GetPermanentDistrictName['DistrictNameProperCase']; ?>" readonly>
+                                  <div class="row col-12">
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>Permanent Address Type </label>
+                                          <div class="controls">
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['permanentResidenceType']) ? '' : $motherData['permanentResidenceType'];?>" readonly >
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>Country </label>
+                                          <div class="controls">
+                                            <?php  if(empty($motherData['permanentCountry'])){?>
+                                              <input type="text" class="form-control" value="<?php //echo 'Other'; ?>" readonly>
+                                            <?php } else { ?>
+                                              <input type="text" class="form-control" value="<?php echo empty($motherData['permanentCountry']) ? '' : $motherData['permanentCountry']; ?>" readonly >
+                                            <?php } ?>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>State</label>
+                                          <div class="controls">
+                                            <?php  if(empty($motherData['permanentState'])){?>
+                                              <input type="text" class="form-control" value="<?php //echo 'Other'; ?>" readonly>
+                                            <?php } else { ?>
+                                              <input type="text" class="form-control" value="<?php echo empty($motherData['permanentState']) ? '' : $motherData['permanentState']; ?>" readonly>
+                                            <?php } ?>
+                                          </div>
+                                        </div>
+                                      </div>
+                                  </div>
 
+                                  <div class="row col-12">
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>District </label>
+                                          <div class="controls">
+                                            <?php $GetPermanentDistrictName = $this->load->MotherModel->GetPermanentDistrictName($motherData['permanentDistrictName']);?> 
+                                            <input type="text" class="form-control" value="<?php echo empty($GetPermanentDistrictName['DistrictNameProperCase']) ? '' : $GetPermanentDistrictName['DistrictNameProperCase']; ?>" readonly>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <?php if($motherData['permanentResidenceType'] == "Rural"){ ?>
+                                        <div class="col-md-4">
+                                          <div class="form-group">
+                                            <label>Block </label>
+                                            <div class="controls">
+                                              <?php $PermanentBlockName = $this->load->MotherModel->GetPermanentBlockName($motherData['permanentBlockName']);?> 
+                                              <input type="text" class="form-control" value="<?php echo empty($PermanentBlockName['BlockPRINameProperCase']) ? '' : $PermanentBlockName['BlockPRINameProperCase'];?>" readonly >
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                          <div class="form-group">
+                                            <label>Gram Sabha/Town or City</label>
+                                            <div class="controls">
+                                              <?php $PermanentVillageName = $this->load->MotherModel->GetPermanentVillageName($motherData['permanentVillageName']);?> 
+                                              <input type="text" class="form-control" value="<?php echo empty($PermanentVillageName['GPNameProperCase']) ? '' : $PermanentVillageName['GPNameProperCase']; ?>" readonly>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      <?php }else{ ?>
+                                        <div class="col-md-4">
+                                          <div class="form-group">
+                                            <label>Address </label>
+                                            <div class="controls">
+                                              <input type="text" class="form-control" value="<?php echo empty($motherData['permanentAddress']) ? '' : $motherData['permanentAddress']; ?>" readonly>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                          <div class="form-group">
+                                            <label>Pincode </label>
+                                            <div class="controls">
+                                              <input type="text" class="form-control" value="<?php echo empty($motherData['permanentPinCode']) ? '' : $motherData['permanentPinCode']; ?>" readonly>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      <?php } ?>
+                                  </div>
+
+                                  <div class="row col-12">
                                     <?php if($motherData['permanentResidenceType'] == "Rural"){ ?>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Block </label>
-                                          <div class="controls">
-                                            <?php $PermanentBlockName = $this->load->MotherModel->GetPermanentBlockName($motherData['permanentBlockName']);?> 
-                                            <input type="text" class="form-control" value="<?php echo empty($PermanentBlockName['BlockPRINameProperCase']) ? '' : $PermanentBlockName['BlockPRINameProperCase'];?>" readonly >
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-4">
-                                        <div class="form-group">
-                                          <label>Gram Sabha/Town or City</label>
-                                          <div class="controls">
-                                            <?php $PermanentVillageName = $this->load->MotherModel->GetPermanentVillageName($motherData['permanentVillageName']);?> 
-                                            <input type="text" class="form-control" value="<?php echo empty($PermanentVillageName['GPNameProperCase']) ? '' : $PermanentVillageName['GPNameProperCase']; ?>" readonly>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    <?php }else{ ?>
                                       <div class="col-md-4">
                                         <div class="form-group">
                                           <label>Address </label>
@@ -720,37 +755,17 @@
                                         </div>
                                       </div>
                                     <?php } ?>
-                                </div>
-
-                                <div class="row col-12">
-                                  <?php if($motherData['permanentResidenceType'] == "Rural"){ ?>
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label>Address </label>
-                                        <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($motherData['permanentAddress']) ? '' : $motherData['permanentAddress']; ?>" readonly>
+                                      <div class="col-md-4">
+                                        <div class="form-group">
+                                          <label>Near By Location </label>
+                                          <div class="controls">
+                                            <?php $PermanentVillageName = $this->load->MotherModel->GetPermanentVillageName($motherData['permanentVillageName']);?> 
+                                            <input type="text" class="form-control" value="<?php echo empty($motherData['permanentAddNearByLocation']) ? '' : $motherData['permanentAddNearByLocation']; ?>" readonly>
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label>Pincode </label>
-                                        <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($motherData['permanentPinCode']) ? '' : $motherData['permanentPinCode']; ?>" readonly>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  <?php } ?>
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label>Near By Location </label>
-                                        <div class="controls">
-                                          <?php $PermanentVillageName = $this->load->MotherModel->GetPermanentVillageName($motherData['permanentVillageName']);?> 
-                                          <input type="text" class="form-control" value="<?php echo empty($motherData['permanentAddNearByLocation']) ? '' : $motherData['permanentAddNearByLocation']; ?>" readonly>
-                                        </div>
-                                      </div>
-                                    </div>
-                                </div>
+                                  </div>
+                                <?php } ?>
 
                                 <!-- <div class="col-12">
                                   <h5 class="float-left mb-2 mt-1 pr-1">Delivery Address</h5>
@@ -875,7 +890,7 @@
                                       <div class="form-group">
                                         <label>Antenatal Visit's </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['antenatalVisits']) ? '' : $pastInfoData['antenatalVisits'];?>" readonly placeholder="Antenatal Visit's">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['antenatalVisits']) ? '' : $pastInfoData['antenatalVisits'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -883,7 +898,7 @@
                                       <div class="form-group">
                                         <label>T.T Doses </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['ttDoses']) ? '' : $pastInfoData['ttDoses'];?>" readonly placeholder="T.T Doses">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['ttDoses']) ? '' : $pastInfoData['ttDoses'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -891,7 +906,7 @@
                                       <div class="form-group">
                                         <label>Hb </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['hbValue']) ? '' : $pastInfoData['hbValue'];?>" readonly placeholder="Hb">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['hbValue']) ? '' : $pastInfoData['hbValue'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -901,7 +916,7 @@
                                       <div class="form-group">
                                         <label>Blood Group </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['bloodGroup']) ? '' : $pastInfoData['bloodGroup'];?>" readonly placeholder="Blood Group">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['bloodGroup']) ? '' : $pastInfoData['bloodGroup'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -909,7 +924,7 @@
                                       <div class="form-group">
                                         <label>PiH </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['isPihAvail']) ? '' : $pastInfoData['isPihAvail'];?>" readonly placeholder="PiH">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['isPihAvail']) ? '' : $pastInfoData['isPihAvail'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -917,7 +932,7 @@
                                       <div class="form-group">
                                         <label>PiH Value </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['pihValue']) ? '' : $pastInfoData['pihValue'];?>" readonly placeholder="PiH Value">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['pihValue']) ? '' : $pastInfoData['pihValue'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -927,7 +942,7 @@
                                       <div class="form-group">
                                         <label>Blood Group </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['bloodGroup']) ? '' : $pastInfoData['bloodGroup'];?>" readonly placeholder="Blood Group">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['bloodGroup']) ? '' : $pastInfoData['bloodGroup'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -935,7 +950,7 @@
                                       <div class="form-group">
                                         <label>PiH </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['isPihAvail']) ? '' : $pastInfoData['isPihAvail'];?>" readonly placeholder="PiH">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['isPihAvail']) ? '' : $pastInfoData['isPihAvail'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -943,7 +958,7 @@
                                       <div class="form-group">
                                         <label>PiH Value </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['pihValue']) ? '' : $pastInfoData['pihValue'];?>" readonly placeholder="PiH Value">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['pihValue']) ? '' : $pastInfoData['pihValue'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -953,7 +968,7 @@
                                       <div class="form-group">
                                         <label>Drug (Allergy) </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['isDrugAvail']) ? '' : $pastInfoData['isDrugAvail'];?>" readonly placeholder="Drug (Allergy)">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['isDrugAvail']) ? '' : $pastInfoData['isDrugAvail'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -961,7 +976,7 @@
                                       <div class="form-group">
                                         <label>Radiation </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['radiation']) ? '' : $pastInfoData['radiation'];?>" readonly placeholder="Radiation">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['radiation']) ? '' : $pastInfoData['radiation'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -969,7 +984,7 @@
                                       <div class="form-group">
                                         <label>Illness </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['isIllnessAvail']) ? '' : $pastInfoData['isIllnessAvail'];?>" readonly placeholder="Illness">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['isIllnessAvail']) ? '' : $pastInfoData['isIllnessAvail'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -979,7 +994,7 @@
                                       <div class="form-group">
                                         <label>Illness Value </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['illnessValue']) ? '' : $pastInfoData['illnessValue'];?>" readonly placeholder="Illness Value">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['illnessValue']) ? '' : $pastInfoData['illnessValue'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -987,7 +1002,7 @@
                                       <div class="form-group">
                                         <label>APH </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['aphValue']) ? '' : $pastInfoData['aphValue'];?>" readonly placeholder="APH">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['aphValue']) ? '' : $pastInfoData['aphValue'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -995,7 +1010,7 @@
                                       <div class="form-group">
                                         <label>GDM </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['gdmValue']) ? '' : $pastInfoData['gdmValue'];?>" readonly placeholder="GDM">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['gdmValue']) ? '' : $pastInfoData['gdmValue'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1005,7 +1020,7 @@
                                       <div class="form-group">
                                         <label>Thyroid </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['thyroid']) ? '' : $pastInfoData['thyroid'];?>" readonly placeholder="Thyroid">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['thyroid']) ? '' : $pastInfoData['thyroid'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1013,7 +1028,7 @@
                                       <div class="form-group">
                                         <label>VDRL </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['vdrlValue']) ? '' : $pastInfoData['vdrlValue'];?>" readonly placeholder="VDRL">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['vdrlValue']) ? '' : $pastInfoData['vdrlValue'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1021,7 +1036,7 @@
                                       <div class="form-group">
                                         <label>HbsAg </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['hbsAgValue']) ? '' : $pastInfoData['hbsAgValue'];?>" readonly placeholder="HbsAg">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['hbsAgValue']) ? '' : $pastInfoData['hbsAgValue'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1031,7 +1046,7 @@
                                       <div class="form-group">
                                         <label>HIV Testing </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['hivTesting']) ? '' : $pastInfoData['hivTesting'];?>" readonly placeholder="HIV Testing">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['hivTesting']) ? '' : $pastInfoData['hivTesting'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1039,7 +1054,7 @@
                                       <div class="form-group">
                                         <label>Amniotic Fluid Volume </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['amnioticFluidVolume']) ? '' : $pastInfoData['amnioticFluidVolume'];?>" readonly placeholder="Amniotic Fluid Volume">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['amnioticFluidVolume']) ? '' : $pastInfoData['amnioticFluidVolume'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1047,7 +1062,7 @@
                                       <div class="form-group">
                                         <label>Other Significant Info For History </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['otherSignificantInfo']) ? '' : $pastInfoData['otherSignificantInfo'];?>" readonly placeholder="Other Significant Info For History">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['otherSignificantInfo']) ? '' : $pastInfoData['otherSignificantInfo'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1062,7 +1077,7 @@
                                       <div class="form-group">
                                         <label>Antenatal Steroids </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['isAntenatalSteroids']) ? '' : $pastInfoData['isAntenatalSteroids'];?>" readonly placeholder="Antenatal Steroids">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['isAntenatalSteroids']) ? '' : $pastInfoData['isAntenatalSteroids'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1070,7 +1085,7 @@
                                       <div class="form-group">
                                         <label>Antenatal Steroids Value </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['antenatalSteroidsValue']) ? '' : $pastInfoData['antenatalSteroidsValue'];?>" readonly placeholder="Antenatal Steroids Value">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['antenatalSteroidsValue']) ? '' : $pastInfoData['antenatalSteroidsValue'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1078,7 +1093,7 @@
                                       <div class="form-group">
                                         <label>No. Of Doses </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['numberOfDoses']) ? '' : $pastInfoData['numberOfDoses'];?>" readonly placeholder="No. Of Doses">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['numberOfDoses']) ? '' : $pastInfoData['numberOfDoses'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1088,7 +1103,7 @@
                                       <div class="form-group">
                                         <label>Time Between Last Dose & Delivery </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['timeBetweenLastDoseDelivery']) ? '' : $pastInfoData['timeBetweenLastDoseDelivery'];?>" readonly placeholder="Time Between Last Dose & Delivery">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['timeBetweenLastDoseDelivery']) ? '' : $pastInfoData['timeBetweenLastDoseDelivery'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1096,7 +1111,7 @@
                                       <div class="form-group">
                                         <label>H/O Fever </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['hoFever']) ? '' : $pastInfoData['hoFever'];?>" readonly placeholder="H/O Fever">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['hoFever']) ? '' : $pastInfoData['hoFever'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1104,7 +1119,7 @@
                                       <div class="form-group">
                                         <label>Foul Smelling Discharge </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['foulSmellingDischarge']) ? '' : $pastInfoData['foulSmellingDischarge'];?>" readonly placeholder="Foul Smelling Discharge">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['foulSmellingDischarge']) ? '' : $pastInfoData['foulSmellingDischarge'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1114,7 +1129,7 @@
                                       <div class="form-group">
                                         <label>Uterine Tenderness </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['uterineTenderness']) ? '' : $pastInfoData['uterineTenderness'];?>" readonly placeholder="Uterine Tenderness">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['uterineTenderness']) ? '' : $pastInfoData['uterineTenderness'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1122,7 +1137,7 @@
                                       <div class="form-group">
                                         <label>Leaking P.V > 24 Hours </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['leakingPv']) ? '' : $pastInfoData['leakingPv'];?>" readonly placeholder="Leaking P.V > 24 Hours">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['leakingPv']) ? '' : $pastInfoData['leakingPv'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1130,7 +1145,7 @@
                                       <div class="form-group">
                                         <label>PPH </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['pphValue']) ? '' : $pastInfoData['pphValue'];?>" readonly placeholder="PPH">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['pphValue']) ? '' : $pastInfoData['pphValue'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1140,7 +1155,7 @@
                                       <div class="form-group">
                                         <label>Amniotic Fluid </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['amnioticFluid']) ? '' : $pastInfoData['amnioticFluid'];?>" readonly placeholder="Amniotic Fluid">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['amnioticFluid']) ? '' : $pastInfoData['amnioticFluid'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1148,7 +1163,7 @@
                                       <div class="form-group">
                                         <label>Presentation </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['presentation']) ? '' : $pastInfoData['presentation'];?>" readonly placeholder="Presentation">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['presentation']) ? '' : $pastInfoData['presentation'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1156,7 +1171,7 @@
                                       <div class="form-group">
                                         <label>Labour </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['labour']) ? '' : $pastInfoData['labour'];?>" readonly placeholder="Labour">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['labour']) ? '' : $pastInfoData['labour'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1166,7 +1181,7 @@
                                       <div class="form-group">
                                         <label>Course Of Labour </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['courseOfLabour']) ? '' : $pastInfoData['courseOfLabour'];?>" readonly placeholder="Course Of Labour">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['courseOfLabour']) ? '' : $pastInfoData['courseOfLabour'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1174,7 +1189,7 @@
                                       <div class="form-group">
                                         <label>E/O Feotal Distress </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['eoFeotalDistress']) ? '' : $pastInfoData['eoFeotalDistress'];?>" readonly placeholder="E/O Feotal Distress">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['eoFeotalDistress']) ? '' : $pastInfoData['eoFeotalDistress'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1182,7 +1197,7 @@
                                       <div class="form-group">
                                         <label>Delivery Type </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['typeOfDelivery']) ? '' : $pastInfoData['typeOfDelivery'];?>" readonly placeholder="Delivery Type">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['typeOfDelivery']) ? '' : $pastInfoData['typeOfDelivery'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1192,7 +1207,7 @@
                                       <div class="form-group">
                                         <label>Delivery Attended By </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['deliveryAttendedBy']) ? '' : $pastInfoData['deliveryAttendedBy'];?>" readonly placeholder="Delivery Attended By">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['deliveryAttendedBy']) ? '' : $pastInfoData['deliveryAttendedBy'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>
@@ -1200,7 +1215,7 @@
                                       <div class="form-group">
                                         <label>Other Significant Info </label>
                                         <div class="controls">
-                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['otherSignificantValueForLabour']) ? '' : $pastInfoData['otherSignificantValueForLabour'];?>" readonly placeholder="E/O Feotal Distress">
+                                          <input type="text" class="form-control" value="<?php echo empty($pastInfoData['otherSignificantValueForLabour']) ? '' : $pastInfoData['otherSignificantValueForLabour'];?>" readonly placeholder="">
                                         </div>
                                       </div>
                                     </div>

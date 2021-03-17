@@ -147,8 +147,8 @@ class CronjobModel extends CI_Model {
 
   // get baby admission data
   public function getBabyAdmissionDischargeData($loungeArray=false){
-    $start_date = date('Y-m-d',strtotime("-1 days"));
-    $end_date = date('Y-m-d',strtotime("-1 days"));
+    $start_date = date('Y-m-d',strtotime("-1 days")).' 08:00:00';
+    $end_date = date('Y-m-d').' 07:59:59';
 
     $this->db->select('babyAdmission.babyId,babyAdmission.id as babyAdmissionId,babyAdmission.status as dischargeStatus,babyAdmission.babyFileId,babyAdmission.lengthValue as admissionHeight,babyAdmission.babyAdmissionWeight,babyAdmission.admissionDateTime,babyAdmission.dateOfDischarge,babyAdmission.typeOfDischarge,babyRegistration.babyGender,babyRegistration.registrationDateTime,babyRegistration.motherId,babyRegistration.babyWeight,babyRegistration.deliveryDate,babyRegistration.deliveryTime,babyRegistration.typeOfBorn,babyRegistration.deliveryType,motherRegistration.motherName,motherRegistration.isMotherAdmitted,motherRegistration.motherMobileNumber,motherRegistration.fatherName,motherRegistration.motherAadharNumber,motherRegistration.fatherAadharNumber,motherRegistration.motherMCTSNumber,motherRegistration.motherWeight,motherRegistration.motherDOB,motherRegistration.motherAge,motherRegistration.profileUpdateNurseId,motherRegistration.ageAtMarriage,motherRegistration.motherEducation,motherRegistration.motherReligion,motherRegistration.motherCaste,motherRegistration.multipleBirth,motherRegistration.gravida,motherRegistration.para,motherRegistration.abortion,motherRegistration.live,motherRegistration.birthSpacing,motherRegistration.fatherMobileNumber,motherRegistration.guardianName,motherRegistration.guardianRelation,motherRegistration.guardianNumber,motherRegistration.rationCardType,staffMaster.name as motherProfileUpdateNurse,loungeMaster.facilityId,loungeMaster.loungeName,facilitylist.FacilityName, motherRegistration.presentResidenceType,motherRegistration.presentCountry,motherRegistration.presentState,motherRegistration.presentDistrictName,motherRegistration.presentBlockName,motherRegistration.presentVillageName,motherRegistration.presentAddress,motherRegistration.presentPinCode,motherRegistration.presentAddNearByLocation,motherRegistration.sameAddress,motherRegistration.permanentResidenceType,motherRegistration.permanentCountry,motherRegistration.permanentState,motherRegistration.permanentDistrictName,motherRegistration.permanentBlockName,motherRegistration.permanentVillageName,motherRegistration.permanentAddress,motherRegistration.permanentPinCode,motherRegistration.permanentAddNearByLocation');
     $this->db->join('babyRegistration','babyRegistration.babyId=babyAdmission.babyId');
@@ -156,8 +156,8 @@ class CronjobModel extends CI_Model {
     $this->db->join('loungeMaster','loungeMaster.loungeId=babyAdmission.loungeId');
     $this->db->join('facilitylist','facilitylist.FacilityID=loungeMaster.facilityId');
     $this->db->join('staffMaster','staffMaster.staffId=motherRegistration.profileUpdateNurseId','left');
-    $this->db->where('DATE(babyAdmission.dateOfDischarge) >=', $start_date);
-    $this->db->where('DATE(babyAdmission.dateOfDischarge) <=', $end_date);
+    $this->db->where('babyAdmission.dateOfDischarge >=', $start_date);
+    $this->db->where('babyAdmission.dateOfDischarge <=', $end_date);
     if(!empty($loungeArray)){
       $this->db->where_in('babyAdmission.loungeId',$loungeArray);
     }
@@ -225,6 +225,19 @@ class CronjobModel extends CI_Model {
     return $this->db->get_where('revenuevillagewithblcoksandsubdistandgs',array('GPPRICode'=>$Id))->row_array();
   }
 
+  // get lounge birth review data
+  public function getLoungeBirthReview($loungeId,$shift){
+    $start_date = date('Y-m-d',strtotime("-1 days")).' 08:00:00';
+    $end_date = date('Y-m-d').' 07:59:59';
+
+    $this->db->select('loungeBirthReview.*,staffMaster.name as nurseName');
+    $this->db->join('staffMaster','staffMaster.staffId=loungeBirthReview.nurseId');
+    $this->db->where('loungeBirthReview.addDate >=', $start_date);
+    $this->db->where('loungeBirthReview.addDate <=', $end_date);
+    $query = $this->db->get_where('loungeBirthReview',array('loungeBirthReview.loungeId'=>$loungeId,'loungeBirthReview.shift'=>$shift))->result_array();
+    return $query;
+  }
+
 
   public function getBabyNutritionList($loungeArray=false){
     $previousDate = date('Y-m-d',strtotime("-1 days"));
@@ -279,6 +292,34 @@ class CronjobModel extends CI_Model {
     }
 
     $query = $this->db->query('SELECT staffMaster.*,facilitylist.FacilityName as FacilityName FROM staffMaster JOIN facilitylist on facilitylist.FacilityID=staffMaster.facilityId WHERE '.$con.' staffMaster.status ="1"')->result_array();
+    return $query;
+  }
+
+
+
+  public function getAllAdmitionDischargeByNurse($loungeArray)
+  {
+    $loungeId = implode(",", $loungeArray);
+    $qry = "SELECT * FROM `V_babyAdmissionDischargeMotherAdmission` where loungeid in (".$loungeId.")  
+ORDER BY `V_babyAdmissionDischargeMotherAdmission`.`loungeId` ASC";
+
+    $query = $this->db->query($qry)->result_array();
+    return $query;
+  }
+
+  public function getAllLBW($loungeArray)
+  {
+    $previousDate = date('Y-m-d',strtotime("-1 days"));
+    $currentDate = date('Y-m-d');
+
+    $previous = "'".$previousDate.' 8:00:00'."'";
+    $current = "'".$currentDate.' 8:00:00'."'";
+
+    $loungeId = implode(",", $loungeArray);
+    $qry = "SELECT * FROM `V_loungeBirthReview` where loungeid in (".$loungeId.") AND  addDate BETWEEN ".$previous." AND ".$current."
+ORDER BY `V_loungeBirthReview`.`loungeId` ASC";
+
+    $query = $this->db->query($qry)->result_array();
     return $query;
   }
 

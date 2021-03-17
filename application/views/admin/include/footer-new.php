@@ -35,6 +35,7 @@
     <script src="<?php echo base_url(); ?>app-assets/vendors/js/pickers/pickadate/picker.time.js"></script>
     <script src="<?php echo base_url(); ?>app-assets/vendors/js/pickers/pickadate/legacy.js"></script>
     <script src="<?php echo base_url(); ?>app-assets/vendors/js/pickers/daterange/moment.min.js"></script>
+    <script src="<?php echo base_url(); ?>app-assets/vendors/js/pickers/daterange/daterangepicker.js"></script>
     <!-- END: DatePicker JS-->
 
     <!-- BEGIN: Theme JS-->

@@ -143,10 +143,10 @@ class ReportSettingModel extends CI_Model {
 
   // insert data into staffMaster and smsMaster
   public function AddReportData($data){
-    $fields                             =       array();
+    $fields = array();
     
 
-    $fields['subject']                     =       $data['subject'];
+    $fields['subject']            =       $data['subject'];
     $fields['body']               =       $data['body'];
     $fields['emailFrom']          =       $data['emailFrom'];
     $fields['subscription']       =       $data['subscription'];
@@ -169,7 +169,7 @@ class ReportSettingModel extends CI_Model {
       $this->db->insert('reportfacilities',$fields2);
     }
 
-$emails = explode(",",$data['email']);
+    $emails = explode(",",$data['email']);
     foreach($emails as $values)
     {
       $fields3                   =       array();

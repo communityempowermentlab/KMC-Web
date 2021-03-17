@@ -130,7 +130,7 @@ public function captcha(){
     $this->is_logged_in(); 
     $data['title'] = PROJECT_NAME; 
     $data['backgroundImages'] = $this->FacilityModel->getActiveImage(); 
-    $data['district'] = $this->db->query('SELECT DISTINCT StateCode, StateNameProperCase, PRIDistrictCode , DistrictNameProperCase, UrbanRural, STATUS FROM revenuevillagewithblcoksandsubdistandgs')->result_array();
+    $data['district'] = $this->db->query('SELECT DISTINCT StateCode, StateNameProperCase, PRIDistrictCode , DistrictNameProperCase, UrbanRural, STATUS FROM revenuevillagewithblcoksandsubdistandgs group by PRIDistrictCode')->result_array();
     $this->load->view('/admin/lounge-auth-login',$data);
   }
 
@@ -171,7 +171,7 @@ public function captcha(){
     $this->is_not_logged_in(); 
     $adminData = $this->session->userdata('adminData'); 
     $dashboardMenuSettings = array();
-    if($adminData['Type']=='2'){
+    if($adminData['Type']=='2' || $adminData['Type']=='3'){
       $getMenus = $this->UserModel->getEmployeeMenu($adminData['Id'],$adminData['Type']);
       $this->session->set_userdata('userPermission', $getMenus);
     }
@@ -182,7 +182,7 @@ public function captcha(){
 
     $data['index']         = 'index';
     $data['index2']        = '';
-    $data['title']         ='Dashboard Control Panel | '.PROJECT_NAME;   
+    $data['title']         = 'Dashboard Control Panel | '.PROJECT_NAME;   
     $data['counting']      = $this->UserModel->getCount(); 
     $data['LatestMother']  = $this->FacilityModel->getLatestMother();
     $data['totalLounges']  = $this->DashboardDataModel->getAllLonges();
@@ -351,6 +351,38 @@ public function captcha(){
       foreach ($distData as $value) {
         $Select = ($district==$value['PRIDistrictCode'])?'SELECTED':'' ;
         $set_html_cont.= '<option value="'.$value['PRIDistrictCode'].'" '.$Select.'   >'.$value['DistrictNameProperCase'].'</option>'; 
+      }
+      print_r($set_html_cont);
+      die();
+    }
+  }
+
+  // get facility list by district id
+  public function getDistrictFacility(){
+    if ($this->input->post()) {
+      $district = $this->input->post('district');
+      $facilityData = $this->UserModel->getDistrictFacility($district);
+
+      $set_html_cont = '<option value="">Select Facility</option>'; 
+
+      foreach ($facilityData as $value) {
+        $set_html_cont.= '<option value="'.$value['FacilityID'].'">'.$value['FacilityName'].'</option>'; 
+      }
+      print_r($set_html_cont);
+      die();
+    }
+  }
+
+  // get lounge list by facility id
+  public function getFacilityLounge(){
+    if ($this->input->post()) {
+      $facility = $this->input->post('facility');
+      $loungeData = $this->UserModel->getFacilityLounge($facility);
+
+      $set_html_cont = '<option value="">Select Lounge</option>'; 
+
+      foreach ($loungeData as $value) {
+        $set_html_cont.= '<option value="'.$value['loungeId'].'">'.$value['loungeName'].'</option>'; 
       }
       print_r($set_html_cont);
       die();

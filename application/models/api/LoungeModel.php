@@ -1144,10 +1144,10 @@ class LoungeModel extends CI_Model {
 					
 					$arrayName['shift']      			= ($request['shift'] != '') ? $request['shift'] : NULL; 
 					// 1 = 8 AM to 2PM; 2 = 2 PM to 8 PM; 3 = 8 PM to 8 AM 
-					$arrayName['totalLiveBirth'] 		= ($request['totalLiveBirth'] != '') ? $request['totalLiveBirth'] : NULL; 
-					$arrayName['totalStableBabies'] 	= ($request['totalStableBabies'] != '') ? $request['totalStableBabies'] : NULL; 
+					$arrayName['totalLiveBirth'] 		= ($request['totalLiveBirth'] != '' || $request['totalLiveBirth'] == '0') ? $request['totalLiveBirth'] : NULL; 
+					$arrayName['totalStableBabies'] 	= ($request['totalStableBabies'] != '' || $request['totalStableBabies'] == '0') ? $request['totalStableBabies'] : NULL; 
 					// total babies between 2000 to 2500 g
-					$arrayName['totalUnstableBabies'] 	= ($request['totalUnstableBabies'] != '') ? $request['totalUnstableBabies'] : NULL; 
+					$arrayName['totalUnstableBabies'] 	= ($request['totalUnstableBabies'] != '' || $request['totalUnstableBabies'] == '0') ? $request['totalUnstableBabies'] : NULL; 
 					// total babies below 2000 g 
 					
 					$arrayName['latitude'] 				= ($request['latitude'] != '') ? $request['latitude'] : NULL; 
@@ -1195,10 +1195,10 @@ class LoungeModel extends CI_Model {
 					
 					$arrayName1['shift']      			= ($request['shift'] != '') ? $request['shift'] : NULL; 
 					// 1 = 8 AM to 2PM; 2 = 2 PM to 8 PM; 3 = 8 PM to 8 AM 
-					$arrayName1['totalLiveBirth'] 		= ($request['totalLiveBirth'] != '') ? $request['totalLiveBirth'] : NULL; 
-					$arrayName1['totalStableBabies'] 	= ($request['totalStableBabies'] != '') ? $request['totalStableBabies'] : NULL; 
+					$arrayName1['totalLiveBirth'] 		= ($request['totalLiveBirth'] != '' || $request['totalLiveBirth'] == '0') ? $request['totalLiveBirth'] : NULL; 
+					$arrayName1['totalStableBabies'] 	= ($request['totalStableBabies'] != '' || $request['totalStableBabies'] == '0') ? $request['totalStableBabies'] : NULL; 
 					// total babies between 2000 to 2500 g
-					$arrayName1['totalUnstableBabies'] 	= ($request['totalUnstableBabies'] != '') ? $request['totalUnstableBabies'] : NULL;
+					$arrayName1['totalUnstableBabies'] 	= ($request['totalUnstableBabies'] != '' || $request['totalUnstableBabies'] == '0') ? $request['totalUnstableBabies'] : NULL;
 					// total babies below 2000 g 
 
 					$arrayName1['latitude'] 			= ($request['latitude'] != '') ? $request['latitude'] : NULL; 

@@ -134,7 +134,7 @@ class GenerateReport extends Welcome {
   }
 
 
-public function addGenerateReportM(){
+    public function addGenerateReportM(){
       $data['index']         = 'Generate Report';
       $data['index2']        = '';
       $data['title']         = 'Add Generate Report | '.PROJECT_NAME; 
@@ -150,30 +150,71 @@ public function addGenerateReportM(){
       $this->load->view('admin/include/footer-new');
     }
 
+    // get lounges by facilities
+    public function getFacilityMultipleLounge(){
+      if($this->input->post()){
+      
+        $facility = $this->input->post('facility');
+        $district = $this->input->post('district');
+        $id = $this->input->post('id');
+
+        $lounge_arr = array();
+        if(!empty($id)){
+          $facilitydata = $this->ReportSettingModel->GetFacilityByReportId($id);
+          foreach ($facilitydata as $key => $value) {
+            if(!in_array($value['loungeId'], $lounge_arr)){
+              $lounge_arr[] = $value['loungeId'];
+            }
+          }
+        }
+        
+        $html = ''; 
+        $selected = "";
+
+        foreach ($facility as $key => $value) {
+          $facilityIds = $value;
+          $getFacility = $this->FacilityModel->GetFacilitiesById('facilitylist', $facilityIds); 
+          
+          $getLounge = $this->LoungeModel->GetLoungeByFAcility($facilityIds); 
+          
+          if(!empty($getLounge)){
+            $html.='<optgroup label="'.$getFacility['FacilityName'].'">';
+            foreach ($getLounge as $key2 => $value2) {
+              if(in_array($value2['loungeId'], $lounge_arr)){
+                $selected = "selected";
+              }else{
+                $selected = "";
+              }
+              $html.='<option value="'.$district.'-'.$facilityIds.'-'.$value2['loungeId'].'" '.$selected.'>'.$value2['loungeName'].'</option>';
+            }
+          }
+        }
+
+        echo $html;die;
+      }
+    }
+
 
 
   /* Staff Data Insert By This*/
-public function AddGenerateReportPost(){
-        $data= $this->input->post();
-        if(empty($data['subscription']))
-        {
-          $data['subscription'] ="No";
-        }
-        
-        // echo $data['subscription'];
-        // print_r($data); die;
-        $facility_id = $this->input->post('facilityname');
-        $result = $this->ReportSettingModel ->AddReportData($data);
-        if ($result > 0) {
-            $this->session->set_flashdata('activate', getCustomAlert('S','Data has been Added Successfully.'));
-            redirect('GenerateReportM/manageGeneralReport/');
-        } else {
-            $this->session->set_flashdata('activate', getCustomAlert('W','Oops! somthing is worng please try again.'));
-            redirect('GenerateReportM/manageGeneralReport/');
+  public function AddGenerateReportPost(){
+      $data= $this->input->post();
+      if(empty($data['subscription']))
+      {
+        $data['subscription'] ="No";
       }
-    } 
+
+      $result = $this->ReportSettingModel->AddReportData($data);
+      if ($result > 0) {
+          $this->session->set_flashdata('activate', getCustomAlert('S','Data has been added successfully.'));
+          redirect('GenerateReportM/manageGeneralReport/');
+      } else {
+          $this->session->set_flashdata('activate', getCustomAlert('W','Oops! something is wrong please try again.'));
+          redirect('GenerateReportM/manageGeneralReport/');
+    }
+  } 
   /* Update Staff Page Call*/
-public function updateReport(){
+    public function updateReport(){
       $id = $this->uri->segment(3);
       $data['index']         = 'Report';
       $data['index2']        = '';
@@ -220,6 +261,7 @@ public function updateReport(){
       $data['GetJobType']     = $this->ReportSettingModel->GetJobType();
       $data['GetDistrict']    = $this->ReportSettingModel->getDistrict(); 
       $data['GetFacilities'] = $this->ReportSettingModel->GetFacilities();
+      $data['reportid'] = $id;
       $this->load->view('admin/include/header-new',$data);
       $this->load->view('admin/report/reportSetting_edit');
       $this->load->view('admin/include/footer-new');
@@ -233,7 +275,7 @@ public function UpdateReportPost(){
         $data['subscription'] ="No";
       }
      // $facility_id = $this->uri->segment(3, 0); 
-     $AddLounge = $this->ReportSettingModel ->UpdateReport($data,$id);
+     $AddLounge = $this->ReportSettingModel->UpdateReport($data,$id);
       if ($AddLounge > 0) {
             $this->session->set_flashdata('activate', getCustomAlert('S','Data has been updated successfully.'));
             redirect('GenerateReportM/manageGeneralReport/');

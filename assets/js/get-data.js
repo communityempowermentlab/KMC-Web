@@ -1501,7 +1501,17 @@ function validateAmenities(){
     });
   }
 
-
+  function getFacilityMultipleLounge(district,url,id){
+    var facility = $('#facility'+district).val();  
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: {'district': district,'facility': facility,'id': id},
+        success: function(result) {
+          $("#lounge"+district).html(result);
+        }
+    });
+  }
 
   function coachValidate(type){
     var coach_name = $('#coach_name').val();

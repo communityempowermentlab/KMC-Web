@@ -16,6 +16,15 @@ class LoungeModel extends CI_Model {
     return $this->db->query("SELECT * From loungeMaster ".$where_lounge." ORDER BY loungeId desc")->result_array();
   }
 
+  public function GetData($table, $cond){
+    return $this->db->get_where($table, $cond)->result_array();
+  }
+
+  public function GetDataOrderByAsc($table, $cond, $col){
+    $this->db->order_by($col, "ASC");
+    return $this->db->get_where($table, $cond)->result_array();
+  }
+
   public function GetLoungeByDistrict($district){
     return $this->db->query("SELECT loungeMaster.* From loungeMaster inner join facilitylist on loungeMaster.`facilityId` = facilitylist.`FacilityID` where facilitylist.`PRIDistrictCode` = ".$district." ORDER BY loungeId desc")->result_array();
   }
@@ -102,11 +111,30 @@ class LoungeModel extends CI_Model {
     } 
     $array['addDate']                     = date('Y-m-d H:i:s');
     $array['modifyDate']                  = date('Y-m-d H:i:s');
-    //print_r($array);exit();
+
     $this->db->where('loungeId',$id);
     $this->db->update('loungeMaster',$array);
 
+    // update menu group
+    $menu_group           = $data['menu_group'];
+
+    $this ->db->where(array('employeeId'=>$id,'userType'=>3));
+    $this ->db->delete('employeeMenuGroup');
+    if(!empty($menu_group)){
+      foreach ($menu_group as $key => $value) {
+        $insertMenuData   = array( 
+                                'employeeId'    => $id,
+                                'userType'      => 3,
+                                'groupId'       => $value,
+                                'status'        => 1,
+                                'addDate'       => date('Y-m-d H:i:s'),
+                                'modifyDate'    => date('Y-m-d H:i:s')
+                           );
+        $this->db->insert('employeeMenuGroup', $insertMenuData);
+      }
+    }
     
+    // log data
     $logData = array();
     
     $loginId = $this->session->userdata('adminData')['Id'];
@@ -369,7 +397,22 @@ class LoungeModel extends CI_Model {
     $insert = $this->db->insert('loungeMaster', $array); 
     $loungeId = $this->db->insert_id();
 
-    
+    // insert menu group
+    $menu_group             = $data['menu_group'];
+    if(!empty($menu_group)){
+      foreach ($menu_group as $key => $group_value) {
+        $insertMenuData   = array( 
+                                'employeeId'    => $loungeId,
+                                'userType'      => 3,
+                                'groupId'       => $group_value,
+                                'status'        => 1,
+                                'addDate'       => date('Y-m-d H:i:s'),
+                                'modifyDate'    => date('Y-m-d H:i:s')
+                           );
+        $this->db->insert('employeeMenuGroup', $insertMenuData);
+      }
+    }
+
     return 1;
   }
 

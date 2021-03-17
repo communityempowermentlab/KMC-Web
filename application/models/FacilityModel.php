@@ -648,14 +648,11 @@ class FacilityModel extends CI_Model {
 
   /* get latest (8) mother data*/
   public function getLatestMother(){
+     $this->db->select('motherRegistration.*');
      $this->db->order_by("motherId", "desc");
      $this->db->limit("8");
      $adminData = $this->session->userdata('adminData'); 
-    if($adminData['Type']=='1') {
-      return $this->db->get_where('motherRegistration')->result_array();
-    } else if($adminData['Type']=='2') {
-      return $this->db->get_where('motherRegistration')->result_array();
-    } 
+     return $this->db->get_where('motherRegistration')->result_array();
   }
 
   /* get data from table settings */

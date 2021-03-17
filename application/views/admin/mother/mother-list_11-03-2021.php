@@ -65,18 +65,6 @@
     $motherStatus = '';
   }
 
-  if(isset($_GET['admissionTypeFilterValue'])){
-    $admissionTypeFilterValue = $_GET['admissionTypeFilterValue']; 
-  } else {
-    $admissionTypeFilterValue = '';
-  }
-
-  if(isset($_GET['admitTypeFilterValue'])){
-    $admitTypeFilterValue = $_GET['admitTypeFilterValue']; 
-  } else {
-    $admitTypeFilterValue = '';
-  }
-
   if(isset($_GET['dischargeTypeFilterValue'])){
     $dischargeTypeFilterValue = $_GET['dischargeTypeFilterValue']; 
   } else {
@@ -117,11 +105,11 @@
                           <div class="col-md-12">
                             <form action="" method="GET">
                               <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-10">
                                   <div class="row">
-                                    <div class="col-md-4 p-0">
+                                    <div class="col-md-5 p-0">
                                       <fieldset class="form-group position-relative has-icon-left">
-                                        <input type="text" class="form-control datetime" placeholder="Select Date" name="fromDate" id="fromDate" value="<?php echo $fromDate; ?>" readonly>
+                                        <input type="text" class="form-control datetime" placeholder="Select Date" name="fromDate" id="fromDate" value="<?php echo $fromDate; ?>">
                                         <div class="form-control-position calendar-position">
                                           <i class="fa fa-calendar" aria-hidden="true"></i>
                                         </div>
@@ -135,9 +123,9 @@
                                         </div>
                                       </fieldset>
                                     </div> -->
-                                    <div class="col-md-2 p-0">
-                                      <select class="select2 form-control" name="district" onchange="getFacility(this.value, '<?php echo base_url('motherM/getFacility') ?>')">
-                                        <option value="">Select District</option>
+                                    <div class="col-md-1 p-0">
+                                      <select class="select2 form-control" name="district" onchange="getFacility(this.value, '<?php echo base_url('loungeM/getFacility/') ?>')">
+                                        <option value="">District</option>
                                         <?php
                                           foreach ($GetDistrict as $key => $value) {?>
                                             <option value="<?php echo $value['PRIDistrictCode']; ?>" <?php if($district == $value['PRIDistrictCode']) { echo 'selected'; } ?>><?php echo $value['DistrictNameProperCase']; ?></option>
@@ -145,7 +133,7 @@
                                       </select>
                                     </div>
                                     <div class="col-md-2 p-0">
-                                      <select class="select2 form-control" name="facilityname" id="facilityname" onchange="getLounge(this.value, '<?php echo base_url('motherM/getLounge') ?>'), getNurse(this.value, '<?php echo base_url('motherM/getNurse/') ?>')">
+                                      <select class="select2 form-control" name="facilityname" id="facilityname" onchange="getLounge(this.value, '<?php echo base_url('motherM/getLounge/') ?>'), getNurse(this.value, '<?php echo base_url('motherM/getNurse/') ?>')">
                                         <option value="">Select Facility</option>
                                         <?php
                                           foreach ($Facility as $key => $value) {?>
@@ -173,46 +161,22 @@
                                     </div>
                                   </div>
                                 </div>
+                                <div class="col-md-2 p-0">
+                                  <div class="col-md-12 p-0">
+                                      <select class="select2 form-control" name="motherStatus" id="motherStatus" onchange="openSubFilterBox(this.value);">
+                                        <option value="">Select Status</option>
+                                        <option value="admitted" <?php echo ($motherStatus == 'admitted') ? 'selected' : ''; ?>>Admitted</option>
+                                        <option value="referred" <?php echo ($motherStatus == 'referred') ? 'selected' : ''; ?>>Referred</option>
+                                        <option value="dischargedMother" <?php echo ($motherStatus == 'dischargedMother') ? 'selected' : ''; ?>>Discharged</option>
+                                        <option value="notAdmtted" <?php echo ($motherStatus == 'notAdmtted') ? 'selected' : ''; ?>>Not Admitted</option>
+                                      </select>
+                                    </div>
+                                </div>
                               </div>
                               <div class="row">
-                                <div class="col-md-4 p-0"></div>
+                                <div class="col-md-6 p-0"></div>
                                 <div class="col-md-2 p-0">
-                                  <div class="col-md-11 p-0">
-                                    <select class="select2 form-control" name="motherStatus" id="motherStatus" onchange="openSubFilterBox(this.value);">
-                                      <option value="">Select Status</option>
-                                      <option value="isAdmit" <?php echo ($motherStatus == 'isAdmit') ? 'selected' : ''; ?>>Admitted</option>
-                                      <option value="admitted" <?php echo ($motherStatus == 'admitted') ? 'selected' : ''; ?>>Admission</option>
-                                      <option value="dischargedMother" <?php echo ($motherStatus == 'dischargedMother') ? 'selected' : ''; ?>>Discharged</option>
-                                      <!-- <option value="referred" <?php echo ($motherStatus == 'referred') ? 'selected' : ''; ?>>Referred</option>
-                                      <option value="notAdmtted" <?php echo ($motherStatus == 'notAdmtted') ? 'selected' : ''; ?>>Not Admitted</option> -->
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-md-2 p-0" id="admissionTypeFilterBox" style="display: <?php echo ($motherStatus == "admitted")?"block":"none"; ?>">
-                                  <div class="col-md-11 p-0">
-                                    <select class="select2 form-control" name="admissionTypeFilterValue" id="admissionTypeFilterValue">
-                                      <option value="">Select Type</option>
-                                      <option value="1" <?php echo ($admissionTypeFilterValue == '1') ? 'selected' : ''; ?>>Referral</option>
-                                      <option value="2" <?php echo ($admissionTypeFilterValue == '2') ? 'selected' : ''; ?>>Mother accompanied</option>
-                                      <option value="3" <?php echo ($admissionTypeFilterValue == '3') ? 'selected' : ''; ?>>Dead</option>
-                                      <option value="4" <?php echo ($admissionTypeFilterValue == '4') ? 'selected' : ''; ?>>Baby was referred & mother did not accompanied</option>
-                                      <option value="5" <?php echo ($admissionTypeFilterValue == "5") ? 'selected' : ''; ?>>Mother is in a different ward in same hospital</option>
-                                      <option value="6" <?php echo ($admissionTypeFilterValue == '6') ? 'selected' : ''; ?>>Unknown/ Baby is an orphan</option>
-                                      <option value="7" <?php echo ($admissionTypeFilterValue == '7') ? 'selected' : ''; ?>>Other</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-md-2 p-0" id="admitTypeFilterBox" style="display: <?php echo ($motherStatus == "isAdmit")?"block":"none"; ?>">
-                                  <div class="col-md-11 p-0">
-                                    <select class="select2 form-control" name="admitTypeFilterValue" id="admitTypeFilterValue">
-                                      <option value="">Select Type</option>
-                                      <option value="1" <?php echo ($admitTypeFilterValue == '1') ? 'selected' : ''; ?>>Referral</option>
-                                      <option value="2" <?php echo ($admitTypeFilterValue == '2') ? 'selected' : ''; ?>>Mother accompanied</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-md-2 p-0" id="dischargeTypeFilterBox" style="display: <?php echo ($motherStatus == "dischargedMother")?"block":"none"; ?>">
-                                  <div class="col-md-11 p-0">
+                                  <div class="col-md-11 p-0" id="dischargeTypeFilterBox" style="display: <?php echo ($motherStatus == "dischargedMother")?"block":"none"; ?>">
                                     <select class="select2 form-control" name="dischargeTypeFilterValue" id="dischargeTypeFilterValue">
                                       <option value="">Select Discharge Type</option>
                                       <option value="Normal Discharge" <?php echo ($dischargeTypeFilterValue == 'Normal Discharge') ? 'selected' : ''; ?>>Normal discharge</option>
@@ -489,20 +453,8 @@
   function openSubFilterBox(val){
     if(val == "dischargedMother"){
       $('#dischargeTypeFilterBox').show();
-      $('#admissionTypeFilterBox').hide();
-      $('#admitTypeFilterBox').hide();
-    }else if(val == "admitted"){
-      $('#admissionTypeFilterBox').show();
-      $('#dischargeTypeFilterBox').hide();
-      $('#admitTypeFilterBox').hide();
-    }else if(val == "isAdmit"){
-      $('#admitTypeFilterBox').show();
-      $('#admissionTypeFilterBox').hide();
-      $('#dischargeTypeFilterBox').hide();
     }else{
       $('#dischargeTypeFilterBox').hide();
-      $('#admissionTypeFilterBox').hide();
-      $('#admitTypeFilterBox').hide();
     }
   }
 

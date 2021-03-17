@@ -61,8 +61,7 @@ input:checked + .slider:before {
 }
 
 
-</style>
- <?php //print_r($GetFacilities); ?>  
+</style>  
     <!-- BEGIN: Content-->
   <div class="app-content content">
     <div class="content-overlay"></div>
@@ -103,7 +102,6 @@ input:checked + .slider:before {
               
               <div class="row col-12">
                   
-                  
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Subject <span class="red">*</span></label>
@@ -114,73 +112,14 @@ input:checked + .slider:before {
                   </div>
 
                   <div class="col-md-4">
-                  <div class="form-group">
-                    <label>Body </label>
-                    <div class="controls">
-                      <textarea class="form-control" id="body" rows="3" placeholder="Enter Body" name="body" required=""></textarea>
+                    <div class="form-group">
+                      <label>Body <span class="red">*</span></label>
+                      <div class="controls">
+                        <textarea class="form-control" id="body" rows="3" placeholder="Enter Body" name="body" required=""></textarea>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <!-- <div class="col-md-4">
-                    <div class="form-group">
-                      <label>Facility <span class="red">*</span></label>
-                      <div class="controls">
-                        <select class="select2 form-control" name="facilityId[]" id="facilityId" required="" data-validation-required-message="This field is required"  multiple="multiple">
-                          <?php
-                            foreach ($GetFacilities as $key => $value) {?>
-                              <option value="<?php echo $value['FacilityID']; ?>"><?php echo $value['FacilityName']; ?></option>
-                          <?php } ?>
-                        </select>
-                        
-                      </div>
-                    </div>
-                  </div> -->
-                  
-              </div>
-
-              <div class="row col-12">
-                  
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label>District <span class="red">*</span></label>
-                      <div class="controls">
-                        <select class="select2 form-control" multiple="multiple" name="district[]" id="district" onchange="getMultipleFacility('<?php echo base_url('coachM/getFacility/') ?>')">
-                          <?php foreach ($GetDistrict as $key => $value) {?>
-                            <option value ="<?php echo $value['PRIDistrictCode']?>" ><?php echo $value['DistrictNameProperCase'] ?></option>
-                          <?php } ?>
-                        </select>
-                        <span class="custom-error" id="err_district"></span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label>Facility <span class="red">*</span></label>
-                      <div class="controls">
-                        <select class="select2 form-control" multiple="multiple" name="facility[]" id="facility" onchange="getMultipleLounge('<?php echo base_url('coachM/getLounge/') ?>')">
-                          
-                        </select>
-                        <span class="custom-error" id="err_facility"></span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label>Lounge <span class="red">*</span></label>
-                      <div class="controls">
-                        <select class="select2 form-control" multiple="multiple" name="lounge[]" id="lounge">
-                          
-                        </select>
-                        <span class="custom-error" id="err_lounge"></span>
-                        
-                      </div>
-                    </div>
-                  </div>
-              </div>
-
-              <div class="row col-12">
-                  
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Email To <span class="red">*</span></label>
@@ -189,35 +128,76 @@ input:checked + .slider:before {
                       </div>
                     </div>
                   </div>
+                  
+              </div>
+
+              <div class="row col-12">
+
                   <div class="col-md-4">
                     <div class="form-group" id="tabDiv">
-                      <label>Email From</label>
+                      <label>Email From <span class="red">*</span></label>
                       <div class="controls">
-                        <input type="Email" class="form-control" name="emailFrom" id="emailFrom" placeholder="email From">
+                        <input type="Email" class="form-control" name="emailFrom" id="emailFrom" placeholder="Email From">
                       </div>
                     </div>
                   </div>
 
                   <div class="col-md-4">
-                  <div class="form-group">
-                    <label>Subscribe </label>
-                    <div class="controls">
-                      <label class="switch">
-                        <input type="checkbox" name="subscription" value="Yes">
-                        <span class="slider round"></span>
-                      </label>
-                      
+                    <div class="form-group">
+                      <label>Subscribe </label>
+                      <div class="controls">
+                        <label class="switch">
+                          <input type="checkbox" name="subscription" value="Yes">
+                          <span class="slider round"></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <hr>
+
+              <?php foreach ($GetDistrict as $key => $districtValue) { 
+                $GetFacilities = $this->ReportSettingModel->GetFacilityByDistrict($districtValue['PRIDistrictCode']);
+                ?>
+                <div class="row col-12">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <?php if($key == 0){ ?>
+                        <label>District</label>
+                      <?php } ?>
+                      <div class="controls">
+                        <input type="text" class="form-control" value="<?php echo $districtValue['DistrictNameProperCase'] ?>" readonly>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <?php if($key == 0){ ?>
+                        <label>Facility</label>
+                      <?php } ?>
+                      <div class="controls">
+                        <select class="select2 form-control" multiple="multiple" name="facility[]" id="facility<?php echo $districtValue['PRIDistrictCode'] ?>" onchange="getFacilityMultipleLounge('<?php echo $districtValue['PRIDistrictCode'] ?>','<?php echo base_url('GenerateReportM/getFacilityMultipleLounge') ?>','');">
+                          <?php foreach($GetFacilities as $GetFacilitiesData){ ?>
+                            <option value="<?php echo $GetFacilitiesData['FacilityID']?>"><?php echo $GetFacilitiesData['FacilityName'] ?></option>
+                          <?php } ?>
+                        </select>
+                        <span class="custom-error" id="err_facility"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-5">
+                    <div class="form-group">
+                      <?php if($key == 0){ ?>
+                        <label>Lounge</label>
+                      <?php } ?>
+                      <div class="controls">
+                        <select class="select2 form-control" multiple="multiple" name="lounge[]" id="lounge<?php echo $districtValue['PRIDistrictCode'] ?>"></select>
+                        <span class="custom-error" id="err_lounge"></span>
+                      </div>
                     </div>
                   </div>
                 </div>
-
-
-                  
-              </div>
-
-              
-
-          
+              <?php } ?>
               
               <button type="submit" class="btn btn-primary">Submit</button>
             </form>

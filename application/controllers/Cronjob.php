@@ -51,13 +51,18 @@ class Cronjob extends CI_Controller {
 
     // Baseline information available report
     public function getBaselineInfoAvailableReport(){
+      $reportDate = date('jS F Y, l',strtotime("-1 days"));
+      $timeNotes = "("."8:00 am ".date('jS F',strtotime(date('Y-m-d',strtotime("-1 days"))))." to 8:00 am  ".date('jS F',strtotime(date('Y-m-d'))).")";
+
       $objPHPExcel = new PHPExcel();
 
       $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
       $objWorkSheet->getRowDimension('1')->setRowHeight(25);
       $objWorkSheet->mergeCells('A1:G1');
+      $objWorkSheet->mergeCells('A2:G2');
       $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
       $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
 
       for($col = ord('A'); $col <= ord('G'); $col++)
       {
@@ -87,7 +92,9 @@ class Cronjob extends CI_Controller {
       $objWorkSheet->setCellValue('E3', 'Doctor');
       $objWorkSheet->setCellValue('F3', 'Amenities');
       $objWorkSheet->setCellValue('G3', 'Password');
+
       $objWorkSheet->setCellValue('A1', 'Baseline Report');
+      $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate." ".$timeNotes);
 
       $getReportSettings = $this->cmodel->getReportSettings(4);
       $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
@@ -189,7 +196,7 @@ class Cronjob extends CI_Controller {
 
       $objWorkSheet->setTitle('Baseline Report');
 
-      $file = "Baseline-Report-".date('d-m-Y');  
+      $file = "Baseline-Report-".date('d-m-Y',strtotime("-1 days"));  
       $filename=$file.'.xls';
       header('Content-Type: application/vnd.ms-excel');
       header('Content-Disposition: attachment;filename="'.$filename.'"');
@@ -1116,11 +1123,20 @@ class Cronjob extends CI_Controller {
       // baby nutrition report
       $this->babyNutritionReport();
 
-      // Daily baby Admition & discharge report
+      // Daily baby Admition report
       $this->sendNurseAdmitionReport();
 
-      // Baby & Mother all details
+      // Daily baby Discharge report
+      $this->sendNurseDischargeReport();
+
+      // Daily baby/mother Admition & discharge report
+      $this->sendNurseAdmitionDischargeReport();
+
+      // Baby & Mother all details report
       $this->getMotherBabyDischargeFeedbackReport();
+
+      // LBW Count report
+      $this->getLbwCountReport();
     }
 
     // Mother Baby discharge details for feedback calling report
@@ -1629,6 +1645,287 @@ class Cronjob extends CI_Controller {
               }
           }
 
+      }
+
+    }
+
+    // LBW Count Report
+    public function getLbwCountReport1(){
+      $reportDate = date('jS F Y, l',strtotime("-1 days"));
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->getRowDimension('2')->setRowHeight(20);
+      $objWorkSheet->mergeCells('A1:G1');
+      $objWorkSheet->mergeCells('A2:G2');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
+
+      for($col = ord('A'); $col <= ord('O'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."4")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
+      $objWorkSheet->getColumnDimension('B')->setWidth(22);
+      $objWorkSheet->getColumnDimension('C')->setWidth(25);
+      $objWorkSheet->getColumnDimension('D')->setWidth(20);
+      $objWorkSheet->getColumnDimension('E')->setWidth(20);
+      $objWorkSheet->getColumnDimension('F')->setWidth(20);
+      $objWorkSheet->getColumnDimension('G')->setWidth(20);
+      $objWorkSheet->getColumnDimension('H')->setWidth(20);
+      $objWorkSheet->getColumnDimension('I')->setWidth(20);
+      $objWorkSheet->getColumnDimension('J')->setWidth(20);
+      $objWorkSheet->getColumnDimension('K')->setWidth(20);
+      $objWorkSheet->getColumnDimension('L')->setWidth(20);
+      $objWorkSheet->getColumnDimension('M')->setWidth(20);
+      $objWorkSheet->getColumnDimension('N')->setWidth(20);
+      $objWorkSheet->getColumnDimension('O')->setWidth(20);
+
+      for($col = ord('A'); $col <= ord('O'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->setCellValue('A4', 'Sr. No.');
+      $objWorkSheet->setCellValue('B4', 'Facility Name');
+      $objWorkSheet->setCellValue('C4', 'Lounge Name');
+      $objWorkSheet->setCellValue('D4', 'Nurse Name (Shift-1)');
+      $objWorkSheet->setCellValue('E4', 'Total (LBW) live births (Shift-1)');
+      $objWorkSheet->setCellValue('F4', 'Total babies 2000 grams - 2500 grams (Shift-1)');
+      $objWorkSheet->setCellValue('G4', 'Total babies < 2000 grams (Shift-1)');
+      $objWorkSheet->setCellValue('H4', 'Nurse Name (Shift-2)');
+      $objWorkSheet->setCellValue('I4', 'Total (LBW) live births (Shift-2)');
+      $objWorkSheet->setCellValue('J4', 'Total babies 2000 grams - 2500 grams (Shift-2)');
+      $objWorkSheet->setCellValue('K4', 'Total babies < 2000 grams (Shift-2)');
+      $objWorkSheet->setCellValue('L4', 'Nurse Name (Shift-3)');
+      $objWorkSheet->setCellValue('M4', 'Total (LBW) live births (Shift-3)');
+      $objWorkSheet->setCellValue('N4', 'Total babies 2000 grams - 2500 grams (Shift-3)');
+      $objWorkSheet->setCellValue('O4', 'Total babies < 2000 grams (Shift-3)');
+
+      $objWorkSheet->setCellValue('A1', 'Daily LBW Count Report');
+      $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate);
+
+      $getReportSettings = $this->cmodel->getReportSettings(15);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+
+      // Get all lounges
+      $getAllLounges = $this->cmodel->getAllLounges($loungeArray);
+      $dataCount = 1;
+      $a=5;
+      
+      foreach($getAllLounges as $key_lounge => $getAllLoungesData){
+        $loungeListArray    = [];
+        $loungeListArray[]  = $dataCount;
+        $loungeListArray[]  = $getAllLoungesData['FacilityName'];
+        $loungeListArray[]  = $getAllLoungesData['loungeName'];
+        $objWorkSheet->fromArray($loungeListArray, null, 'A'.$a);
+        $sortMaxElement = $a;
+
+        // Get lounge shift 1 data
+        $getLoungeReviewShift1 = $this->cmodel->getLoungeBirthReview($getAllLoungesData['loungeId'],1);
+        $birth_review_row1 = $a;
+        foreach($getLoungeReviewShift1 as $key_shift1 => $getLoungeReviewShift1Data){
+          $birthReviewListArray1    = [];
+          $birthReviewListArray1[] = $getLoungeReviewShift1Data['nurseName'];
+          $birthReviewListArray1[] = $getLoungeReviewShift1Data['totalLiveBirth'];
+          $birthReviewListArray1[] = $getLoungeReviewShift1Data['totalStableBabies'];
+          $birthReviewListArray1[] = $getLoungeReviewShift1Data['totalUnstableBabies'];
+
+          $objWorkSheet->fromArray($birthReviewListArray1, null, 'D'.$birth_review_row1);
+          $birth_review_row1 = $birth_review_row1+1;
+        }
+
+        // Get lounge shift 2 data
+        $getLoungeReviewShift2 = $this->cmodel->getLoungeBirthReview($getAllLoungesData['loungeId'],2);
+        $birth_review_row2 = $a;
+        foreach($getLoungeReviewShift2 as $key_shift2 => $getLoungeReviewShift2Data){
+          $birthReviewListArray2    = [];
+          $birthReviewListArray2[] = $getLoungeReviewShift2Data['nurseName'];
+          $birthReviewListArray2[] = $getLoungeReviewShift2Data['totalLiveBirth'];
+          $birthReviewListArray2[] = $getLoungeReviewShift2Data['totalStableBabies'];
+          $birthReviewListArray2[] = $getLoungeReviewShift2Data['totalUnstableBabies'];
+
+          $objWorkSheet->fromArray($birthReviewListArray2, null, 'H'.$birth_review_row2);
+          $birth_review_row2 = $birth_review_row2+1;
+        }
+
+        // Get lounge shift 3 data
+        $getLoungeReviewShift3 = $this->cmodel->getLoungeBirthReview($getAllLoungesData['loungeId'],3);
+        $birth_review_row3 = $a;
+        foreach($getLoungeReviewShift3 as $key_shift3 => $getLoungeReviewShift3Data){
+          $birthReviewListArray3    = [];
+          $birthReviewListArray3[] = $getLoungeReviewShift3Data['nurseName'];
+          $birthReviewListArray3[] = $getLoungeReviewShift3Data['totalLiveBirth'];
+          $birthReviewListArray3[] = $getLoungeReviewShift3Data['totalStableBabies'];
+          $birthReviewListArray3[] = $getLoungeReviewShift3Data['totalUnstableBabies'];
+
+          $objWorkSheet->fromArray($birthReviewListArray3, null, 'L'.$birth_review_row3);
+          $birth_review_row3 = $birth_review_row3+1;
+        }
+
+        $maximumRowsArray = array(count($getLoungeReviewShift1),count($getLoungeReviewShift2),count($getLoungeReviewShift3));
+        $sortMaxElement = max($maximumRowsArray);
+
+        // increment next row
+        $a = $a+$sortMaxElement+1;
+
+        $styleArray = array(
+          'borders' => array(
+          'allborders' => array(
+          'style' => PHPExcel_Style_Border::BORDER_THIN
+          )
+          )
+        );
+        $objWorkSheet->getStyle('A1:O'.$a.'')->applyFromArray($styleArray);
+
+        $dataCount++;
+      }
+
+      $objWorkSheet->setTitle('Daily LBW Count Report');
+
+      $file = "Daily-LBW-Count-Report-".date('d-m-Y',strtotime("-1 days"));
+      $filename=$file.'.xls';
+      header('Content-Type: application/vnd.ms-excel');
+      header('Content-Disposition: attachment;filename="'.$filename.'"');
+      header('Cache-Control: max-age=0');
+
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+      $objWriter->save('php://output');
+      $objWriter->save(str_replace(__FILE__,'assets/Reports/lbwCountReports/'.$filename,__FILE__));
+      chmod('assets/Reports/lbwCountReports/'.$filename, 0777);
+
+      // save file log
+      if(!empty($getReportSettings)){
+        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+        if(empty($checkFileExist)){
+          $logData['reportSettingId']      = $getReportSettings['id'];
+          $logData['fileName']             = $filename;
+          $logData['addDate']              = date('Y-m-d',strtotime("-1 days"));
+          $this->db->insert('reportLogs',$logData);
+        }
+      }
+    }
+
+
+    public function getLbwCountReport(){
+
+      $reportDate = date('jS F Y, l',strtotime("-1 days"));
+      //$reportDate = date('jS F Y, l',strtotime("2021-01-29"));
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->getRowDimension('2')->setRowHeight(20);
+      $objWorkSheet->mergeCells('A1:H1');
+      $objWorkSheet->mergeCells('A2:H2');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
+
+      for($col = ord('A'); $col <= ord('H'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."4")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
+      $objWorkSheet->getColumnDimension('B')->setWidth(20);
+      $objWorkSheet->getColumnDimension('C')->setWidth(30);
+      $objWorkSheet->getColumnDimension('D')->setWidth(30);
+      $objWorkSheet->getColumnDimension('E')->setWidth(12);
+      $objWorkSheet->getColumnDimension('F')->setWidth(12);
+      $objWorkSheet->getColumnDimension('G')->setWidth(12);
+      $objWorkSheet->getColumnDimension('H')->setWidth(12);
+      
+
+      $timeNotes = "("."8:00 am ".date('jS F',strtotime(date('Y-m-d',strtotime("-1 days"))))." to 8:00 am  ".date('jS F',strtotime(date('Y-m-d'))).")";
+      
+
+      for($col = ord('A'); $col <= ord('H'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->setCellValue('A4', 'Sr. No.');
+      $objWorkSheet->setCellValue('B4', 'Date & Time');
+      $objWorkSheet->setCellValue('C4', 'Facility Name');
+      $objWorkSheet->setCellValue('D4', 'Nurse Name');
+      $objWorkSheet->setCellValue('E4', 'Shift');
+      $objWorkSheet->setCellValue('F4', 'Total (LBW) live births');
+      $objWorkSheet->setCellValue('G4', 'Total babies < 2000 grams');
+      $objWorkSheet->setCellValue('H4', 'Total babies 2000 grams - 2500 grams');
+
+      $objWorkSheet->setCellValue('A1', 'Daily LBW Count Report');
+      $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate." ".$timeNotes);
+      
+
+      $getReportSettings = $this->cmodel->getReportSettings(15);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+      
+      $getAllData = $this->cmodel->getAllLBW($loungeArray);
+      $dataCount = 1;
+      $a=4;
+      
+      foreach($getAllData as $key_lounge => $getAllLbw){
+        
+            $ListArray    = [];
+            $ListArray[]  = $dataCount;
+            
+            $ListArray[]  = $getAllLbw['addDate'];
+            $ListArray[]  = $getAllLbw['FacilityName'];
+            $ListArray[]  = $getAllLbw['name'];
+            $ListArray[]  = $getAllLbw['Shift'];
+            $ListArray[]  = $getAllLbw['totalLiveBirth'];
+            $ListArray[]  = $getAllLbw['totalUnstableBabies'];
+            $ListArray[]  = $getAllLbw['totalStableBabies'];
+            
+            $a = $a+1;
+             $objWorkSheet->fromArray($ListArray, null, 'A'.$a);
+             
+            $styleArray = array(
+              'borders' => array(
+              'allborders' => array(
+              'style' => PHPExcel_Style_Border::BORDER_THIN
+              )
+              )
+            );
+
+            $objWorkSheet->getStyle('A1:H'.$a.'')->applyFromArray($styleArray);
+
+            $objWorkSheet->setTitle('Daily LBW Count Report');
+            $dataCount++; 
+          
+      }
+
+      $file = "Daily-LBW-Count-Report-".date('d-m-Y',strtotime("-1 days")); 
+       
+      $filename=$file.'.xls';
+      header('Content-Type: application/vnd.ms-excel');
+      header('Content-Disposition: attachment;filename="'.$filename.'"');
+      header('Cache-Control: max-age=0');
+
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+      $objWriter->save('php://output');
+      $objWriter->save(str_replace(__FILE__,'assets/Reports/lbwCountReports/'.$filename,__FILE__));
+      chmod('assets/Reports/lbwCountReports/'.$filename, 0777);
+
+      // save file log
+      if(!empty($getReportSettings)){
+        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+        if(empty($checkFileExist)){
+          $logData['reportSettingId']      = $getReportSettings['id'];
+          $logData['fileName']             = $filename;
+          $logData['addDate']              = date('Y-m-d',strtotime("-1 days"));
+          $this->db->insert('reportLogs',$logData);
+        }
       }
 
     }
@@ -2339,153 +2636,9 @@ class Cronjob extends CI_Controller {
   }
 
 
-  //Daily Admition report by nurse
-    public function nurseAdmitionReport(){
-      $reportDate = date('jS F Y, l',strtotime("-1 days"));
-      $objPHPExcel = new PHPExcel();
 
-      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
-      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
-      $objWorkSheet->mergeCells('A1:AA1');
-      $objWorkSheet->mergeCells('A2:AA2');
-      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
-      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
-
-      for($col = ord('A'); $col <= ord('AA'); $col++)
-      {
-        $objWorkSheet->getStyle(chr($col)."3")->getFont()->setBold(true)->setSize(10);
-        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $objWorkSheet->getStyle(chr($col)."3")->getAlignment()->setWrapText(true);
-      }
-
-      $objWorkSheet->getColumnDimension('A')->setWidth(8);
-      $objWorkSheet->getColumnDimension('B')->setWidth(18);
-      $objWorkSheet->getColumnDimension('C')->setWidth(24);
-      $objWorkSheet->getColumnDimension('D')->setWidth(15);
-      $objWorkSheet->getColumnDimension('E')->setWidth(16);
-      $objWorkSheet->getColumnDimension('F')->setWidth(20);
-      $objWorkSheet->getColumnDimension('G')->setWidth(15);
-      $objWorkSheet->getColumnDimension('H')->setWidth(20);
-      $objWorkSheet->getColumnDimension('I')->setWidth(20);
-      $objWorkSheet->getColumnDimension('J')->setWidth(20);
-      $objWorkSheet->getColumnDimension('K')->setWidth(20);
-      $objWorkSheet->getColumnDimension('L')->setWidth(20);
-      $objWorkSheet->getColumnDimension('M')->setWidth(20);
-      $objWorkSheet->getColumnDimension('N')->setWidth(24);
-      $objWorkSheet->getColumnDimension('O')->setWidth(15);
-      $objWorkSheet->getColumnDimension('P')->setWidth(16);
-      $objWorkSheet->getColumnDimension('Q')->setWidth(20);
-      $objWorkSheet->getColumnDimension('R')->setWidth(15);
-      $objWorkSheet->getColumnDimension('S')->setWidth(15);
-      $objWorkSheet->getColumnDimension('T')->setWidth(18);
-      $objWorkSheet->getColumnDimension('U')->setWidth(20);
-      $objWorkSheet->getColumnDimension('V')->setWidth(20);
-      $objWorkSheet->getColumnDimension('W')->setWidth(8);
-      $objWorkSheet->getColumnDimension('X')->setWidth(8);
-      $objWorkSheet->getColumnDimension('Y')->setWidth(15);
-      $objWorkSheet->getColumnDimension('Z')->setWidth(10);
-      $objWorkSheet->getColumnDimension('AA')->setWidth(8);
-      
-
-      for($col = ord('A'); $col <= ord('AA'); $col++){
-        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
-        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
-      }
-
-      $objWorkSheet->setCellValue('A3', 'Sr. No.');
-      $objWorkSheet->setCellValue('B3', 'Lounge Name');
-      $objWorkSheet->setCellValue('C3', 'Staf Name');
-      $objWorkSheet->setCellValue('D3', 'Total Admission');
-      $objWorkSheet->setCellValue('E3', 'Refferal');
-      $objWorkSheet->setCellValue('F3', 'Mother is accompanying');
-      $objWorkSheet->setCellValue('G3', 'Dead');
-      $objWorkSheet->setCellValue('H3', 'Baby was referred but mother did not accompanying');
-      $objWorkSheet->setCellValue('I3', 'Mother is in a different ward in same hospital');
-      $objWorkSheet->setCellValue('J3', 'Unknown / Baby is an orphan');
-      $objWorkSheet->setCellValue('K3', 'Others');
-      $objWorkSheet->setCellValue('L3', 'Total Baby Discharge');
-      $objWorkSheet->setCellValue('M3', 'Normal Discharge');
-      $objWorkSheet->setCellValue('N3', 'Referral');
-      $objWorkSheet->setCellValue('O3', 'LAMA');
-      $objWorkSheet->setCellValue('P3', 'DOPR');
-      $objWorkSheet->setCellValue('Q3', 'Doctor Discretion');
-      $objWorkSheet->setCellValue('R3', 'Absconded');
-      $objWorkSheet->setCellValue('S3', 'Died');
-      $objWorkSheet->setCellValue('T3', 'Total Mother Discharge');
-      $objWorkSheet->setCellValue('U3', 'Normal Discharge');
-      $objWorkSheet->setCellValue('V3', 'Referral');
-      $objWorkSheet->setCellValue('W3', 'LAMA');
-      $objWorkSheet->setCellValue('X3', 'DOPR');
-      $objWorkSheet->setCellValue('Y3', 'Doctor Discretion');
-      $objWorkSheet->setCellValue('Z3', 'Absconded');
-      $objWorkSheet->setCellValue('AA3', 'Died');
-
-      $previousDate = date('Y-m-d',strtotime("-1 days"));
-    $currentDate = date('Y-m-d');
-
-    // $previousDate = "2021-01-27";
-    // $currentDate = "2021-01-28";
-
-    $previous = "'".$previousDate.' 8:00:00'."'";
-    $current = "'".$currentDate.' 8:00:00'."'";
-      
-    $getReportSettings = $this->cmodel->getReportSettings(6);
-      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
-      echo "<pre>";
-       print_r($loungeArray);
-       echo $loung = implode(',', $loungeArray);
-
-      $query = $this->db->query('SELECT babyAdmission.staffId as admitionStaf, babyAdmission.dischargeByNurse as babydischargenurse, motherRegistration.isMotherAdmitted as moteradmissionwithbaby, 
-        staffMaster.name as nurseName,
-        motherAdmission.dischargeByNurse as motherDischargeNurse
-         FROM staffMaster 
-          JOIN babyAdmission 
-            on staffMaster.staffId=babyAdmission.staffId 
-            left JOIN motherAdmission 
-            on staffMaster.staffId=motherAdmission.dischargeByNurse
-            left JOIN motherRegistration 
-            on motherRegistration.motherId=motherAdmission.motherId
-          WHERE (
-           (babyAdmission.admissionDateTime BETWEEN '.$previous.' AND '.$current.') 
-           OR (babyAdmission.dateOfDischarge BETWEEN '.$previous.' AND '.$current.') 
-           OR (motherAdmission.dateOfDischarge BETWEEN '.$previous.' AND '.$current.')
-         ) group by babyAdmission.staffId,motherAdmission.dischargeByNurse')->result_array();
-
-
-print_r($query);
-
-
-
-
-
-
-// timestampdiff(hour, c.admissionDateTime, timestamp(CURRENT_DATE, '08:00:00'))
-//       echo $query = $this->db->query('SELECT stafId,
-//         count(if(babyAdmission.admissionDateTime in last 24 hour, 1, NULL)),
-// count(if(babyAdmission.dateOfDischarge in last 24 hour, 1, NULL)),
-// count(if(motherAdmission.dateOfDischarge in last 24 hour, 1, NULL))
-// from staffMaster a 
-// join loungeMaster m 
-//   on a.facilityId = m.facilityId
-// left join babyAdmission b
-//   on a.stafId = b.staffId
-//   and (datediff(CURRENT_DATE, a.`admissionDateTime`) <= 24 hour or datediff(CURRENT_DATE, a.`dateOfDischarge`) <= 24 hour)
-// left join motherAdmission c
-//   on a.stafId = c.dischargeByNurse
-//   and  motherAdmission.dateOfDischarge within 24 hour
-// where m.loungeId in('.$loung.')')->result_array();
-      
-      // Get all lounges
-      //$getAllLounges = $this->cmodel->getAllLounges($loungeArray);
-  }
-
-
-
-
-  //duplicate admition by nurse
-  public function sendNurseAdmitionReport(){
+  //baby admition & discharge and mother Discharge by nurse
+  public function sendNurseAdmitionDischargeReport(){
 
       $reportDate = date('jS F Y, l',strtotime("-1 days"));
       //$reportDate = date('jS F Y, l',strtotime("2021-01-29"));
@@ -2577,85 +2730,53 @@ print_r($query);
       $getReportSettings = $this->cmodel->getReportSettings(6);
       $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
       
-      // Get all lounges
-      $getAllLounges = $this->cmodel->getAllLounges($loungeArray);
+      $getAllLounges = $this->cmodel->getAllAdmitionDischargeByNurse($loungeArray);
       $dataCount = 1;
-      $a=5;
+      $a=4;
       
       foreach($getAllLounges as $key_lounge => $getAllLoungesData){
 
           $loungeListArray    = [];
           $loungeListArray[]  = $dataCount;
-          $loungeListArray[]  = $getAllLoungesData['loungeName'];
-
-          $getNurseAttendanceList = $this->cmodel->getNurseAdmitionList($getAllLoungesData['loungeId']); 
-
-          $objWorkSheet->fromArray($loungeListArray, null, 'A'.$a);
-          $innerRow = $a;
-
-          $previousDate = date('Y-m-d',strtotime("-1 days"));
-          $currentDate = date('Y-m-d');
-          
-
-          if(!empty($getNurseAttendanceList)){
-            foreach($getNurseAttendanceList as $key_nurse => $getNurseAttendanceListData){
-
-                  
-
-                  $nurseListArray   = [];
-                  $nurseListArray[] = $getNurseAttendanceListData['nurseName'];
-                   $rec = $this->cmodel->totalAdmissionByNurse($getAllLoungesData['loungeId'],$getNurseAttendanceListData['staffId']);
-
-                   $recDisBaby = $this->cmodel->totalBabyDischargeByNurse($getAllLoungesData['loungeId'],$getNurseAttendanceListData['staffId']);
-                   $recDisMother = $this->cmodel->totalMotherDischargeByNurse($getAllLoungesData['loungeId'],$getNurseAttendanceListData['staffId']);
-
-                  $nurseListArray[] = $rec['total'];
-                  $nurseListArray[] = $rec['referral'];
-                  $nurseListArray[] = $rec['withmothers'];
-                  $nurseListArray[] = $rec['dethmothers'];
-                  $nurseListArray[] = $rec['notmothers'];
-                  $nurseListArray[] = $rec['samehospitalmothers'];
-                  $nurseListArray[] = $rec['unknownmothers'];
-                  $nurseListArray[] = $rec['othermothers'];
-
-                  $nurseListArray[] = $recDisBaby['total'];
-                  $nurseListArray[] = $recDisBaby['referral'];
-                  $nurseListArray[] = $recDisBaby['LAMA'];
-                  $nurseListArray[] = $recDisBaby['DOPR'];
-                  $nurseListArray[] = $recDisBaby['Doctor'];
-                  $nurseListArray[] = $recDisBaby['Absconded'];
-                  $nurseListArray[] = $recDisBaby['Died'];
-
-                  $nurseListArray[] = $recDisMother['total'];
-                  $nurseListArray[] = $recDisMother['Normal'];
-                  $nurseListArray[] = $recDisMother['referral'];
-                  $nurseListArray[] = $recDisMother['LAMA'];
-                  $nurseListArray[] = $recDisMother['DOPR'];
-                  $nurseListArray[] = $recDisMother['Doctor'];
-                  $nurseListArray[] = $recDisMother['Absconded'];
-                  $nurseListArray[] = $recDisMother['Died'];
-
-                  $objWorkSheet->fromArray($nurseListArray, null, 'C'.$innerRow);
-                  
-                  $innerRow = $innerRow+1;
-
-              
-            }
-            $a = $innerRow+1;
+          if($getAllLounges[$key_lounge-1]['loungeName']==$getAllLoungesData['loungeName'])
+          {
+            $a = $a+1;
+            $loungeListArray[]  = '';
+            //$a = $innerRow+1;
           }
-          else{
-            $nurseListArray   = [];
-            $nurseListArray[] = "";
-            $nurseListArray[] = "";
-            $nurseListArray[] = "";
-            $nurseListArray[] = "";
-            $nurseListArray[] = "";
-            $objWorkSheet->fromArray($nurseListArray, null, 'C'.$innerRow);
-
-            $a = $innerRow+2;
+          else
+          {
+            $a = $a+2;
+            $loungeListArray[]  = $getAllLoungesData['loungeName'];
           }
-          
+          //$loungeListArray[]  = $getAllLoungesData['loungeName'];
+          $loungeListArray[]  = $getAllLoungesData['name'];
+          $loungeListArray[]  = $getAllLoungesData['babyAdmit'];
+          $loungeListArray[]  = $getAllLoungesData['Referral'];
+          $loungeListArray[]  = $getAllLoungesData['MotherAdmited'];
+          $loungeListArray[]  = $getAllLoungesData['MotherDeath'];
+          $loungeListArray[]  = $getAllLoungesData['MotherNotAccompanied'];
+          $loungeListArray[]  = $getAllLoungesData['MotherIsDifferentWard'];
+          $loungeListArray[]  = $getAllLoungesData['MotherOrphan'];
+          $loungeListArray[]  = $getAllLoungesData['MotherOther'];
+          $loungeListArray[]  = $getAllLoungesData['babydischarge'];
+          $loungeListArray[]  = $getAllLoungesData['ReferralDischarge'];
+          $loungeListArray[]  = $getAllLoungesData['LAMADischarge'];
+          $loungeListArray[]  = $getAllLoungesData['DOPRDischarge'];
+          $loungeListArray[]  = $getAllLoungesData['doctorDiscritionDischarge'];
+          $loungeListArray[]  = $getAllLoungesData['AbscondedDischarge'];
+          $loungeListArray[]  = $getAllLoungesData['DiedDischarge'];
+          $loungeListArray[]  = $getAllLoungesData['motherdischarge'];
+          $loungeListArray[]  = $getAllLoungesData['NormalDischargeMother'];
+          $loungeListArray[]  = $getAllLoungesData['ReferralDischargeMother'];
+          $loungeListArray[]  = $getAllLoungesData['LAMADischargeMother'];
+          $loungeListArray[]  = $getAllLoungesData['DOPRDischargeMother'];
+          $loungeListArray[]  = $getAllLoungesData['doctorDiscritionDischargeMother'];
+          $loungeListArray[]  = $getAllLoungesData['AbscondedDischargeMother'];
+          $loungeListArray[]  = $getAllLoungesData['NormalDischargeMother'];
 
+           $objWorkSheet->fromArray($loungeListArray, null, 'A'.$a);
+           
           $styleArray = array(
             'borders' => array(
             'allborders' => array(
@@ -2666,11 +2787,128 @@ print_r($query);
 
           $objWorkSheet->getStyle('A1:Z'.$a.'')->applyFromArray($styleArray);
 
-          $objWorkSheet->setTitle('Nurse Admition Report');
+          $objWorkSheet->setTitle('Nurse AdmissionDischarge Report');
           $dataCount++;   
       }
 
-      $file = "Nurse-Admition-Report-".date('d-m-Y',strtotime("-1 days")); 
+      $file = "Nurse-Admission-Discharge-Report-".date('d-m-Y',strtotime("-1 days")); 
+       
+      $filename=$file.'.xls';
+      header('Content-Type: application/vnd.ms-excel');
+      header('Content-Disposition: attachment;filename="'.$filename.'"');
+      header('Cache-Control: max-age=0');
+
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+      $objWriter->save('php://output');
+      $objWriter->save(str_replace(__FILE__,'assets/Reports/admitiondischarge/'.$filename,__FILE__));
+      chmod('assets/Reports/admitiondischarge/'.$filename, 0777);
+
+      // save file log
+      if(!empty($getReportSettings)){
+        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+        if(empty($checkFileExist)){
+          $logData['reportSettingId']      = $getReportSettings['id'];
+          $logData['fileName']             = $filename;
+          $logData['addDate']              = date('Y-m-d',strtotime("-1 days"));
+          $this->db->insert('reportLogs',$logData);
+        }
+      }
+
+    }
+
+  public function sendNurseAdmitionReport(){
+
+      $reportDate = date('jS F Y, l',strtotime("-1 days"));
+      //$reportDate = date('jS F Y, l',strtotime("2021-01-29"));
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->getRowDimension('2')->setRowHeight(20);
+      $objWorkSheet->mergeCells('A1:C1');
+      $objWorkSheet->mergeCells('A2:C2');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
+
+      for($col = ord('A'); $col <= ord('C'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."4")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
+      $objWorkSheet->getColumnDimension('B')->setWidth(60);
+      $objWorkSheet->getColumnDimension('C')->setWidth(12);
+      //$objWorkSheet->getColumnDimension('D')->setWidth(12);
+      
+
+      $timeNotes = "("."8:00 am ".date('jS F',strtotime(date('Y-m-d',strtotime("-1 days"))))." to 8:00 am  ".date('jS F',strtotime(date('Y-m-d'))).")";
+      
+
+      for($col = ord('A'); $col <= ord('C'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->setCellValue('A4', 'Sr. No.');
+      $objWorkSheet->setCellValue('B4', 'Lounge Name - Nurse Name');
+      //$objWorkSheet->setCellValue('C4', 'Nurse Name');
+      $objWorkSheet->setCellValue('C4', 'Total Admission');
+
+      $objWorkSheet->setCellValue('A1', 'KMC App Admition Report');
+      $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate." ".$timeNotes);
+      
+
+      $getReportSettings = $this->cmodel->getReportSettings(16);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+      
+      $getAllLounges = $this->cmodel->getAllAdmitionDischargeByNurse($loungeArray);
+      $dataCount = 1;
+      $a=4;
+      
+      foreach($getAllLounges as $key_lounge => $getAllLoungesData){
+        if($getAllLoungesData['babyAdmit'] != 0 )
+        {
+            $loungeListArray    = [];
+            $loungeListArray[]  = $dataCount;
+            // if($getAllLounges[$key_lounge-1]['loungeName']==$getAllLoungesData['loungeName'])
+            // {
+            //   $a = $a+1;
+            //   $loungeListArray[]  = '';
+            //   //$a = $innerRow+1;
+            // }
+            // else
+            // {
+            //   $a = $a+2;
+            //   $loungeListArray[]  = $getAllLoungesData['loungeName'];
+            // }
+            //$loungeListArray[]  = $getAllLoungesData['loungeName'];
+            $a = $a+1;
+            $loungeListArray[]  = $getAllLoungesData['loungeName'].' - '.$getAllLoungesData['name'];
+            //$loungeListArray[]  = $getAllLoungesData['name'];
+            $loungeListArray[]  = $getAllLoungesData['babyAdmit'];
+            
+             $objWorkSheet->fromArray($loungeListArray, null, 'A'.$a);
+             
+            $styleArray = array(
+              'borders' => array(
+              'allborders' => array(
+              'style' => PHPExcel_Style_Border::BORDER_THIN
+              )
+              )
+            );
+
+            $objWorkSheet->getStyle('A1:C'.$a.'')->applyFromArray($styleArray);
+
+            $objWorkSheet->setTitle('Nurse Admission Report');
+            $dataCount++; 
+        }  
+      }
+
+      $file = "Nurse-Admission-Report-".date('d-m-Y',strtotime("-1 days")); 
        
       $filename=$file.'.xls';
       header('Content-Type: application/vnd.ms-excel');
@@ -2693,6 +2931,124 @@ print_r($query);
         }
       }
 
+    }
+
+  public function sendNurseDischargeReport(){
+
+      $reportDate = date('jS F Y, l',strtotime("-1 days"));
+      //$reportDate = date('jS F Y, l',strtotime("2021-01-29"));
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->getRowDimension('2')->setRowHeight(20);
+      $objWorkSheet->mergeCells('A1:D1');
+      $objWorkSheet->mergeCells('A2:D2');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
+
+      for($col = ord('A'); $col <= ord('D'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."4")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
+      $objWorkSheet->getColumnDimension('B')->setWidth(60);
+      $objWorkSheet->getColumnDimension('C')->setWidth(24);
+      $objWorkSheet->getColumnDimension('D')->setWidth(15);
+      //$objWorkSheet->getColumnDimension('D')->setWidth(15);
+      
+
+      $timeNotes = "("."8:00 am ".date('jS F',strtotime(date('Y-m-d',strtotime("-1 days"))))." to 8:00 am  ".date('jS F',strtotime(date('Y-m-d'))).")";
+      
+
+      for($col = ord('A'); $col <= ord('D'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->setCellValue('A4', 'Sr. No.');
+      $objWorkSheet->setCellValue('B4', 'Lounge Name - Nurse Name');
+      //$objWorkSheet->setCellValue('C4', 'Nurse Name');
+      $objWorkSheet->setCellValue('C4', 'Total Baby Discharge');
+      $objWorkSheet->setCellValue('D4', 'Total Mother Discharge');
+
+      $objWorkSheet->setCellValue('A1', 'KMC App Discharge Report');
+      $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate." ".$timeNotes);
+      
+
+      $getReportSettings = $this->cmodel->getReportSettings(17);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+      
+      $getAllLounges = $this->cmodel->getAllAdmitionDischargeByNurse($loungeArray);
+      $dataCount = 1;
+      $a=5;
+      
+      foreach($getAllLounges as $key_lounge => $getAllLoungesData){
+         if($getAllLoungesData['babydischarge'] > 0 OR $getAllLoungesData['motherdischarge'] > 0)
+         {
+            $loungeListArray    = [];
+            $loungeListArray[]  = $dataCount;
+            
+              $a = $a+1;
+              $loungeListArray[]  = $getAllLoungesData['loungeName'].' - '.$getAllLoungesData['name'];
+            
+            //$loungeListArray[]  = $getAllLoungesData['loungeName'];
+            //$loungeListArray[]  = $getAllLoungesData['name'];
+            $loungeListArray[]  = $getAllLoungesData['babydischarge'];
+            $loungeListArray[]  = $getAllLoungesData['motherdischarge'];
+             $objWorkSheet->fromArray($loungeListArray, null, 'A'.$a);
+             
+            $styleArray = array(
+              'borders' => array(
+              'allborders' => array(
+              'style' => PHPExcel_Style_Border::BORDER_THIN
+              )
+              )
+            );
+
+            $objWorkSheet->getStyle('A1:D'.$a.'')->applyFromArray($styleArray);
+
+            $objWorkSheet->setTitle('Nurse Discharge Report');
+            $dataCount++; 
+        }  
+      }
+
+      $file = "Nurse-Discharge-Report-".date('d-m-Y',strtotime("-1 days")); 
+       
+      $filename=$file.'.xls';
+      header('Content-Type: application/vnd.ms-excel');
+      header('Content-Disposition: attachment;filename="'.$filename.'"');
+      header('Cache-Control: max-age=0');
+
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+      $objWriter->save('php://output');
+      $objWriter->save(str_replace(__FILE__,'assets/Reports/discharge/'.$filename,__FILE__));
+      chmod('assets/Reports/discharge/'.$filename, 0777);
+
+      // save file log
+      if(!empty($getReportSettings)){
+        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+        if(empty($checkFileExist)){
+          $logData['reportSettingId']      = $getReportSettings['id'];
+          $logData['fileName']             = $filename;
+          $logData['addDate']              = date('Y-m-d',strtotime("-1 days"));
+          $this->db->insert('reportLogs',$logData);
+        }
+      }
+
+    }
+
+    public function terst()
+    {
+      $getReportSettings = $this->cmodel->getReportSettings(6);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+      
+      echo $loungeId = implode(",", $loungeArray);
     }
 
 

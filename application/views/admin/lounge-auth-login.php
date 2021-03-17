@@ -32,6 +32,7 @@
     <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>app-assets/css/core/menu/menu-types/horizontal-menu.min.css">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>app-assets/css/pages/authentication.css">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>app-assets/css/plugins/forms/validation/form-validation.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>app-assets/vendors/css/forms/select/select2.min.css">
     <!-- END: Page CSS-->
 
     <link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css' rel='stylesheet'>
@@ -120,12 +121,35 @@
                                     </div>
                                 </div>
                                 <?php echo $this->session->flashdata('login_message'); ?>
-                                <form action="<?php echo site_url().'Welcome/doLogin'; ?>" method="post" id="loginForm">
+                                <form action="<?php echo site_url().'Welcome/loungeLogin'; ?>" method="post" id="loginForm">
                                     <div class="form-group mb-50">
                                         <div class="controls">
-                                            <label class="text-bold-600" for="email_address">Facility</label>
-                                            <input type="text" class="form-control" id="email_address" placeholder="Email Id / Mobile No." name="email">
-                                            <span id="email_address_error" class="error_style"></span>
+                                            <label class="text-bold-600" for="district_id">District</label>
+                                            <select class="select2 form-control" name="district_id" id="district_id" onchange="getDistrictFacility(this.value);">
+                                                <option value="">Select District</option>
+                                                <?php foreach($district as $district_data){ ?>
+                                                    <option value="<?php echo $district_data['PRIDistrictCode']; ?>"><?php echo $district_data['DistrictNameProperCase']; ?></option>
+                                                <?php } ?>
+                                            </select>
+                                            <span id="district_id_error" class="error_style"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-50">
+                                        <div class="controls">
+                                            <label class="text-bold-600" for="facility_id">Facility</label>
+                                            <select class="select2 form-control" name="facility_id" id="facility_id" onchange="getFacilityLounge(this.value);">
+                                               <option value="">Select Facility</option> 
+                                            </select>
+                                            <span id="facility_id_error" class="error_style"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-50">
+                                        <div class="controls">
+                                            <label class="text-bold-600" for="lounge_id">Lounge</label>
+                                            <select class="select2 form-control" name="lounge_id" id="lounge_id">
+                                                <option value="">Select Lounge</option> 
+                                            </select>
+                                            <span id="lounge_id_error" class="error_style"></span>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -135,25 +159,11 @@
                                             <span id="password_error" class="error_style"></span>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="g-recaptcha" data-sitekey="6LdmUeEZAAAAABk5y8pRpyrBsABe92HP8m3yRTpF"></div>
-                                        <span id="captcha_error" class="error_style"></span>
-                                    </div>
-                                    <div
-                                        class="form-group d-flex flex-md-row flex-column justify-content-between align-items-center">
-                                        <div class="text-left">
-                                            <div class="checkbox checkbox-sm">
-                                                <input type="checkbox" class="form-check-input" id="keep_login">
-                                                <label class="checkboxsmall" for="keep_login"><small>Keep me logged
-                                                        in</small></label>
-                                            </div>
-                                        </div>
-                                        <!-- <div class="text-right"><a href="auth-forgot-password.html" class="card-link"><small>Forgot Password?</small></a></div> -->
-                                    </div>
+                                    
                                     <button type="submit" class="btn btn-primary glow w-100 position-relative" id="login_button">Login<i id="icon-arrow" class="bx bx-right-arrow-alt"></i></button>
                                 </form>
                                 <hr>
-                                <div class="text-center" style="margin-top:-12px;"><small class="mr-25">Login as Lounge</small><a href="<?php echo base_url() ?>Admin/loungeLogin"><small>Click Here</small></a></div>
+                                <div class="text-center" style="margin-top:-12px;"><small class="mr-25">Login as Admin</small><a href="<?php echo base_url() ?>Admin"><small>Click Here</small></a></div>
                             </div>
                         </div>
                     </div>
@@ -181,25 +191,60 @@
         setTimeout(function(){
             $('.alert-dismissible').hide();
         },5000);
+        
+        // get facility
+        function getDistrictFacility(district){
+            $.ajax({ 
+              type: "POST", 
+              url: '<?php echo base_url('admin/getDistrictFacility'); ?>', 
+              data: {'district': district}, 
+              success:function(response){
+                $('#facility_id').html(response);
+              }
+            });
+        }
 
-        //Captcha
-        window.onload = function() {
-            var recaptcha = document.querySelector('#g-recaptcha-response');
+        // get lounges
+        function getFacilityLounge(facility){
+           $.ajax({ 
+              type: "POST", 
+              url: '<?php echo base_url('admin/getFacilityLounge'); ?>', 
+              data: {'facility': facility}, 
+              success:function(response){
+                $('#lounge_id').html(response);
+              }
+            }); 
+        }
 
-            if(recaptcha) {
-                recaptcha.setAttribute("required", "required");
-            }
-        };
-        /////////////////////////////
-
+        // login field validation
         $('#login_button').click(function() { 
 
-            var email_address = $('#email_address').val();
-            if(email_address == "")
+            var district_id = $('#district_id').val();
+            if(district_id == "")
             {
-                $('#email_address_error').html('Email address field is required.');
+                $('#district_id_error').html('District field is required.');
                 setTimeout(function() {
-                    $('#email_address_error').html("");
+                    $('#district_id_error').html("");
+                }, 5000);
+                return false;
+            }
+
+            var facility_id = $('#facility_id').val();
+            if(facility_id == "")
+            {
+                $('#facility_id_error').html('Facility field is required.');
+                setTimeout(function() {
+                    $('#facility_id_error').html("");
+                }, 5000);
+                return false;
+            }
+
+            var lounge_id = $('#lounge_id').val();
+            if(lounge_id == "")
+            {
+                $('#lounge_id_error').html('Lounge field is required.');
+                setTimeout(function() {
+                    $('#lounge_id_error').html("");
                 }, 5000);
                 return false;
             }
@@ -213,19 +258,8 @@
                 }, 5000);
                 return false;
             }
-
-            var recaptcha = $('#g-recaptcha-response').val();
-            if(recaptcha == "")
-            {
-                $('#captcha_error').html('Captcha field is required.');
-                setTimeout(function() {
-                    $('#captcha_error').html("");
-                }, 5000);
-                return false;
-            }
         });
     </script>
-
 
     <!-- BEGIN: Vendor JS-->
     <script src="<?php echo base_url(); ?>app-assets/vendors/js/vendors.min.js"></script>
@@ -245,6 +279,8 @@
     <script src="<?php echo base_url(); ?>app-assets/js/core/app.min.js"></script>
     <script src="<?php echo base_url(); ?>app-assets/js/scripts/components.min.js"></script>
     <script src="<?php echo base_url(); ?>app-assets/js/scripts/footer.min.js"></script>
+    <script src="<?php echo base_url(); ?>app-assets/vendors/js/forms/select/select2.full.min.js"></script>
+    <script src="<?php echo base_url(); ?>app-assets/js/scripts/forms/select/form-select2.min.js"></script>
     <!-- END: Theme JS-->
 
     <!-- BEGIN: Page JS-->

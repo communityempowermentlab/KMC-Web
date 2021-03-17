@@ -7,6 +7,7 @@ class DashboardDataModel extends CI_Model {
 
   // get all lounges by name in asc order
   public function getAllLonges(){
+    $this->db->select('loungeMaster.*');
     $this->db->order_by('loungeName','ASC');
     return $this->db->get_where('loungeMaster',array('status'=>1))->result_array();
   }

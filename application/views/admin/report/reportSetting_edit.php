@@ -120,8 +120,7 @@ input:checked + .slider:before {
               </div>
 
               <div class="row col-12">
-                  
-                  
+
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Subject <span class="red">*</span></label>
@@ -132,93 +131,14 @@ input:checked + .slider:before {
                   </div>
 
                   <div class="col-md-4">
-                  <div class="form-group">
-                    <label>Body </label>
-                    <div class="controls">
-                      <textarea class="form-control" id="body" rows="3" placeholder="Enter Body" name="body" required="" <?php echo $inputDisable; ?>><?php echo $GetReport['body']; ?></textarea>
+                    <div class="form-group">
+                      <label>Body <span class="red">*</span></label>
+                      <div class="controls">
+                        <textarea class="form-control" id="body" rows="3" placeholder="Enter Body" name="body" required="" <?php echo $inputDisable; ?>><?php echo $GetReport['body']; ?></textarea>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <!-- <div class="col-md-4">
-                    <div class="form-group">
-                      <label>Facility <span class="red">*</span></label>
-                      <div class="controls">
-                        <select class="select2 form-control" name="facilityId[]" id="facilityId" required="" data-validation-required-message="This field is required"  multiple="multiple">
-                          <?php
-                            foreach ($GetFacilities as $key => $value) {?>
-                              <option <?php if(in_array($value['FacilityID'], $facilitys)){ ?> selected="" <?php } ?> value="<?php echo $value['FacilityID']; ?>"><?php echo $value['FacilityName']; ?></option>
-                          <?php } ?>
-                        </select>
-                        
-                      </div>
-                    </div>
-                  </div> -->
-                  
-              </div>
-
-              <div class="row col-12">
-                  
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label>District <span class="red">*</span></label>
-                      <div class="controls">
-                        <select class="select2 form-control" multiple="multiple" name="district[]" id="district" onchange="getMultipleFacility('<?php echo base_url('coachM/getFacility/') ?>')" <?php echo $dropdownDisable; ?>>
-                          <?php foreach ($GetDistrict as $key => $value) {?>
-                            <option value ="<?php echo $value['PRIDistrictCode']?>" <?php if (in_array($value['PRIDistrictCode'], $dis_arr)) { echo 'selected'; } ?>><?php echo $value['DistrictNameProperCase'] ?></option>
-                          <?php } ?>
-                        </select>
-                        <span class="custom-error" id="err_district"></span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label>Facility <span class="red">*</span></label>
-                      <div class="controls">
-                        <select class="select2 form-control" multiple="multiple" name="facility[]" id="facility" onchange="getMultipleLounge('<?php echo base_url('coachM/getLounge/') ?>')" <?php echo $dropdownDisable; ?>>
-                          <?php foreach ($dis_arr as $key => $value) {
-                            $getFacility = $this->ReportSettingModel->GetFacilityByDistrict($value); 
-        
-                            $getDistrict = $this->FacilityModel->GetDistrictNameById('revenuevillagewithblcoksandsubdistandgs', $value); ?>
-                            <optgroup label="<?= $getDistrict['DistrictNameProperCase'] ?>">
-                              <?php foreach ($getFacility as $key2 => $value2) { ?>
-                                <option value="<?= $value ?>-<?= $value2['FacilityID'] ?>" <?php if (in_array($value2['FacilityID'], $fac_arr)) { echo 'selected'; } ?>><?= $value2['FacilityName']; ?></option>
-                              <?php } ?>
-                              
-                            </optgroup>
-                          <?php } ?>
-                        </select>
-                        <span class="custom-error" id="err_facility"></span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label>Lounge <span class="red">*</span></label>
-                      <div class="controls">
-                        <select class="select2 form-control" multiple="multiple" name="lounge[]" id="lounge" <?php echo $dropdownDisable; ?>>
-                          <?php foreach ($fac_arr as $key => $value) {
-                            $getFacility = $this->FacilityModel->GetFacilitiesById('facilitylist', $value); 
-        
-                           $getLounge = $this->ReportSettingModel->GetLoungeByFAcility($value); ?>
-                            <optgroup label="<?= $getFacility['FacilityName'] ?>">
-                              <?php foreach ($getLounge as $key2 => $value2) { ?>
-                                <option value="<?= $getFacility['PRIDistrictCode'] ?>-<?= $value ?>-<?= $value2['loungeId'] ?>" <?php if (in_array($value2['loungeId'], $lounge_arr)) { echo 'selected'; } ?>><?= $value2['loungeName']; ?></option>
-                              <?php } ?>
-                              
-                            </optgroup>
-                          <?php } ?>
-                        </select>
-                        <span class="custom-error" id="err_lounge"></span>
-                        
-                      </div>
-                    </div>
-                  </div>
-              </div>
-
-              <div class="row col-12">
-                  
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Email To <span class="red">*</span></label>
@@ -227,9 +147,13 @@ input:checked + .slider:before {
                       </div>
                     </div>
                   </div>
+                  
+              </div>
+
+              <div class="row col-12">
                   <div class="col-md-4">
                     <div class="form-group" id="tabDiv">
-                      <label>Email From</label>
+                      <label>Email From <span class="red">*</span></label>
                       <div class="controls">
                         <input type="Email" class="form-control" name="emailFrom" id="emailFrom" placeholder="email From" value="<?php echo $GetReport['emailFrom']; ?>" <?php echo $inputDisable; ?>>
                       </div>
@@ -248,8 +172,70 @@ input:checked + .slider:before {
                     </div>
                   </div>
                 </div>
-                  
-              </div>          
+              </div>
+              <hr>
+
+              <?php foreach ($GetDistrict as $key => $districtValue) { 
+                $GetFacilities = $this->ReportSettingModel->GetFacilityByDistrict($districtValue['PRIDistrictCode']);
+                ?>
+                <div class="row col-12">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <?php if($key == 0){ ?>
+                        <label>District</label>
+                      <?php } ?>
+                      <div class="controls">
+                        <input type="text" class="form-control" value="<?php echo $districtValue['DistrictNameProperCase'] ?>" readonly>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <?php if($key == 0){ ?>
+                        <label>Facility</label>
+                      <?php } ?>
+                      <div class="controls">
+                        <select class="select2 form-control" multiple="multiple" name="facility[]" id="facility<?php echo $districtValue['PRIDistrictCode'] ?>" onchange="getFacilityMultipleLounge('<?php echo $districtValue['PRIDistrictCode'] ?>','<?php echo base_url('GenerateReportM/getFacilityMultipleLounge') ?>','<?php echo $reportid; ?>');" <?php echo $dropdownDisable; ?>>
+                          <?php $facilityArray = array(); foreach($GetFacilities as $GetFacilitiesData){
+                            if (in_array($GetFacilitiesData['FacilityID'], $fac_arr)){ 
+                              array_push($facilityArray, $GetFacilitiesData['FacilityID']);
+                            }
+                          ?>
+                            <option value="<?php echo $GetFacilitiesData['FacilityID']?>" <?php if (in_array($GetFacilitiesData['FacilityID'], $fac_arr)) { echo 'selected'; } ?>><?php echo $GetFacilitiesData['FacilityName'] ?></option>
+                          <?php } ?>
+                        </select>
+                        <span class="custom-error" id="err_facility"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-5">
+                    <div class="form-group">
+                      <?php if($key == 0){ ?>
+                        <label>Lounge</label>
+                      <?php } ?>
+                      <div class="controls">
+                        <select class="select2 form-control" multiple="multiple" name="lounge[]" id="lounge<?php echo $districtValue['PRIDistrictCode'] ?>" <?php echo $dropdownDisable; ?>>
+
+                          <?php foreach ($facilityArray as $key => $value) {
+                            $getFacility = $this->FacilityModel->GetFacilitiesById('facilitylist', $value); 
+        
+                           $getLounge = $this->ReportSettingModel->GetLoungeByFAcility($value); ?>
+                            <optgroup label="<?= $getFacility['FacilityName'] ?>">
+                              <?php foreach ($getLounge as $key2 => $value2) { ?>
+                                <option value="<?= $getFacility['PRIDistrictCode'] ?>-<?= $value ?>-<?= $value2['loungeId'] ?>" <?php if (in_array($value2['loungeId'], $lounge_arr)) { echo 'selected'; } ?>><?= $value2['loungeName']; ?></option>
+                              <?php } ?>
+                              
+                            </optgroup>
+                          <?php } ?>
+
+                        </select>
+                        <span class="custom-error" id="err_lounge"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              <?php } ?>
               
               <button type="submit" class="btn btn-primary" style="<?php echo $buttonDisable; ?>">Submit</button>
             </form>
@@ -266,6 +252,7 @@ input:checked + .slider:before {
     <!-- END: Content-->
 
 <script type="text/javascript">
+
   function openOtherStaffSubType(str){ 
 
     var selected_value = $('option:selected', str).attr('typevalue');

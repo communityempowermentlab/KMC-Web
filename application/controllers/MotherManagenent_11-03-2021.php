@@ -49,13 +49,11 @@ class MotherManagenent extends Welcome {
       $nurseid = $this->input->get('nurseid');
       $keyword  = $this->input->get('keyword'); 
       $motherStatus  = $this->input->get('motherStatus'); 
-      $dischargeTypeFilterValue = $this->input->get('dischargeTypeFilterValue');
-      $admissionTypeFilterValue = $this->input->get('admissionTypeFilterValue'); 
-      $admitTypeFilterValue = $this->input->get('admitTypeFilterValue');   
-      $totalRecords = $this->MotherModel->totalMotherRecordsSearch($loungeid,$fromDate,$toDate,$district,$keyword,$facilityname,$nurseid,$motherStatus,$dischargeTypeFilterValue,$admissionTypeFilterValue,$admitTypeFilterValue);
+      $dischargeTypeFilterValue = $this->input->get('dischargeTypeFilterValue'); 
+      $totalRecords = $this->MotherModel->totalMotherRecordsSearch($loungeid,$fromDate,$toDate,$district,$keyword,$facilityname,$nurseid,$motherStatus,$dischargeTypeFilterValue);
       //$config["base_url"] = base_url('motherM/registeredMother/'.$loungeid.'?fromDate='.$this->input->get('fromDate').'&toDate='.$this->input->get('toDate').'&district='.$district.'&keyword='.$keyword);
 
-      $config["base_url"] = base_url('motherM/registeredMother/'.$loungeid.'?fromDate='.$this->input->get('fromDate').'&toDate='.$this->input->get('toDate').'&district='.$district.'&facilityname='.$facilityname.'&loungeid='.$loungeid.'&nurseid='.$nurseid.'&motherStatus='.$motherStatus.'&admissionTypeFilterValue='.$admissionTypeFilterValue.'&dischargeTypeFilterValue='.$dischargeTypeFilterValue.'&keyword='.$keyword.'&admitTypeFilterValue='.$admitTypeFilterValue);
+      $config["base_url"] = base_url('motherM/registeredMother/'.$loungeid.'?fromDate='.$this->input->get('fromDate').'&toDate='.$this->input->get('toDate').'&district='.$district.'&facilityname='.$facilityname.'&loungeid='.$loungeid.'&nurseid='.$nurseid.'&motherStatus='.$motherStatus.'&dischargeTypeFilterValue='.$dischargeTypeFilterValue.'&keyword='.$keyword.'');
 
     } else {
       if($type != ''){ 
@@ -90,7 +88,7 @@ class MotherManagenent extends Welcome {
     }
         
     if($this->input->get()) {
-      $AllRecord = $this->MotherModel->getMotherRecordSearch($loungeid,$limit,$offset,$fromDate,$toDate,$district,$keyword,$facilityname,$nurseid,$motherStatus,$dischargeTypeFilterValue,$admissionTypeFilterValue,$admitTypeFilterValue);
+      $AllRecord = $this->MotherModel->getMotherRecordSearch($loungeid,$limit,$offset,$fromDate,$toDate,$district,$keyword,$facilityname,$nurseid,$motherStatus,$dischargeTypeFilterValue);
     } else {
       if($type != ''){
         $AllRecord = $this->MotherModel->getAllMotherList($limit,$offset);
@@ -118,25 +116,6 @@ class MotherManagenent extends Welcome {
     $this->load->view('admin/mother/mother-list');      
     $this->load->view('admin/include/footer-new');
     $this->load->view('admin/include/datatable-new');
-  }
-
-  public function getFacility(){
-    if($this->input->post()){
-      $district = $this->input->post('districtId');
-      $facility = $this->input->post('facility');
-      $getDistrict = $this->LoungeModel->GetFacilityByDistrict($district); 
-      $html = ''; 
-      if(!empty($getDistrict)){
-        $html.='<option value="">Select Facility</option>';
-        foreach ($getDistrict as $key => $value) {
-          $Select = ($facility==$value['FacilityID'])?'SELECTED':'' ;
-          $html.='<option value="'.$value['FacilityID'].'" '.$Select.'>'.$value['FacilityName'].'</option>';
-        }
-      } else {
-        $html.='<option value="">No Records Found</option>';
-      }
-      echo $html;die;
-    }
   }
 
 

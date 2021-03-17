@@ -58,11 +58,16 @@
                                 <?php 
                                   $counter ="1";
                                   foreach ($GetCheckinData as $value) {
-                                    $staffCheckinLog = $this->LoungeModel->loungeNurseCheckinLogs($value['id']);
-                                    foreach($staffCheckinLog as $staffCheckinLogData){
+                                    if(empty($value['modifyDate'])){
+                                      $maxRow = 1;
+                                    }else{
+                                      $maxRow = 2;
+                                    }
+                                    //$staffCheckinLog = $this->LoungeModel->loungeNurseCheckinLogs($value['id']);
+                                    for($attendanceRow=1;$attendanceRow<=$maxRow;$attendanceRow++){
 
                                       $search = 'checked in';
-                                      if(preg_match("/{$search}/i", $staffCheckinLogData['remark'])) {
+                                      if($attendanceRow == "1") {
                                           $dateTime = date("F d ",strtotime($value['addDate'])).'at '.date("h:i A",strtotime($value['addDate']));
                                           $checkStatus = "Checked In";
                                       }else{
@@ -74,7 +79,7 @@
                                    <td><?php echo $counter; ?></td>
                                    <td><?php echo ucwords($value['nurseName']); ?></td>
                                    <td>
-                                    <?php if(preg_match("/{$search}/i", $staffCheckinLogData['remark'])) { ?>
+                                    <?php if($attendanceRow == "1") { ?>
                                       <img src="<?php echo signDirectoryUrl.$value['selfie']; ?>" style="border-radius:50%;width: 60px;height: 60px;cursor:pointer;" onclick="showNurseSelfie('<?= signDirectoryUrl.$value['selfie'] ?>')">
                                     <?php }else{ ?>
                                       <img src="<?php echo signDirectoryUrl.$value['checkoutSelfie']; ?>" style="border-radius:50%;width: 60px;height: 60px;cursor:pointer;" onclick="showNurseSelfie('<?= signDirectoryUrl.$value['checkoutSelfie'] ?>')">
@@ -82,7 +87,7 @@
                                   </td>
                                    <td><?php echo $checkStatus; ?></td>
                                    <td>
-                                    <?php if(preg_match("/{$search}/i", $staffCheckinLogData['remark'])) { ?>
+                                    <?php if($attendanceRow == "1") { ?>
                                       <?php if($value['feeling'] == 1){
                                         $feeling_icon = "happy_feeling.svg";
                                         $feeling_text = "Happy";

@@ -1985,7 +1985,7 @@ class BabyModel extends CI_Model
                 $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => trim($request['babyId'])))->row_array();
                 $validateNurseId = $this->db->get_where('staffMaster', array('staffId' => trim($request['nurseId']),'staffType'=>2))->row_array();
 
-                if(!empty($validateBabyId)){
+                //if(!empty($validateBabyId)){
                     $checkDuplicateData = $this
                         ->db
                         ->get_where('babyDailyWeight', array(
@@ -2166,7 +2166,7 @@ class BabyModel extends CI_Model
                             'babyWeightPdfName' => $PdfName
                         ));*/
                     }
-                }
+                //}
             }
             if ($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2)
             {
@@ -2195,7 +2195,7 @@ class BabyModel extends CI_Model
             {
                 $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => $request['babyId']))->row_array();
 
-                if(!empty($validateBabyId)){
+                //if(!empty($validateBabyId)){
                     $checkDuplicateData = $this
                         ->db
                         ->get_where('babyDailyNutrition', array(
@@ -2321,7 +2321,7 @@ class BabyModel extends CI_Model
                             'babyFeedingPdfName' => $PdfName
                         ));*/
                     }
-                }
+                //}
             }
 
             if ($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2)
@@ -3035,7 +3035,7 @@ class BabyModel extends CI_Model
                 $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => trim($request['babyId'])))->row_array();
                 $validateNurseId = $this->db->get_where('staffMaster', array('staffId' => trim($request['nurseId']),'staffType'=>2))->row_array();
 
-                if(!empty($validateBabyId)){
+                //if(!empty($validateBabyId)){
                     $checkDuplicateData = $this
                         ->db
                         ->get_where('babyVaccination', array(
@@ -3050,11 +3050,13 @@ class BabyModel extends CI_Model
                     $arrayName['androidUuid'] = $request['localId'];
                     //$arrayName['babyId'] = $request['babyId'];
                     //$arrayName['loungeId'] = $request['loungeId'];
+                    $arrayName['anmName'] = isset($request['anmName'])?$request['anmName']:NULL;
                     $arrayName['vaccinationName'] = $request['vaccinationName'];
                     $arrayName['quantity'] = $request['quantity'];
                     $arrayName['vaccinationDate'] = $request['date'];
                     $arrayName['VaccinationTime'] = $request['time'];
                     $arrayName['nurseId'] = $request['nurseId'];
+                    $arrayName['addDate'] = date('Y-m-d H:i:s');
                    
 
                     //get last Baby AdmissionId
@@ -3071,8 +3073,6 @@ class BabyModel extends CI_Model
 
                     if ($checkDuplicateData == 0)
                     {   
-                        $arrayName['addDate'] = date('Y-m-d H:i:s');
-
                         $inserted = $this
                         ->db
                         ->insert('babyVaccination', $arrayName);
@@ -3113,7 +3113,7 @@ class BabyModel extends CI_Model
                         $listID['localId'] = $request['localId'];
                         $param[] = $listID;
                     }
-                }
+                //}
             }
 
             if ($checkDataForAllUpdate == 1 || $checkDataForAllUpdate == 2)
@@ -4013,7 +4013,7 @@ class BabyModel extends CI_Model
                 $validateBabyId = $this->db->get_where('babyRegistration', array('babyId' => trim($request['babyId'])))->row_array();
                 $validateStaffId = $this->db->get_where('staffMaster', array('staffId' => trim($request['staffId'])))->row_array();
 
-                if((!empty($validateBabyId)) && (!empty($validateStaffId)) && (trim($request['staffId']) != "0") && (trim($request['staffId']) != "")){
+                //if((!empty($validateBabyId)) && (!empty($validateStaffId)) && (trim($request['staffId']) != "0") && (trim($request['staffId']) != "")){
 
                     $checkSyncedData = 2;
                     //get last Baby AdmissionId
@@ -4196,7 +4196,7 @@ class BabyModel extends CI_Model
                         $listID['localId'] = $request['localId'];
                         $param[] = $listID;
                     }
-                }
+                //}
 
             }
         }

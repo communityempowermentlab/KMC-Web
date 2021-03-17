@@ -58,6 +58,18 @@
   } else {
     $babyStatus = '';
   }
+
+  if(isset($_GET['admissionTypeFilterValue'])){
+    $admissionTypeFilterValue = $_GET['admissionTypeFilterValue']; 
+  } else {
+    $admissionTypeFilterValue = '';
+  }
+
+  if(isset($_GET['dischargeTypeFilterValue'])){
+    $dischargeTypeFilterValue = $_GET['dischargeTypeFilterValue']; 
+  } else {
+    $dischargeTypeFilterValue = '';
+  }
 ?>
 
 
@@ -90,26 +102,26 @@
                           <div class="col-md-12">
                             <form action="" method="GET">
                               <div class="row">
-                                <div class="col-md-10">
+                                <div class="col-md-12">
                                   <div class="row">
-                                    <div class="col-md-2 p-0">
+                                    <div class="col-md-4 p-0">
                                       <fieldset class="form-group position-relative has-icon-left">
-                                        <input type="text" class="form-control pickadate-months-year" placeholder="Start Date" name="fromDate" value="<?= $fromDate; ?>">
+                                        <input type="text" class="form-control datetime" placeholder="Select Date" name="fromDate" id="fromDate" value="<?= $fromDate; ?>" readonly>
                                         <div class="form-control-position calendar-position">
                                           <i class="fa fa-calendar" aria-hidden="true"></i>
                                         </div>
                                       </fieldset>
                                     </div>
-                                    <div class="col-md-2 p-0">
+                                    <!-- <div class="col-md-2 p-0">
                                       <fieldset class="form-group position-relative has-icon-left">
                                         <input type="text" class="form-control pickadate-months-year" placeholder="End Date" name="toDate" value="<?= $toDate; ?>">
                                         <div class="form-control-position calendar-position">
                                           <i class="fa fa-calendar" aria-hidden="true"></i>
                                         </div>
                                       </fieldset>
-                                    </div>
+                                    </div> -->
                                     <div class="col-md-2 p-0">
-                                      <select class="select2 form-control" name="district" onchange="getFacility(this.value, '<?php echo base_url('loungeM/getFacility/') ?>')">
+                                      <select class="select2 form-control" name="district" onchange="getFacility(this.value, '<?php echo base_url('babyM/getFacility') ?>')">
                                         <option value="">Select District</option>
                                         <?php
                                           foreach ($GetDistrict as $key => $value) {?>
@@ -118,7 +130,7 @@
                                       </select>
                                     </div>
                                     <div class="col-md-2 p-0">
-                                      <select class="select2 form-control" name="facilityname" id="facilityname" onchange="getLounge(this.value, '<?php echo base_url('motherM/getLounge/') ?>'), getNurse(this.value, '<?php echo base_url('motherM/getNurse/') ?>')">
+                                      <select class="select2 form-control" name="facilityname" id="facilityname" onchange="getLounge(this.value, '<?php echo base_url('babyM/getLounge') ?>'), getNurse(this.value, '<?php echo base_url('babyM/getNurse') ?>')">
                                         <option value="">Select Facility</option>
                                         <?php
                                           foreach ($Facility as $key => $value) {?>
@@ -146,19 +158,45 @@
                                     </div>
                                   </div>
                                 </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-md-4 p-0"></div>
                                 <div class="col-md-2 p-0">
-                                  <div class="col-md-12 p-0">
-                                      <select class="select2 form-control" name="babyStatus" id="babyStatus">
+                                  <div class="col-md-11 p-0">
+                                      <select class="select2 form-control" name="babyStatus" id="babyStatus" onchange="openSubFilterBox(this.value);">
                                         <option value="">Select Status</option>
                                         <option value="1" <?php echo ($babyStatus == '1') ? 'selected' : ''; ?>>Admitted</option>
-                                        <option value="3" <?php echo ($babyStatus == '3') ? 'selected' : ''; ?>>Referred</option>
+                                        <option value="3" <?php echo ($babyStatus == '3') ? 'selected' : ''; ?>>Admission</option>
                                         <option value="2" <?php echo ($babyStatus == '2') ? 'selected' : ''; ?>>Discharged</option>
                                       </select>
                                     </div>
                                 </div>
-                              </div>
-                              <div class="row">
-                                <div class="col-md-8 p-0">
+                                <div class="col-md-2 p-0" id="admissionTypeFilterBox" style="display: <?php echo ($babyStatus == "1" || $babyStatus == "3")?"block":"none"; ?>">
+                                  <div class="col-md-11 p-0">
+                                    <select class="select2 form-control" name="admissionTypeFilterValue" id="admissionTypeFilterValue">
+                                      <option value="">Select Type</option>
+                                      <option value="1" <?php echo ($admissionTypeFilterValue == '1') ? 'selected' : ''; ?>>Referral</option>
+                                      <option value="2" <?php echo ($admissionTypeFilterValue == '2') ? 'selected' : ''; ?>>Mother accompanied</option>
+                                      <option value="3" <?php echo ($admissionTypeFilterValue == '3') ? 'selected' : ''; ?>>Dead</option>
+                                      <option value="4" <?php echo ($admissionTypeFilterValue == '4') ? 'selected' : ''; ?>>Baby was referred & mother did not accompanied</option>
+                                      <option value="5" <?php echo ($admissionTypeFilterValue == "5") ? 'selected' : ''; ?>>Mother is in a different ward in same hospital</option>
+                                      <option value="6" <?php echo ($admissionTypeFilterValue == '6') ? 'selected' : ''; ?>>Unknown/ Baby is an orphan</option>
+                                      <option value="7" <?php echo ($admissionTypeFilterValue == '7') ? 'selected' : ''; ?>>Other</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-md-2 p-0" id="dischargeTypeFilterBox" style="display: <?php echo ($babyStatus == "2")?"block":"none"; ?>">
+                                  <div class="col-md-11 p-0">
+                                    <select class="select2 form-control" name="dischargeTypeFilterValue" id="dischargeTypeFilterValue">
+                                      <option value="">Select Discharge Type</option>
+                                      <option value="Referral" <?php echo ($dischargeTypeFilterValue == 'Referral') ? 'selected' : ''; ?>>Referral</option>
+                                      <option value="LAMA" <?php echo ($dischargeTypeFilterValue == 'LAMA') ? 'selected' : ''; ?>>LAMA</option>
+                                      <option value="DOPR" <?php echo ($dischargeTypeFilterValue == 'DOPR') ? 'selected' : ''; ?>>DOPR</option>
+                                      <option value="Doctor's discretion" <?php echo ($dischargeTypeFilterValue == "Doctor's discretion") ? 'selected' : ''; ?>>Doctor discretion</option>
+                                      <option value="Absconded" <?php echo ($dischargeTypeFilterValue == 'Absconded') ? 'selected' : ''; ?>>Absconded</option>
+                                      <option value="Died" <?php echo ($dischargeTypeFilterValue == 'Died') ? 'selected' : ''; ?>>Died</option>
+                                    </select>
+                                  </div>
                                 </div>
                                 <div class="col-md-4 p-0">
                                   <fieldset>
@@ -185,6 +223,7 @@
                                       <th style="padding: 1.15rem 1.25rem;">S&nbsp;No.</th>
                                       <th style="padding: 1.15rem 1.25rem;">Status</th>
                                       <th>Admission Type</th>
+                                      <th>Discharge Type</th>
                                       <th>Action</th>
                                       <th>District</th>
                                       <th>Facility</th>
@@ -217,18 +256,46 @@
                                   ($pageNo == '1') ? $counter = '1' : $counter = ((($pageNo*DATA_PER_PAGE)-DATA_PER_PAGE) + 1);  
                                   foreach ($results as $value1) { 
                                     $babyRecord          = $this->BabyModel->GetBabyViaBabyId('babyRegistration',$value1['babyId']);
+                                    $babyAdmissionRecord          = $this->BabyModel->GetBabyViaBabyId('babyAdmission',$value1['babyId']);
 
                                     // admission type
                                     $motherRegistrationDetails          = $this->BabyModel->getMotherRegistration($babyRecord['motherId']);
-                                    if($motherRegistrationDetails['type'] == "3"){
-                                      $motherAdmissionType = "Referred";
-                                    }elseif($motherRegistrationDetails['isMotherAdmitted'] == "Yes" && $motherRegistrationDetails['type'] == "1"){
+                                    $searchTextEng1 = "Dead";
+                                    $searchTextHin1 = "मृत";
+                                    $searchTextEng2 = "Baby was referred";
+                                    $searchTextHin2 = "बेबी को रेफर किया";
+                                    $searchTextEng3 = "Mother is in a different";
+                                    $searchTextHin3 = "माँ एक ही अस्पताल";  
+                                    $searchTextEng4 = "Other";
+                                    $searchTextHin4 = "अन्य";  
+
+                                    if($motherRegistrationDetails['isMotherAdmitted']=="Yes" && $motherRegistrationDetails['type']=="1" && $babyAdmissionRecord['status']=="3"){
+                                      $motherAdmissionType = "Referral";
+                                    }elseif($motherRegistrationDetails['isMotherAdmitted']=="Yes" && $motherRegistrationDetails['type']=="1"){
                                       $motherAdmissionType = "Mother Accompanying";
-                                    }elseif($motherRegistrationDetails['isMotherAdmitted'] == "No"){
-                                      $motherAdmissionType = $motherRegistrationDetails['notAdmittedReason'];
+                                    }elseif($motherRegistrationDetails['isMotherAdmitted']=="No" && $motherRegistrationDetails['type']=="3" && (preg_match("/{$searchTextEng1}/i", $motherRegistrationDetails['notAdmittedReason']) || preg_match("/{$searchTextHin1}/i", $motherRegistrationDetails['notAdmittedReason']))){
+                                      $motherAdmissionType = "Dead";
+                                    }elseif($motherRegistrationDetails['isMotherAdmitted']=="No" && $motherRegistrationDetails['type']=="3" && (preg_match("/{$searchTextEng2}/i", $motherRegistrationDetails['notAdmittedReason']) || preg_match("/{$searchTextHin2}/i", $motherRegistrationDetails['notAdmittedReason']))){
+                                      $motherAdmissionType = "Baby was referred & mother did not accompanied";
+                                    }elseif($motherRegistrationDetails['isMotherAdmitted']=="No" && $motherRegistrationDetails['type']=="3" && (preg_match("/{$searchTextEng3}/i", $motherRegistrationDetails['notAdmittedReason']) || preg_match("/{$searchTextHin3}/i", $motherRegistrationDetails['notAdmittedReason']))){
+                                      $motherAdmissionType = "Mother is in a different ward in same hospital";
+                                    }elseif($motherRegistrationDetails['isMotherAdmitted']=="No" && $motherRegistrationDetails['type']=="2"){
+                                      $motherAdmissionType = "Unknown/ Baby is an orphan";
+                                    }elseif($motherRegistrationDetails['isMotherAdmitted']=="No" && $motherRegistrationDetails['type']=="3" && (preg_match("/{$searchTextEng4}/i", $motherRegistrationDetails['notAdmittedReason']) || preg_match("/{$searchTextHin4}/i", $motherRegistrationDetails['notAdmittedReason']))){
+                                      $motherAdmissionType = "Other";
                                     }else{
                                       $motherAdmissionType = "N/A";
                                     }
+
+                                    // if($motherRegistrationDetails['type'] == "3"){
+                                    //   $motherAdmissionType = "Referred";
+                                    // }elseif($motherRegistrationDetails['isMotherAdmitted'] == "Yes" && $motherRegistrationDetails['type'] == "1"){
+                                    //   $motherAdmissionType = "Mother Accompanying";
+                                    // }elseif($motherRegistrationDetails['isMotherAdmitted'] == "No"){
+                                    //   $motherAdmissionType = $motherRegistrationDetails['notAdmittedReason'];
+                                    // }else{
+                                    //   $motherAdmissionType = "N/A";
+                                    // }
 
                                     $babyAdmissionData   = $this->BabyModel->getBabyRecordByAdmisonId($value1['id']);
                                     
@@ -367,6 +434,7 @@
                                       <td style="padding: 1.15rem 1.25rem;"><?php echo $counter; ?></td>
                                       <td style="padding: 1.15rem 1.25rem;"><?php echo $status ; ?></td>
                                       <td><?php echo $motherAdmissionType; ?></td>
+                                      <td><?php echo empty($babyAdmissionData['typeOfDischarge']) ? '-' : $babyAdmissionData['typeOfDischarge']; ?></td>
                                       <td><a href="<?php echo base_url();?>babyM/viewBaby/<?php echo $value1['id']; ?>" class="btn btn-info btn-sm">View</a></td>
                                       <td><?php echo $District['DistrictNameProperCase']; ?></td>
                                       <td><?php echo $Facility['FacilityName']; ?></td>
@@ -431,4 +499,29 @@
     </div>
 </section>
 <!-- Column selectors with Export Options and print table -->
+
+<script type="text/javascript">
+  function openSubFilterBox(val){
+    if(val == "2"){
+      $('#dischargeTypeFilterBox').show();
+      $('#admissionTypeFilterBox').hide();
+    }else if(val == "1" || val == "3"){
+      $('#admissionTypeFilterBox').show();
+      $('#dischargeTypeFilterBox').hide();
+    }else{
+      $('#dischargeTypeFilterBox').hide();
+      $('#admissionTypeFilterBox').hide();
+    }
+  }
+
+  $( document ).ready(function() {
+    var searchDate = '<?php echo $fromDate; ?>';
+    if(searchDate != ""){
+      $('#fromDate').val(searchDate);
+    }else{
+      $('#fromDate').val("");
+    }
+    
+  });
+</script>
 

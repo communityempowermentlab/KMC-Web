@@ -42,6 +42,7 @@
 
     <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>app-assets/vendors/css/forms/select/select2.min.css">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>app-assets/vendors/css/pickers/pickadate/pickadate.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>app-assets/vendors/css/pickers/pickadate/daterangepicker.css">
 
     <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>twd-theme/videojs/video-js.css">
     <!-- BEGIN: Custom CSS-->
@@ -156,35 +157,39 @@
                   <ul class="search-list"></ul>
                 </div>
               </li>
-              <li class="dropdown dropdown-notification nav-item"><a class="nav-link nav-link-label" href="#" data-toggle="dropdown"><i class="ficon bx bx-bell bx-tada bx-flip-horizontal"></i><span class="badge badge-pill badge-danger badge-up"><?php echo $countNotification; ?></span></a>
-                <ul class="dropdown-menu dropdown-menu-media dropdown-menu-right">
-                  <li class="dropdown-menu-header">
-                    <div class="dropdown-header px-1 py-75 d-flex justify-content-between"><span class="notification-title"><?php echo $countNotification; ?> new Notification</span><a href="<?php echo base_url(); ?>notificationM/markAllRead" style="color: #FFF;"><span class="text-bold-400 cursor-pointer">Mark all as read</span></a></div>
-                  </li>
-                  <li class="scrollable-container media-list">
 
-                  <?php  foreach ($notifications as $key => $value) {
-                      $time =     $this->load->FacilityModel->time_ago_in_php($value['addDate']);
-                      $notificationTypeArray = array('1'=>'E','2'=>'A','3'=>'S');
-                  ?>
-                  <a href="<?= $value['url']; ?>" onclick="markReadNotification('<?php echo $value['id'] ?>');">
-                    <div class="d-flex justify-content-between cursor-pointer notifyDa">
-                      <div class="media d-flex align-items-center" style="border-bottom:1px solid #D3D5D7;">
-                        <div class="media-left pr-0">
-                          <div class="avatar bg-primary bg-lighten-5 mr-1 m-0 p-25"><span class="avatar-content text-primary font-medium-2"><?php if(array_key_exists($value['type'], $notificationTypeArray)){ echo $notificationTypeArray[$value['type']]; }else{ echo "N"; } ?></span></div>
-                        </div>
-                        <div class="media-body">
-                          <h6 class="media-heading"><?php echo $value['text']; ?></h6><small class="notification-text"><?php echo $time; ?></small>
+              <?php if($adminData['Type']==1) { ?>
+                <li class="dropdown dropdown-notification nav-item"><a class="nav-link nav-link-label" href="#" data-toggle="dropdown"><i class="ficon bx bx-bell bx-tada bx-flip-horizontal"></i><span class="badge badge-pill badge-danger badge-up"><?php echo $countNotification; ?></span></a>
+                  <ul class="dropdown-menu dropdown-menu-media dropdown-menu-right">
+                    <li class="dropdown-menu-header">
+                      <div class="dropdown-header px-1 py-75 d-flex justify-content-between"><span class="notification-title"><?php echo $countNotification; ?> new Notification</span><a href="<?php echo base_url(); ?>notificationM/markAllRead" style="color: #FFF;"><span class="text-bold-400 cursor-pointer">Mark all as read</span></a></div>
+                    </li>
+                    <li class="scrollable-container media-list">
+
+                    <?php  foreach ($notifications as $key => $value) {
+                        $time =     $this->load->FacilityModel->time_ago_in_php($value['addDate']);
+                        $notificationTypeArray = array('1'=>'E','2'=>'A','3'=>'S');
+                    ?>
+                    <a href="<?= $value['url']; ?>" onclick="markReadNotification('<?php echo $value['id'] ?>');">
+                      <div class="d-flex justify-content-between cursor-pointer notifyDa">
+                        <div class="media d-flex align-items-center" style="border-bottom:1px solid #D3D5D7;">
+                          <div class="media-left pr-0">
+                            <div class="avatar bg-primary bg-lighten-5 mr-1 m-0 p-25"><span class="avatar-content text-primary font-medium-2"><?php if(array_key_exists($value['type'], $notificationTypeArray)){ echo $notificationTypeArray[$value['type']]; }else{ echo "N"; } ?></span></div>
+                          </div>
+                          <div class="media-body">
+                            <h6 class="media-heading"><?php echo $value['text']; ?></h6><small class="notification-text"><?php echo $time; ?></small>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </a>
-                  <?php }   ?>
-                    
-                  </li>
-                  <li class="dropdown-menu-footer"><a class="dropdown-item p-50 text-primary justify-content-center" href="<?php echo base_url() ?>notificationM/viewAll">Read all notifications</a></li>
-                </ul>
-              </li>
+                    </a>
+                    <?php }   ?>
+                      
+                    </li>
+                    <li class="dropdown-menu-footer"><a class="dropdown-item p-50 text-primary justify-content-center" href="<?php echo base_url() ?>notificationM/viewAll">Read all notifications</a></li>
+                  </ul>
+                </li>
+              <?php } ?>
+              
               <li class="dropdown dropdown-user nav-item"><a class="dropdown-toggle nav-link dropdown-user-link" href="#" data-toggle="dropdown">
                   <div class="user-nav d-lg-flex d-none"><span class="user-name"><?php echo $adminData['Name']; ?></span><span class="user-status">Available</span></div><span>
                     <?php if($userlogindata['profileImage']){ ?>
@@ -197,11 +202,12 @@
                   </span></a>
                 <div class="dropdown-menu dropdown-menu-right pb-0">
 
-                  <?php if($adminData['Type']==1) { $profileUrl = base_url()."ProfileM/updateProfile"; } else { $profileUrl = base_url()."ProfileM/updateProfile";  } ?>
-                  <a class="dropdown-item" href="<?= $profileUrl; ?>"><i class="bx bx-user mr-50"></i> Edit Profile</a>
+                  <?php if($adminData['Type']!=3) {  if($adminData['Type']==1) { $profileUrl = base_url()."ProfileM/updateProfile"; } else { $profileUrl = base_url()."ProfileM/updateProfile";  } ?>
+                    <a class="dropdown-item" href="<?= $profileUrl; ?>"><i class="bx bx-user mr-50"></i> Edit Profile</a>
+                  <?php } ?>
                   
                   <a class="dropdown-item" href="app-email.html"><i class="bx bx-envelope mr-50"></i> My Inbox</a><a class="dropdown-item" href="app-todo.html"><i class="bx bx-check-square mr-50"></i> Task</a><a class="dropdown-item" href="app-chat.html"><i class="bx bx-message mr-50"></i> Chats</a>
-                  <?php if($adminData['Type']==1) { $logoutUrl = base_url()."Welcome/logout"; } else { $logoutUrl = base_url()."Welcome/employeeLogout";  } ?>
+                  <?php if($adminData['Type']==1) { $logoutUrl = base_url()."Welcome/logout"; } elseif($adminData['Type']==2) { $logoutUrl = base_url()."Welcome/employeeLogout"; }else{ $logoutUrl = base_url()."Welcome/loungeLogout"; } ?>
                   <div class="dropdown-divider mb-0"></div><a class="dropdown-item" href="<?= $logoutUrl; ?>"><i class="bx bx-power-off mr-50"></i> Logout</a>
                 </div>
               </li>

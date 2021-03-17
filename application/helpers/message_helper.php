@@ -11,6 +11,8 @@ function getAlertMessage($code){
                 '8' => 'Logout successfully.',
                 '9' => 'Select captcha.',
                 '10' => 'Invalid captcha.',
+                '11' => 'Your account is deactivated.',
+                '12' => 'Invalid Password.',
                 //Image Upload Alerts
                 '101' => 'Please upload image only.',
                 '102' => 'Please upload image with extensions .png, .jpg, .jpeg only.',

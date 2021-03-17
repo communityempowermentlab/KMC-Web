@@ -153,7 +153,7 @@
                                     <button type="submit" class="btn btn-primary glow w-100 position-relative" id="login_button">Login<i id="icon-arrow" class="bx bx-right-arrow-alt"></i></button>
                                 </form>
                                 <hr>
-                                <!-- <div class="text-center" style="margin-top:-12px;"><small class="mr-25">Login as Lounge</small><a href="<?php echo base_url() ?>Admin/loungeLogin"><small>Click Here</small></a></div> -->
+                                <div class="text-center" style="margin-top:-12px;"><small class="mr-25">Login as Lounge</small><a href="<?php echo base_url() ?>Admin/loungeLogin"><small>Click Here</small></a></div>
                             </div>
                         </div>
                     </div>

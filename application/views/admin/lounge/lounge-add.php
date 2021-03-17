@@ -113,14 +113,7 @@
                   <div class="form-group" id="passwordDiv">
                     <label>Lounge Password <span class="red">*</span></label>
                     <div class="controls">
-                      <fieldset>
-                        <div class="input-group">
-                          <input type="password" class="form-control hideCls" data-validation-required-message="This field is required" name="lounge_password" id="lounge_password" placeholder="Lounge Password">
-                          <div class="input-group-append">
-                            <span class="input-group-text" id="basic-addon2-password" onclick="showPassword()"><i class="bx bxs-show"></i></span>
-                          </div>
-                        </div>
-                      </fieldset>
+                      <input type="password" class="form-control" data-validation-required-message="This field is required" name="lounge_password" id="lounge_password" placeholder="Lounge Password">
                     </div>
                   </div>
                 </div>
@@ -135,7 +128,27 @@
                 </div>
               </div>
 
-          
+              <!-- Header menus -->
+              <br>
+              <div class="col-12">
+                <h5 class="float-left pr-1">Header Menus Privilege</h5>
+              </div>
+
+              <div class="row col-12">
+                <div class="col-md-4">
+                  <div class="form-group" id="passwordDiv">
+                    <label>Menu Group</label>
+                    <div class="controls">
+                      <select class="select2 form-control" multiple="multiple" name="menu_group[]" id="menu_group">
+                        <?php foreach ($menuGroup as $key => $value) {?>
+                          <option value ="<?php echo $value['id']?>" ><?php echo $value['groupName'] ?></option>
+                        <?php } ?>
+                      </select>
+                      <span class="custom-error" id="err_menu_group"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               <button type="submit" class="btn btn-primary">Submit</button>
             </form>
