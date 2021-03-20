@@ -163,7 +163,7 @@
                                     <button type="submit" class="btn btn-primary glow w-100 position-relative" id="login_button">Login<i id="icon-arrow" class="bx bx-right-arrow-alt"></i></button>
                                 </form>
                                 <hr>
-                                <div class="text-center" style="margin-top:-12px;"><small class="mr-25">Login as Admin</small><a href="<?php echo base_url() ?>Admin"><small>Click Here</small></a></div>
+                                <div class="text-center" style="margin-top:-12px;font-size:14px;"><small class="mr-25">Login as Admin</small><a href="<?php echo base_url() ?>Admin"><small>Click Here</small></a></div>
                             </div>
                         </div>
                     </div>

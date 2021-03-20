@@ -91,7 +91,7 @@
 
           <?php if(($sessionData['Type']==1) || in_array(57, $userPermittedMenuData)){ ?>
             <div class="col-sm-2 col-12 dashboard-users-success">
-              <a href="<?php echo base_url('videoM/manageVideo'); ?>">
+              <a href="<?php echo base_url('motherM/registeredMother/all/all'); ?>">
                 <div class="card text-center">
                   <div class="card-content">
                     <div class="card-body py-1">
@@ -109,14 +109,14 @@
 
           <?php if(($sessionData['Type']==1) || in_array(58, $userPermittedMenuData)){ ?>
             <div class="col-sm-2 col-12 dashboard-users-danger">
-              <a href="<?php echo base_url('employeeM/manageEmployee'); ?>">
+              <a href="<?php echo base_url('babyM/registeredBaby/1/all'); ?>">
                 <div class="card text-center">
                   <div class="card-content">
                     <div class="card-body py-1">
                       <div class="badge-circle badge-circle-lg badge-circle-light-danger mx-auto mb-50">
                         <i class="bx bx-group font-medium-5"></i>
                       </div>
-                      <div class="text-muted line-ellipsis">Total Infrants </div>
+                      <div class="text-muted line-ellipsis">Total Infants </div>
                       <h3 class="mb-0"><?php echo $getDashboardData['total_baby']; ?></h3>
                     </div>
                   </div>

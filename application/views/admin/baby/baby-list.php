@@ -70,6 +70,17 @@
   } else {
     $dischargeTypeFilterValue = '';
   }
+
+  $adminData = $this->session->userdata('adminData'); 
+  if($adminData['Type'] == 3){
+    $loungeDetails = $this->UserModel->getCoachFacilities();
+    $district = @$loungeDetails['coachDistrictArray'][0];
+    $Facility = $this->LoungeModel->GetFacilityByDistrict($district);
+    $facilityname = @$loungeDetails['coachFacilityArray'][0];
+    $Lounge = $this->LoungeModel->GetLoungeByFAcility($facilityname); 
+    $Staff = $this->LoungeModel->GetNurseByFacility($facilityname);
+    $loungeid = @$loungeDetails['coachLoungeArray'][0];
+  }
 ?>
 
 

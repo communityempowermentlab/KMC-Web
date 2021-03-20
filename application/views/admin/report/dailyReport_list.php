@@ -169,6 +169,9 @@
                                     else if($value['reportSettingId'] == "17"){
                                       $folder_name = "discharge";
                                     }
+                                    else if($value['reportSettingId'] == "18"){
+                                      $folder_name = "7dayadmitiondischarge";
+                                    }
                                     else{
                                       $folder_name = "babyadmission";
                                     }

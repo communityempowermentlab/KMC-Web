@@ -3,6 +3,8 @@ class UserModel extends CI_Model {
   public function __construct(){
     parent::__construct();
     $this->load->database();
+    $this->load->model('MotherModel');
+    $this->load->model('BabyModel');  
   }
  
  // get admin data when login
@@ -316,6 +318,12 @@ class UserModel extends CI_Model {
       $getCoachFacilityLoungeList = $this->db->get_where('coachDistrictFacilityLounge',array('masterId'=>$adminData['Id'],'status'=>1))->result_array();
       $coachFacilityArray  = array_column($getCoachFacilityLoungeList, 'facilityId');
       $coachLoungeArray  = array_column($getCoachFacilityLoungeList, 'loungeId');
+    }elseif($adminData['Type'] == 3){
+      $this->db->select('loungeMaster.loungeId,facilitylist.FacilityID,facilitylist.PRIDistrictCode');
+      $this->db->join('facilitylist','facilitylist.FacilityID=loungeMaster.facilityId');
+      $getFacilityLoungeList = $this->db->get_where('loungeMaster',array('loungeMaster.loungeId'=>$adminData['Id'],'loungeMaster.status'=>1))->row_array();
+      $coachFacilityArray  = array('0'=>$getFacilityLoungeList['FacilityID']);
+      $coachLoungeArray  = array('0'=>$getFacilityLoungeList['loungeId']);
     }
 
     // facility count
@@ -375,8 +383,8 @@ class UserModel extends CI_Model {
       }
     } 
 
-    $total_mothers = $this->db->get('motherRegistration')->num_rows();
-    $total_baby = $this->db->get('babyRegistration')->num_rows();
+    $total_mothers = $this->MotherModel->getAllMotherCount();
+    $total_baby = $this->BabyModel->countAllBabies('all','current');
                   
     $result = array();
     $result['facility_count'] = $facility;
