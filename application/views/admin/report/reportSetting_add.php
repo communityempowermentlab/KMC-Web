@@ -101,6 +101,20 @@ input:checked + .slider:before {
               </div>
               
               <div class="row col-12">
+                <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Report Type <span class="red">*</span></label>
+                      <div class="controls">
+                        <select class="select2 form-control" name="category" id="category">
+                          <option value="">Select Report Category</option>
+                          <?php
+                            foreach ($reportCategory as $key => $value) {?>
+                              <option value="<?php echo $value['id']; ?>" ><?php echo $value['name']; ?></option>
+                          <?php } ?>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
                   
                   <div class="col-md-4">
                     <div class="form-group">
@@ -120,7 +134,13 @@ input:checked + .slider:before {
                     </div>
                   </div>
 
-                  <div class="col-md-4">
+                  
+                  
+              </div>
+
+              <div class="row col-12">
+
+                <div class="col-md-4">
                     <div class="form-group">
                       <label>Email To <span class="red">*</span></label>
                       <div class="controls">
@@ -128,10 +148,6 @@ input:checked + .slider:before {
                       </div>
                     </div>
                   </div>
-                  
-              </div>
-
-              <div class="row col-12">
 
                   <div class="col-md-4">
                     <div class="form-group" id="tabDiv">

@@ -172,6 +172,12 @@
                                     else if($value['reportSettingId'] == "18"){
                                       $folder_name = "7dayadmitiondischarge";
                                     }
+                                    else if($value['reportSettingId'] == "19"){
+                                      $folder_name = "exceptionreport1day";
+                                    }
+                                    else if($value['reportSettingId'] == "20"){
+                                      $folder_name = "exceptionreport7day";
+                                    }
                                     else{
                                       $folder_name = "babyadmission";
                                     }

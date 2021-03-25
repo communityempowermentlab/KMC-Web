@@ -4,6 +4,7 @@ class BabyAdmissionPDF extends CI_Model {
     {
         parent::__construct();         
         include_once APPPATH.'/third_party/mpdf/mpdf.php';    
+        $this->load->model('DangerSignModel'); 
     }
     public function pdfGenerate($id)
     { 
@@ -12,16 +13,16 @@ class BabyAdmissionPDF extends CI_Model {
 
       $fileName = "b_".$babyAdmisionLastId['id'].".pdf";
       $GetMotherAllData = $this->GetMotherAllData($getMotherId['motherId']);
-      $GetBabyAllData   = $this->GetBabyAllData($babyAdmisionLastId['babyId']);
+      $GetBabyAllData   = $this->GetBabyAllData($babyAdmisionLastId['id']);
       $PdfFile = $this->pdfconventer($GetMotherAllData,$GetBabyAllData,$fileName,$babyAdmisionLastId['id']);
 
       $this->db->where('id',$babyAdmisionLastId['id']);
       $this->db->update('babyAdmission', array('babyPdfFileName'=>$PdfFile));
 
 
-      $PdfName = $this->BabyWeightPdfFile($babyAdmisionLastId['loungeId'],$babyAdmisionLastId['babyId'],$babyAdmisionLastId['id']);
-      $this->db->where('id',$babyAdmisionLastId['id']);
-      $res = $this->db->update('babyAdmission',array('babyWeightPdfName'=>$PdfName));
+      // $PdfName = $this->BabyWeightPdfFile($babyAdmisionLastId['loungeId'],$babyAdmisionLastId['babyId'],$babyAdmisionLastId['id']);
+      // $this->db->where('id',$babyAdmisionLastId['id']);
+      // $res = $this->db->update('babyAdmission',array('babyWeightPdfName'=>$PdfName));
       return $res;
 
     }
@@ -56,12 +57,12 @@ class BabyAdmissionPDF extends CI_Model {
 
     public function GetMotherAllData($MotherID)
     {
-      return $this->db->query("SELECT * FROM motherRegistration AS MR LEFT JOIN motherAdmission AS MA ON MR.`motherId` = MA.`motherId`  WHERE MR.`motherId` = '".$MotherID."'")->row_array();
+      return $this->db->query("SELECT *,MR.guardianName as guardianNameAdmission FROM motherRegistration AS MR LEFT JOIN motherAdmission AS MA ON MR.`motherId` = MA.`motherId`  WHERE MR.`motherId` = '".$MotherID."'")->row_array();
     }
 
     public function GetBabyAllData($BabyAdmissionID)
     {   
-      return $this->db->query("SELECT *,BA.`addDate` as AddDate FROM  babyRegistration AS BR LEFT JOIN babyAdmission AS BA ON BR.`babyId` = BA.`id`  WHERE BA.`id` = '".$BabyAdmissionID."' order by BA.`id` desc")->row_array();
+      return $this->db->query("SELECT *,BA.`addDate` as AddDate FROM  babyRegistration AS BR LEFT JOIN babyAdmission AS BA ON BR.`babyId` = BA.`babyId`  WHERE BA.`id` = '".$BabyAdmissionID."'")->row_array();
         //echo $this->db->last_query();
     }
 
@@ -84,16 +85,15 @@ class BabyAdmissionPDF extends CI_Model {
     }
 
     public function pdfconventer($MotherData, $BabyData,$filename ='',$id)
-    { 
+    {   //print_r($BabyData);exit;
         error_reporting(0);
         if($MotherData['motherLmpDate']!=NULL){
         $gestationAge = $this->GetDateDifference(strtotime($BabyData['deliveryDate']),strtotime($MotherData['motherLmpDate']));
         $weekPlural = ($gestationAge > 1) ? 'Weeks' : 'Week';
         if($gestationAge == '0'){
-          $GestationalAge = 'UNKNOWN';
           $birthTerm = 'N/A';
         } else {
-          $GestationalAge = $gestationAge.' '.$weekPlural; 
+          $GestationalAge = $gestationAge; 
           if($GestationalAge < 38.6){
             $birthTerm = 'Preterm';
           } else {
@@ -101,9 +101,14 @@ class BabyAdmissionPDF extends CI_Model {
           }
         }
       } else {
-        $GestationalAge = '___________________';
         $birthTerm = 'N/A'; 
       }
+
+        if(!empty($BabyData['gestationalAge'])){
+          $GestationalAge = $BabyData['gestationalAge'];
+        }else{
+          $GestationalAge = '___________________';
+        }
 
         $getFirstbabyData = $this->db->get_where('babyAdmission',array('id'=>$id))->row_array();
         $getFirstAseessmentbabyData = $this->db->get_where('admissionCheckList',array('babyAdmissionId'=>$id))->row_array();
@@ -113,16 +118,16 @@ class BabyAdmissionPDF extends CI_Model {
         $GR_Relation=  ($MotherData['guardianRelation']!='') ?  $MotherData['guardianRelation'] :'___________________';
         $MCTS = ($MotherData['motherMCTSNumber']!=NULL)?  ' '.$MotherData['motherMCTSNumber']: ' --';
         
-        $District_Name =  $this->DistrictVillageBlock($MotherData['presentDistrictName'], 3) ;
+        $District_Name =  $this->DistrictVillageBlock($MotherData['permanentDistrictName'], 3) ;
         $Dname = ($District_Name!='') ? $District_Name : '';
-        $State = ($MotherData['presentState']!='') ? $MotherData['presentState'] : '';
-        $Country = ($MotherData['presentCountry']!='') ? $MotherData['presentCountry'] : '';
+        $State = ($MotherData['permanentState']!='') ? $MotherData['permanentState'] : '';
+        $Country = ($MotherData['permanentCountry']!='') ? $MotherData['permanentCountry'] : '';
         
 
         $Block_Name =  $this->DistrictVillageBlock($MotherData['presentBlockName'], 2) ;
         $Bname = ($MotherData['presentBlockName']!='') ? $MotherData['presentBlockName'] : '';
 
-        $Village_Name =  $this->DistrictVillageBlock($MotherData['presentVillageName'], 1) ;
+        $Village_Name =  $this->DistrictVillageBlock($MotherData['permanentVillageName'], 1) ;
         $Vname = ($Village_Name!='') ? $Village_Name: '_________________________________';
 
         $date = date('d/m/Y', strtotime($BabyData['addDate'])); 
@@ -132,23 +137,35 @@ class BabyAdmissionPDF extends CI_Model {
         $AdmissionBirthWeigth = ($getFirstbabyData['babyAdmissionWeight']!='') ? $getFirstbabyData['babyAdmissionWeight'].' grams' :'';
 
 
-        $MotherDeliveryPlace = (($MotherData['facilityId']=='0') || ($MotherData['facilityId']=='')) ? ucwords($MotherData['deliveryPlace']) : 'Hospital';
+        if(($BabyData['infantComingFrom'] == 'Other') || ($BabyData['infantComingFrom'] == 'अन्य')){ 
+          $MotherDeliveryPlace = $BabyData['infantComingFromOther']; 
+        }
+        else
+        { 
+          $MotherDeliveryPlace = $BabyData['infantComingFrom']; 
+        }
+
+        if($BabyData['typeOfBorn'] == 'Inborn'){ 
+          $getBabyLounge = $this->singlerowparameter('facilityId','loungeId',$BabyData['loungeId'],'loungeMaster');
+          $FacilityName = $this->singlerowparameter('FacilityName','FacilityID',$getBabyLounge,'facilitylist');
+        }
+        else
+        { 
+          $FacilityName = "-";
+        }
 
 
-        $FacilityName = ($MotherData['facilityId']!='0' && $MotherData['facilityId']!=NULL) ? $this->singlerowparameter('FacilityName','facilityId',$MotherData['facilityId'],'facilitylist') : 'Other';
+        $RuralUrban = ($MotherData['permanentResidenceType']!='') ? " ". $MotherData['permanentResidenceType'] :  '  _______________  ';
+        $Pincode    = ($MotherData['permanentPinCode']!='') ? " ".$MotherData['permanentPinCode'] :  '  _______________  ';
 
-
-        $RuralUrban = ($MotherData['presentResidenceType']!='') ? " ". $MotherData['presentResidenceType'] :  '  _______________  ';
-        $Pincode    = ($MotherData['presentPinCode']!='') ? " ".$MotherData['presentPinCode'] :  '  _______________  ';
-
-        $NearBy     = ($MotherData['presentAddNearByLocation']!='') ? " ".$MotherData['presentAddNearByLocation'] :  '  _______________  ';
-        $Address    = ($MotherData['presentAddress']!='') ? " ".$MotherData['presentAddress'] :  '  _______________  ';
-        $AshaName   = ($MotherData['ashaName']!='') ? " ".$MotherData['ashaName'] :  '  _______________  ';
-        $AshaNumber = ($MotherData['ashaNumber']!='') ? " ".$MotherData['ashaNumber'] :  '  _______________  ';
+        $NearBy     = ($MotherData['permanentAddNearByLocation']!='') ? " ".$MotherData['permanentAddNearByLocation'] :  '  _______________  ';
+        $Address    = ($MotherData['permanentAddress']!='') ? " ".$MotherData['permanentAddress'] :  '  _______________  ';
+        $AshaName   = '  _______________  ';
+        $AshaNumber = '  _______________  ';
 
         $Signatures = signDirectoryUrl.$getFirstAseessmentbabyData['nurseDigitalSign'];
 
-        $NurseSign = ($MotherData['staffId']!='') ? $this->singlerowparameter('name','staffId',$MotherData['staffId'],'staffMaster').'<br> '. date('d/m/Y h:i A').'<br>' : ' __________________________________________________';
+        $NurseSign = ($getFirstbabyData['staffId']!='') ? $this->singlerowparameter('name','staffId',$getFirstbabyData['staffId'],'staffMaster').'<br>' : ' __________________________________________________';
 
 
         $MotherNo = ($MotherData['motherMobileNumber']!='') ? $MotherData['motherMobileNumber'] : '____________________________________________________';
@@ -160,7 +177,7 @@ class BabyAdmissionPDF extends CI_Model {
 
         if($MotherData['motherName']!=''){
 
-          $MotherName = ($MotherData['motherName']!='') ? ucwords($MotherData['motherName']) :'__________________';
+          $MotherName = ($MotherData['motherName']!='') ? $MotherData['motherName'] :'__________________';
         }elseif($MotherData['motherName']==NULL && $MotherData['guardianName']==NULL ){
           $MotherName  = '__________________';
             
@@ -180,25 +197,31 @@ class BabyAdmissionPDF extends CI_Model {
 
         //$Mname = ($MotherData['Type']=='2')? $MotherData['MotherName'] : $MotherName;
 
-        $FatherName = ($MotherData['fatherName']!='') ? ucwords($MotherData['fatherName']) :'__________________';
+        $FatherName = ($MotherData['fatherName']!='') ? $MotherData['fatherName'] :'__________________';
 
-        if($MotherData['guardianName']==NULL  && $MotherData['guardianName']==NULL){
-            if($GR_Relation=='Father'){
+        // if($MotherData['guardianName']==NULL){
+        //     if($GR_Relation=='Father'){
+        //         $GR_NAME = $FatherName;
+        //     }else{
+        //         $GR_NAME = $MotherData['motherName'];   
+        //     }
+        // }else{
+        //     $GR_NAME = ($MotherData['guardianName']!='') ?  $MotherData['guardianName'] :'  _________________________________________________';
+        // }
 
-                $GR_NAME = $FatherName;
-            }else{
-                $GR_NAME = $MotherData['motherName'];   
-            }
-
-
+        if($MotherData['isMotherAdmitted']=="Yes"){
+          $GR_NAME = $MotherData['motherName'];  
+          $GR_Relation='Mother';
+        }elseif($MotherData['type']=="2"){
+          $GR_NAME = $MotherData['organisationName'];  
+          $GR_Relation = "Organisation";
         }else{
-
-            $GR_NAME = ($MotherData['guardianName']!='') ?  $MotherData['guardianName'] :'  _________________________________________________';
-
+          $GR_NAME = $MotherData['guardianNameAdmission'];  
+          $GR_Relation = $MotherData['guardianRelation'];
         }
-         $motherName00=  ($MotherData['motherName']!='') ? ucwords($MotherData['motherName']) :'_____________________';
 
-         $fatherName00=  ($MotherData['fatherName']!='') ? ucwords($MotherData['fatherName']) :'_____________________';  
+        $motherName00=  ($MotherData['motherName']!='') ? $MotherData['motherName'] :'_____________________';
+        $fatherName00=  ($MotherData['fatherName']!='') ? $MotherData['fatherName'] :'_____________________';  
 
 
         $OrganisationName = ($MotherData['organisationName']!='') ? $MotherData['organisationName'] :"_____________________";
@@ -208,7 +231,27 @@ class BabyAdmissionPDF extends CI_Model {
 
         $LMPDate = ($MotherData['motherLmpDate']!=NULL) ? date('d/m/Y', strtotime($MotherData['motherLmpDate'])) : '_____________________';
 
-        //echo $this->db->last_query();
+        // birth complication
+        $complicationAtBirthString = "";
+        $complicationAtBirthData =json_decode($BabyData['isAnyComplicationAtBirth'], true);
+        if(!empty($complicationAtBirthData) && count($complicationAtBirthData) > 0){
+          $complicationCount=1;
+          foreach ($complicationAtBirthData as $complicationkey => $complicationAtBirthVal) {
+            $complicationAtBirthString .='<span style="margin-left:20px">'.$complicationCount.". ".$complicationAtBirthVal['name'].'</span><br>';
+            $complicationCount++;
+          }
+        }else{
+          $complicationAtBirthString = "";
+        }
+
+        // baby stable
+        $get_first_assessment = $this->db->query("select * from babyDailyMonitoring where babyAdmissionId=".$id." order by id ASC limit 0,1")->row_array();
+        $babyStableStatus      = $this->DangerSignModel->getBabyIcon($get_first_assessment);
+        if($babyStableStatus == 1){
+          $babyStableStatusData = "Yes";
+        }else{
+          $babyStableStatusData = "No";
+        }
          
 
 
@@ -223,6 +266,7 @@ class BabyAdmissionPDF extends CI_Model {
 
                 border-collapse: collapse;
             }
+            td,div { font-family: freeserif; }
         </style>
 
         </head>
@@ -232,7 +276,7 @@ class BabyAdmissionPDF extends CI_Model {
             <h3 style ="text-align: center; margin-top:-5px !important"><u> FORM A: KMC UNIT ADMISSION FORM</u> </h3>
             <p style="font-size: 14px"> <b>Objective:</b> To be filled at the time of admission to the KMC unit, before starting long-duration KMC. The form contains information on eligibility of the baby of KMC and detail required for follow-up. </p>
             <p style=" font-size: 14px ; padding-bottom:-5px !important ;"><b><u><i> Information to be collect by nurse on duty in KMC unit from the case sheet, health officials, mother and caregivers. </i></u></b></p>
-            <span style="margin-top:-10px">--------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+            <span style="margin-top:-10px">------------------------------------------------------------------------------------------------------------------------------------------</span>
         
 
          <div>
@@ -266,7 +310,7 @@ class BabyAdmissionPDF extends CI_Model {
             </div>
                 <br>
               <div style="margin-top: 3px; margin-left:20px">    
-              <b> 1.4 Type of Admission: </b> '.ucwords($BabyData['typeOfBorn']).'
+              <b> 1.4 Type of Admission: </b> '.$BabyData['typeOfBorn'].'
               
             </div>
             <br>
@@ -284,28 +328,28 @@ class BabyAdmissionPDF extends CI_Model {
             </div>   
             <br>
             <div style="margin-top: 3px; margin-left:20px">    
-              <b> 1.7 Type of Birth: </b> '.ucwords($BabyData['deliveryType']).'              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <b> 1.7 Type of Birth: </b> '.$BabyData['deliveryType'].'              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
                </div>   
             <br>
             <div style="margin-top: 3px; margin-left:20px">    
             
-                <b> 1.8  Term of Birth:</b> '.$birthTerm.' 
+                <b> 1.8  Term of Birth:</b> '.$birthTerm.'
             </div>  
 
             <br>
             <div style="margin-top: 3px; margin-left:20px">
-              <b> 1.9 LMP </b> (first day of last menstrual period - dd/mm/yyyy): '.$LMPDate.'
+              <b> 1.9 LMP (first day of last menstrual period - dd/mm/yyyy):</b> '.$LMPDate.'
               
             </div>
             <br>   
             <div style="margin-top: 3px; margin-left:20px">
-              <b> 1.10  Gestational Age  </b>(in weeks): '.$GestationalAge.' 
+              <b> 1.10  Gestational Age (in weeks) </b>: '.$GestationalAge.' 
             </div>
             <br>
 
              <div style="margin-top: 3px; margin-left:20px">
-              <b> 1.11 Weigth of baby at admission to KMC unit</b> (in grams): '.$AdmissionBirthWeigth.'
+              <b> 1.11 Weight of baby at admission to KMC unit</b> (in grams): '.$AdmissionBirthWeigth.'
 
             </div>  
             <br> 
@@ -334,13 +378,11 @@ class BabyAdmissionPDF extends CI_Model {
             </div><br>
 
             <div style="margin-top: 3px; margin-left:20px">
-              <b> 1.13   Is the Baby Stable? </b>  &nbsp;&nbsp; Yes&nbsp; /&nbsp; No
+              <b> 1.13   Is the Baby Stable? </b>  &nbsp;&nbsp; '.$babyStableStatusData.'
               <br>
               Is the baby on medication at time of admission? (Specify name and dosage)
               <br>
-              <span style="margin-left:20px">1. ______________________________________________</span><br>
-              <span style="margin-left:20px">2. ______________________________________________</span><br>
-              <span style="margin-left:20px">3. ______________________________________________</span><br>
+              '.$complicationAtBirthString.'
             </div>   
             <br>
 
@@ -348,7 +390,7 @@ class BabyAdmissionPDF extends CI_Model {
           <div>
 
           <br>
-            <b>2- </b> <label>FAMILY DETAIL (For Follow Up)</label>
+            <b>2- <label>FAMILY DETAIL (For Follow Up)</b></label>
             <br>
               <div style="margin-top: 15px; margin-left:20px">
                 <b> 2.1 Name of the Mother: </b> '.$motherName00.'
@@ -412,7 +454,7 @@ class BabyAdmissionPDF extends CI_Model {
             </div>
             <br>
             <div style="margin-top: 3px; margin-left:35px">
-              <b> 2.4.1 Name and Number of ASHA: </b> '. ucwords($AshaName) ."&nbsp;&nbsp;&nbsp; ".$AshaNumber.'
+              <b> 2.4.1 Name and Number of ASHA: </b> '. $AshaName ."&nbsp;&nbsp;&nbsp; ".$AshaNumber.'
             </div>
             <br>
             <div style="margin-top: 3px; margin-left:20px">    
@@ -428,7 +470,7 @@ class BabyAdmissionPDF extends CI_Model {
        
         
 
-        if($MotherData['isMotherAdmitted']==NULL && $MotherData['notAdmittedReason']==NULL && $MotherData['type']=='2'){
+        if($MotherData['type']=='2'){
             $html.='<div style="margin-top: 3px; margin-left:20px">    
                       <b> 2.7 Address: </b>
                       <br><br>
@@ -460,7 +502,7 @@ class BabyAdmissionPDF extends CI_Model {
               <b> Rural/Urban: </b> ' .$RuralUrban.  '<br>
               <b> State/Country: </b> ' .$State.', '.$Country.'<br>
               <b> District: </b> ' .$Dname.'<br>
-              <b> Gram Sabha-Hamlet/ House NO.:</b> '.$Vname.'<br>
+              <b> Gram Sabha-Hamlet/ House No.:</b> '.$Vname.'<br>
               <b> Address:</b>' . $Address. '<br>
               <b> Pin Code:</b>' . $Pincode. '<br>
               <b> Near:</b>' . $NearBy. '<br>

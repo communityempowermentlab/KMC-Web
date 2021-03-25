@@ -3222,6 +3222,269 @@ class Cronjob extends CI_Controller {
     }
 
 
+      //Exception report for 1day
+  public function exceptionReportFor1Day(){
+
+      $reportDate = date('jS F Y, l',strtotime("-1 days"));
+      //$reportDate = date('jS F Y, l',strtotime("2021-01-29"));
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->getRowDimension('2')->setRowHeight(20);
+      $objWorkSheet->mergeCells('A1:D1');
+      $objWorkSheet->mergeCells('A2:D2');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
+
+      for($col = ord('A'); $col <= ord('D'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."4")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
+      $objWorkSheet->getColumnDimension('B')->setWidth(40);
+      $objWorkSheet->getColumnDimension('C')->setWidth(12);
+      $objWorkSheet->getColumnDimension('D')->setWidth(12);
+     
+      
+
+      $timeNotes = "("."8:00 am ".date('jS F',strtotime(date('Y-m-d',strtotime("-1 days"))))." to 8:00 am  ".date('jS F',strtotime(date('Y-m-d'))).")";
+      
+
+      for($col = ord('A'); $col <= ord('D'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->setCellValue('A4', 'Sr. No.');
+      $objWorkSheet->setCellValue('B4', 'Lounge Name');
+      //$objWorkSheet->setCellValue('C4', 'Nurse Name');
+      $objWorkSheet->setCellValue('C4', 'Admission');
+      $objWorkSheet->setCellValue('D4', 'Discharge');
+      
+
+      $objWorkSheet->setCellValue('A1', 'KMC App 1 day Exception Report');
+      $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate." ".$timeNotes);
+
+      $getReportSettings = $this->cmodel->getReportSettings(18);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+      
+      $getAllLounges = $this->cmodel->exceptionReportFor1Day($loungeArray);
+      $dataCount = 1;
+      $a=4;
+      
+      foreach($getAllLounges as $key_lounge => $getAllLoungesData){
+
+          $loungeListArray    = [];
+          $loungeListArray[]  = $dataCount;
+          // if($getAllLounges[$key_lounge-1]['loungeName']==$getAllLoungesData['loungeName'])
+          // {
+          //   $a = $a+1;
+          //   $loungeListArray[]  = '';
+          //   //$a = $innerRow+1;
+          // }
+          // else
+          // {
+          //   $a = $a+2;
+          //   $loungeListArray[]  = $getAllLoungesData['loungeName'];
+          // }
+          $a = $a+1;
+          $loungeListArray[]  = $getAllLoungesData['loungeName'];
+          //$loungeListArray[]  = $getAllLoungesData['name'];
+          if ($getAllLoungesData['day1Admission'] > 0) {
+            $loungeListArray[]  = "Yes";
+          }
+          else
+          {
+              $loungeListArray[]  = "No";
+          }
+          if ($getAllLoungesData['day1BabyDischarge'] > 0 || $getAllLoungesData['day1MotherDischarge'] > 0) 
+          {
+            $loungeListArray[]  = "Yes";
+          }
+          else
+          {
+              $loungeListArray[]  = "No";
+          }
+
+           $objWorkSheet->fromArray($loungeListArray, null, 'A'.$a);
+           
+          $styleArray = array(
+            'borders' => array(
+            'allborders' => array(
+            'style' => PHPExcel_Style_Border::BORDER_THIN
+            )
+            )
+          );
+
+          $objWorkSheet->getStyle('A1:W'.$a.'')->applyFromArray($styleArray);
+
+          $objWorkSheet->setTitle('Lounge Exception Report');
+          $dataCount++;   
+      }
+
+      $file = "1 day-Exception-Report-".date('d-m-Y',strtotime("-1 days")); 
+       
+      $filename=$file.'.xls';
+      header('Content-Type: application/vnd.ms-excel');
+      header('Content-Disposition: attachment;filename="'.$filename.'"');
+      header('Cache-Control: max-age=0');
+
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+      $objWriter->save('php://output');
+      $objWriter->save(str_replace(__FILE__,'assets/Reports/exceptionreport1day/'.$filename,__FILE__));
+      chmod('assets/Reports/exceptionreport1day/'.$filename, 0777);
+
+      // save file log
+      if(!empty($getReportSettings)){
+        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+        if(empty($checkFileExist)){
+          $logData['reportSettingId']      = $getReportSettings['id'];
+          $logData['fileName']             = $filename;
+          $logData['addDate']              = date('Y-m-d',strtotime("-1 days"));
+          //$this->db->insert('reportLogs',$logData);
+        }
+      }
+
+    }
+
+
+      //Exception report for 7 days
+  public function exceptionReportFor7Day(){
+
+      $reportDate = date('jS F Y, l',strtotime("-1 days"));
+      //$reportDate = date('jS F Y, l',strtotime("2021-01-29"));
+      $objPHPExcel = new PHPExcel();
+
+      $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
+      $objWorkSheet->getRowDimension('1')->setRowHeight(25);
+      $objWorkSheet->getRowDimension('2')->setRowHeight(20);
+      $objWorkSheet->mergeCells('A1:D1');
+      $objWorkSheet->mergeCells('A2:D2');
+      $objWorkSheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+      $objWorkSheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+      $objWorkSheet->getStyle('A2')->getFont()->setBold(true)->setSize(10);
+
+      for($col = ord('A'); $col <= ord('D'); $col++)
+      {
+        $objWorkSheet->getStyle(chr($col)."4")->getFont()->setBold(true)->setSize(10);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col)."4")->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->getColumnDimension('A')->setWidth(8);
+      $objWorkSheet->getColumnDimension('B')->setWidth(40);
+      $objWorkSheet->getColumnDimension('C')->setWidth(12);
+      $objWorkSheet->getColumnDimension('D')->setWidth(12);
+     
+      
+
+      $timeNotes = "("."8:00 am ".date('jS F',strtotime(date('Y-m-d',strtotime("-7 days"))))." to 8:00 am  ".date('jS F',strtotime(date('Y-m-d'))).")";
+      
+
+      for($col = ord('A'); $col <= ord('D'); $col++){
+        $objWorkSheet->getStyle(chr($col))->getFont()->setSize(10);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objWorkSheet->getStyle(chr($col))->getAlignment()->setWrapText(true);
+      }
+
+      $objWorkSheet->setCellValue('A4', 'Sr. No.');
+      $objWorkSheet->setCellValue('B4', 'Lounge Name');
+      //$objWorkSheet->setCellValue('C4', 'Nurse Name');
+      $objWorkSheet->setCellValue('C4', 'Admission');
+      $objWorkSheet->setCellValue('D4', 'Discharge');
+      
+
+      $objWorkSheet->setCellValue('A1', 'KMC App 7 days Exception Report');
+      $objWorkSheet->setCellValue('A2', "For Date: ".$reportDate." ".$timeNotes);
+
+      $getReportSettings = $this->cmodel->getReportSettings(18);
+      $loungeArray = array_column($getReportSettings['facilities'], 'loungeId');
+      
+      $getAllLounges = $this->cmodel->exceptionReportFor7Day($loungeArray);
+      $dataCount = 1;
+      $a=4;
+      
+      foreach($getAllLounges as $key_lounge => $getAllLoungesData){
+
+          $loungeListArray    = [];
+          $loungeListArray[]  = $dataCount;
+          // if($getAllLounges[$key_lounge-1]['loungeName']==$getAllLoungesData['loungeName'])
+          // {
+          //   $a = $a+1;
+          //   $loungeListArray[]  = '';
+          //   //$a = $innerRow+1;
+          // }
+          // else
+          // {
+          //   $a = $a+2;
+          //   $loungeListArray[]  = $getAllLoungesData['loungeName'];
+          // }
+          $a = $a+1;
+          $loungeListArray[]  = $getAllLoungesData['loungeName'];
+          //$loungeListArray[]  = $getAllLoungesData['name'];
+          if ($getAllLoungesData['babyAdmit'] > 0) {
+            $loungeListArray[]  = "Yes";
+          }
+          else
+          {
+              $loungeListArray[]  = "No";
+          }
+          if ($getAllLoungesData['babyDischarge'] > 0 || $getAllLoungesData['motherDischarge'] > 0) 
+          {
+            $loungeListArray[]  = "Yes";
+          }
+          else
+          {
+              $loungeListArray[]  = "No";
+          }
+
+           $objWorkSheet->fromArray($loungeListArray, null, 'A'.$a);
+           
+          $styleArray = array(
+            'borders' => array(
+            'allborders' => array(
+            'style' => PHPExcel_Style_Border::BORDER_THIN
+            )
+            )
+          );
+
+          $objWorkSheet->getStyle('A1:W'.$a.'')->applyFromArray($styleArray);
+
+          $objWorkSheet->setTitle('Lounge Exception Report');
+          $dataCount++;   
+      }
+
+      $file = "7-day-Exception-Report-".date('d-m-Y',strtotime("-1 days")); 
+       
+      $filename=$file.'.xls';
+      header('Content-Type: application/vnd.ms-excel');
+      header('Content-Disposition: attachment;filename="'.$filename.'"');
+      header('Cache-Control: max-age=0');
+
+      $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  
+      $objWriter->save('php://output');
+      $objWriter->save(str_replace(__FILE__,'assets/Reports/exceptionreport7day/'.$filename,__FILE__));
+      chmod('assets/Reports/exceptionreport7day/'.$filename, 0777);
+
+      // save file log
+      if(!empty($getReportSettings)){
+        $checkFileExist = $this->db->get_where('reportLogs',array('reportLogs.reportSettingId'=>$getReportSettings['id'],'fileName'=>$filename))->row_array();
+        if(empty($checkFileExist)){
+          $logData['reportSettingId']      = $getReportSettings['id'];
+          $logData['fileName']             = $filename;
+          $logData['addDate']              = date('Y-m-d',strtotime("-1 days"));
+          //$this->db->insert('reportLogs',$logData);
+        }
+      }
+
+    }
+
 
 
     public function terst()

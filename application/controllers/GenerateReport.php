@@ -16,8 +16,6 @@ class GenerateReport extends Welcome {
 
   /* Report Setting Listing page call */
   public function manageGeneralReport(){
-    // $facility_id = $this->uri->segment(3); 
-//echo "hello"; die;
     $facility_id = 'all';
     
     $limit         = DATA_PER_PAGE;
@@ -26,19 +24,15 @@ class GenerateReport extends Welcome {
     
 
     if($this->input->get()) { 
-      if(empty($_GET['keyword']) && empty($_GET['facilityname']) && empty($_GET['district'])) { 
-        $totalRecords = $this->StaffModel->getStaffData('1', '', '', $facility_id); 
-      } else if(!empty($_GET['keyword']) && empty($_GET['facilityname']) && empty($_GET['district'])) { 
-        $totalRecords = $this->StaffModel->getStaffDataWhereSearching('1',trim($_GET['keyword']));
-      } else if(empty($_GET['keyword']) && !empty($_GET['facilityname'])) { 
-        $totalRecords = $this->StaffModel->getStaffDataWhereFacility('1',trim($_GET['facilityname']));
-      } else if(empty($_GET['keyword']) && empty($_GET['facilityname']) && !empty($_GET['district'])) { 
-        $totalRecords = $this->StaffModel->getStaffDataWhereDistrict('1',trim($_GET['district']));
-      } else if(!empty($_GET['keyword']) && !empty($_GET['facilityname'])) { 
-        $totalRecords = $this->StaffModel->getStaffDataWhereFacilitySearch('1',trim($_GET['keyword']),trim($_GET['facilityname']));
-      } else if(!empty($_GET['keyword']) && !empty($_GET['district'])) { 
-        $totalRecords = $this->StaffModel->getStaffDataWhereDistrictSearch('1',trim($_GET['keyword']),trim($_GET['district']));
-      }
+      if(empty($_GET['keyword']) && empty($_GET['category'])) { 
+        $totalRecords = $this->ReportSettingModel->getReportSettingData('1', '', ''); 
+      } else if(!empty($_GET['keyword']) && empty($_GET['category']) ) { 
+        $totalRecords = $this->ReportSettingModel->getReportSettingDataWhereSearching('1',trim($_GET['keyword']));
+      } else if(empty($_GET['keyword']) && !empty($_GET['category'])) { 
+        $totalRecords = $this->ReportSettingModel->getReportSettingDataWhereCategory('1',trim($_GET['category']));
+      } else if(!empty($_GET['keyword']) && !empty($_GET['category'])) { 
+        $totalRecords = $this->ReportSettingModel->getReportSettingWhereFacilitySearch('1',trim($_GET['keyword']),trim($_GET['category']));
+      } 
     } else { 
       $totalRecords = $this->ReportSettingModel->getReportSettingData('1', '', ''); 
     }  
@@ -67,22 +61,17 @@ class GenerateReport extends Welcome {
           }
 
           if($this->input->get()) { 
-            if(empty($_GET['keyword']) && empty($_GET['facilityname']) && empty($_GET['district'])) { 
-              $AllRecord = $this->StaffModel->getStaffData('2',$limit,$offset, $facility_id); 
-            } else if(!empty($_GET['keyword']) && empty($_GET['facilityname']) && empty($_GET['district']))
+            if(empty($_GET['keyword']) && empty($_GET['category'])) { 
+              $AllRecord = $this->ReportSettingModel->getReportSettingData('2',$limit,$offset, $facility_id); 
+            } else if(!empty($_GET['keyword']) && empty($_GET['category']))
             { 
-              $AllRecord = $this->StaffModel->getStaffDataWhereSearching('2',trim($_GET['keyword']),$limit,$offset);
-            } else if(empty($_GET['keyword']) && !empty($_GET['facilityname']))
+              $AllRecord = $this->ReportSettingModel->getReportSettingDataWhereSearching('2',trim($_GET['keyword']),$limit,$offset);
+            } else if(empty($_GET['keyword']) && !empty($_GET['category']))
             { 
-              $AllRecord = $this->StaffModel->getStaffDataWhereFacility('2',trim($_GET['facilityname']),$limit,$offset);
-            } else if(empty($_GET['keyword']) && empty($_GET['facilityname']) && !empty($_GET['district'])) { 
-              $AllRecord = $this->StaffModel->getStaffDataWhereDistrict('2',trim($_GET['district']),$limit,$offset);
-            } else if(!empty($_GET['keyword']) && !empty($_GET['facilityname']))
+              $AllRecord = $this->ReportSettingModel->getReportSettingDataWhereCategory('2',trim($_GET['category']),$limit,$offset);
+            } else if(!empty($_GET['keyword']) && !empty($_GET['category']))
             { 
-              $AllRecord = $this->StaffModel->getStaffDataWhereFacilitySearch('2',trim($_GET['keyword']),trim($_GET['facilityname']),$limit,$offset);
-            } else if(!empty($_GET['keyword']) && !empty($_GET['district']))
-            { 
-              $AllRecord = $this->StaffModel->getStaffDataWhereDistrictSearch('2',trim($_GET['keyword']),trim($_GET['district']),$limit,$offset);
+              $AllRecord = $this->ReportSettingModel->getReportSettingWhereFacilitySearch('2',trim($_GET['keyword']),trim($_GET['category']),$limit,$offset);
             } 
           } else {
             $AllRecord = $this->ReportSettingModel->getReportSettingData('2',$limit,$offset, $facility_id); 
@@ -111,7 +100,8 @@ class GenerateReport extends Welcome {
 
         
         $GetDistrict    = $this->FacilityModel->selectquery(); 
-
+        $reportCategory = $this->ReportSettingModel->reportCategory();
+        $totalActivLounge = $this->ReportSettingModel->GettotalLaunchLounge();
         $data = array(
                   'totalResult'   => $totalRecords,
                   'results'       => $AllRecord,
@@ -125,6 +115,8 @@ class GenerateReport extends Welcome {
                   'GetDistrict'   => $GetDistrict,
                   'facilityList'  => $GetFacilities,
                   'facility_id'   => $facility_id,
+                  'reportCategory'   => $reportCategory,
+                  'totalActivLounge'   => $totalActivLounge,
                   'title'         => 'Generate Report | '.PROJECT_NAME
                  );
         $this->load->view('admin/include/header-new',$data);
@@ -144,7 +136,8 @@ class GenerateReport extends Welcome {
       //print_r($data['GetFacilities']); die;
       $data['GetStaffType']  = $this->ReportSettingModel->GetStaffType();
       $data['GetJobType'] = $this->ReportSettingModel->GetJobType();
-      $data['GetDistrict'] = $this->FacilityModel->selectquery(); 
+      $data['GetDistrict'] = $this->FacilityModel->selectquery();
+      $data['reportCategory'] = $this->ReportSettingModel->reportCategory(); 
       $this->load->view('admin/include/header-new',$data);
       $this->load->view('admin/report/reportSetting_add');
       $this->load->view('admin/include/footer-new');
@@ -262,6 +255,7 @@ class GenerateReport extends Welcome {
       $data['GetDistrict']    = $this->ReportSettingModel->getDistrict(); 
       $data['GetFacilities'] = $this->ReportSettingModel->GetFacilities();
       $data['reportid'] = $id;
+      $data['reportCategory'] = $this->ReportSettingModel->reportCategory(); 
       $this->load->view('admin/include/header-new',$data);
       $this->load->view('admin/report/reportSetting_edit');
       $this->load->view('admin/include/footer-new');

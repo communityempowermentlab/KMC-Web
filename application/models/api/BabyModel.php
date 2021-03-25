@@ -3052,6 +3052,7 @@ class BabyModel extends CI_Model
                     //$arrayName['loungeId'] = $request['loungeId'];
                     $arrayName['anmName'] = isset($request['anmName'])?$request['anmName']:NULL;
                     $arrayName['vaccinationName'] = $request['vaccinationName'];
+                    $arrayName['otherValue'] = isset($request['otherValue'])?$request['otherValue']:NULL;
                     $arrayName['quantity'] = $request['quantity'];
                     $arrayName['vaccinationDate'] = $request['date'];
                     $arrayName['VaccinationTime'] = $request['time'];

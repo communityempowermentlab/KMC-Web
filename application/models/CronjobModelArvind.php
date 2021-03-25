@@ -5,6 +5,13 @@ class CronjobModelArvind extends CI_Model {
     $this->load->database();
   }
 
+  // get all baby whose discharge pdf not created
+  public function getAllBabyPdfRemains(){
+    //$query = $this->db->query("SELECT id FROM `babyAdmission` WHERE (`babyPdfFileName` IS NULL OR `babyWeightPdfName` IS NULL OR `babyKMCPdfName` IS NULL OR `babyFeedingPdfName` IS NULL OR `babyDischargePdfName` IS NULL) AND `status` = 2")->result_array();
+    $query = $this->db->query("SELECT id FROM `babyAdmission` WHERE (`babyKMCPdfName` IS NULL) AND `status` = 2 ")->result_array();
+    return $query;
+  }
+
   // get lounge birth review data
   public function getLoungeBirthReview($loungeId,$shift){
     $start_date = date('Y-m-d',strtotime("-1 days")).' 08:00:00';

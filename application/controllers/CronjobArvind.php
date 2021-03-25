@@ -14,6 +14,12 @@ class CronjobArvind extends CI_Controller {
         $this->load->helper('api');
         $this->load->library('email');
 
+        $this->load->model('api/BabyAdmissionPDF'); 
+        $this->load->model('api/BabyWeightPDF');
+        $this->load->model('api/BabyKmcPDF'); 
+        $this->load->model('api/BabyFeedingPDF');
+        $this->load->model('api/BabyDischargePdf');
+
       ini_set('max_execution_time', 0);
       ini_set("memory_limit", "1024M");
       // $this->email->initialize(array(
@@ -47,6 +53,20 @@ class CronjobArvind extends CI_Controller {
         $this->load->model('CronjobModelArvind','cmodel');
         $this->load->library('m_pdf');    
         $this->load->library('excel');
+    }
+
+    // create discharge pdf
+    public function createRemainDischargeReportPdf(){
+      // $getAllRecords = $this->cmodel->getAllBabyPdfRemains();
+      // foreach($getAllRecords as $babyAdmission){
+      //   //$admissionPdf = $this->BabyAdmissionPDF->pdfGenerate($babyAdmission['id']);
+      //   //$weightPdf = $this->BabyWeightPDF->WeightpdfGenerate($babyAdmission['id']);
+      //   $kmcPdf = $this->BabyKmcPDF->KMCpdfGenerate($babyAdmission['id']);
+      //   //$feedingPdf = $this->BabyFeedingPDF->FeedingpdfGenerate($babyAdmission['id']);
+      //   //$dischargePdf = $this->BabyDischargePdf->FinalpdfGenerate($babyAdmission['id']);
+      // }
+
+      $feedingPdf = $this->BabyFeedingPDF->FeedingpdfGenerate(1567);
     }
 
     // LBW Count Report

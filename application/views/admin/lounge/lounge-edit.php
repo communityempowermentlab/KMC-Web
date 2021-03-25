@@ -182,6 +182,40 @@ if(($sessionData['Type']==2) && (in_array(8, $userPermittedMenuData) && !in_arra
                 </div>
               </div>
 
+              <!-- App Lounch Information -->
+              <br>
+              <div class="col-12">
+                <h5 class="float-left pr-1">App Launch Information</h5>
+              </div>
+
+              <div class="row col-12">
+                <div class="col-md-4">
+                    <div class="form-group">
+                      <label>App Launch On</label>
+                      <div class="controls">
+                        <fieldset class="form-group position-relative has-icon-left">
+                          <input type="text" class="form-control pickadate-months-year" placeholder="Select App Launch Date" name="appLaunchOn" value="<?php echo $GetLounge['appLaunchOn'];?>">
+                          <div class="form-control-position calendar-position">
+                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                          </div>
+                        </fieldset>
+                      </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Phase</label>
+                      <div class="controls">
+                         <input type="text" class="form-control" name="phase" id="phase" placeholder="Lounge start Phase" data-validation-regex-regex="([^a-z]*[A-Z]*)*" data-validation-containsnumber-regex="([^0-9]*[0-9]+)+"
+                        maxlength="2" minlength="1" value="<?php echo $GetLounge['phase'];?>">
+                      </div>
+                    </div>
+                </div>
+
+              </div>
+
+
               <!-- Header menus -->
               <br>
               <div class="col-12">

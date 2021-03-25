@@ -5,7 +5,7 @@ class ReportSettingModel extends CI_Model {
 		$this->load->database();
 	}
 
-  // get all staffs data in desc order
+  // get all Report data in desc order
   public function reportSetting(){
     $adminData = $this->session->userdata('adminData');  
     $this->db->order_by('staffId','desc');
@@ -14,16 +14,22 @@ class ReportSettingModel extends CI_Model {
     }     
   } 
 
+  public function reportCategory(){ 
+    
+      return $this->db->get_where('reportCategory')->result_array(); 
+        
+  } 
+
   // get Report Settin data via facilityId
   public function getReportSettingData($type,$limit='',$offset=''){ 
     
       if ($type == '1') { 
         $this->db->select('*');
-        $result = $this->db->query("SELECT * FROM reportsetting order by id desc")->result_array();
+        $result = $this->db->query("SELECT reportsetting.*, reportCategory.name as categoryName FROM reportsetting left join reportCategory on reportsetting.`category`=reportCategory.`id` order by reportsetting.id desc")->result_array();
         return $result;
        
       } else { 
-        return $this->db->query("SELECT * FROM reportsetting order by id desc LIMIT ".$offset.", ".$limit."")->result_array();
+        return $this->db->query("SELECT reportsetting.*, reportCategory.name as categoryName FROM reportsetting left join reportCategory on reportsetting.`category`=reportCategory.`id` order by reportsetting.id desc LIMIT ".$offset.", ".$limit."")->result_array();
       } 
        
   } 
@@ -42,53 +48,49 @@ class ReportSettingModel extends CI_Model {
        
   }
 
+  public function getReportSettingDataWhereCategory($type,$category,$limit='',$offset=''){ 
+    
+      if ($type == '1') { 
+        $this->db->select('*');
+        $result = $this->db->query("SELECT reportsetting.*, reportCategory.name as categoryName FROM reportsetting left join reportCategory on reportsetting.`category`=reportCategory.`id` where reportsetting.`category`= $category order by reportsetting.id desc")->result_array();
+        return $result;
+       
+      } else { 
+        return $this->db->query("SELECT reportsetting.*, reportCategory.name as categoryName FROM reportsetting left join reportCategory on reportsetting.`category`=reportCategory.`id` where reportsetting.`category`= $category  order by reportsetting.id desc LIMIT ".$offset.", ".$limit."")->result_array();
+      } 
+       
+  } 
+
+
+
   // get staff data with search and limit
-  public function getStaffDataWhereSearching($type,$keyword,$limit='',$offset=''){
+  public function getReportSettingDataWhereSearching($type,$keyword,$limit='',$offset=''){
     if ($type == '1') {
-      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`staffType` where (sm.`name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%')")->num_rows(); 
+      return $this->db->query("SELECT reportsetting.*, reportCategory.name as categoryName FROM reportsetting left join reportCategory on reportsetting.`category`=reportCategory.`id` where  (reportsetting.`subject` Like '%{$keyword}%')")->num_rows(); 
     } else {
-      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`StaffType` where (sm.`Name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%') LIMIT ".$offset.", ".$limit."")->result_array();
+      return $this->db->query("SELECT reportsetting.*, reportCategory.name as categoryName FROM reportsetting left join reportCategory on reportsetting.`category`=reportCategory.`id` where  (reportsetting.`subject` Like '%{$keyword}%') LIMIT ".$offset.", ".$limit."")->result_array();
        
     }       
   } 
 
   
-  public function getStaffDataWhereFacility($type,$facility,$limit='',$offset=''){
+
+  public function getReportSettingWhereFacilitySearch($type,$keyword,$category,$limit='',$offset=''){
     if ($type == '1') {
-     return  $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`staffType` where (fl.`facilityId` = $facility)")->num_rows(); 
+     return  $this->db->query("SELECT reportsetting.*, reportCategory.name as categoryName FROM reportsetting left join reportCategory on reportsetting.`category`=reportCategory.`id` where reportsetting.`category`= $category AND reportsetting.`subject` Like '%{$keyword}%'")->num_rows(); 
       
     } else {
-      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`StaffType` where (fl.`facilityId` = $facility) LIMIT ".$offset.", ".$limit."")->result_array();
-    }       
-  }
-
-
-  public function getStaffDataWhereDistrict($type,$district,$limit='',$offset=''){
-    if ($type == '1') {
-     return  $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`staffType` where (fl.`PRIDistrictCode` = $district)")->num_rows(); 
-      
-    } else {
-      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`StaffType` where (fl.`PRIDistrictCode` = $district) LIMIT ".$offset.", ".$limit."")->result_array();
-    }   
-  }
-
-  public function getStaffDataWhereFacilitySearch($type,$keyword,$facility,$limit='',$offset=''){
-    if ($type == '1') {
-     return  $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`staffType` where ((sm.`facilityId` = $facility) AND (sm.`name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%'))")->num_rows(); 
-      
-    } else {
-      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`StaffType` where ((sm.`facilityId` = $facility) AND (sm.`name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%')) LIMIT ".$offset.", ".$limit."")->result_array();
+      return $this->db->query("SELECT reportsetting.*, reportCategory.name as categoryName FROM reportsetting left join reportCategory on reportsetting.`category`=reportCategory.`id` where reportsetting.`category`= $category AND reportsetting.`subject` Like '%{$keyword}%' LIMIT ".$offset.", ".$limit."")->result_array();
     }    
   }
 
+  // get total Lounge where application has launched
+  public function GettotalLaunchLounge(){
+    return  $this->db->query("SELECT * FROM loungeMaster where `phase` in (1,2,3) AND `status` = 1")->num_rows(); 
+  }
 
-  public function getStaffDataWhereDistrictSearch($type,$keyword,$district,$limit='',$offset=''){
-    if ($type == '1') {
-     return  $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`staffType` where ((fl.`PRIDistrictCode` = $district) AND (sm.`name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%'))")->num_rows(); 
-      
-    } else {
-      return $this->db->query("SELECT * from staffMaster as sm inner join facilitylist as fl on fl.`FacilityID`=sm.`facilityId` inner join staffType as st on st.`staffTypeId` = sm.`StaffType` where ((fl.`PRIDistrictCode` = $district) AND (sm.`name` Like '%{$keyword}%' OR st.`staffTypeNameEnglish` Like '%{$keyword}%' OR sm.`staffMobileNumber` Like '%{$keyword}%' OR sm.`emergencyContactNumber` Like '%{$keyword}%' OR sm.`staffAddress` Like '%{$keyword}%')) LIMIT ".$offset.", ".$limit."")->result_array();
-    }    
+  public function GettotalLoungeAddInReport($reportsettingId){
+    return  $this->db->query("SELECT * FROM reportfacilities where `reportsettingId` = $reportsettingId")->num_rows(); 
   }
 
 
@@ -150,6 +152,7 @@ class ReportSettingModel extends CI_Model {
     $fields['body']               =       $data['body'];
     $fields['emailFrom']          =       $data['emailFrom'];
     $fields['subscription']       =       $data['subscription'];
+    $fields['category']       =       $data['category'];
     $fields['addDate']            =       date("Y-m-d H:i:s");
     
     $this->db->insert('reportsetting',$fields);
@@ -194,6 +197,7 @@ class ReportSettingModel extends CI_Model {
     $fields['body']               =       $data['body'];
     $fields['emailFrom']          =       $data['emailFrom'];
     $fields['subscription']       =       $data['subscription'];
+    $fields['category']       =       $data['category'];
     $fields['addDate']       =       date("Y-m-d H:i:s");
     $this->db->where('id',$id);
     $this->db->update('reportsetting',$fields);

@@ -454,20 +454,29 @@
                                       <?php } ?>
                                       <td><?php echo $nurseName; ?></td>
                                       <td>
-                                        <div class="dropdown">
-                                          <span class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
-                                          <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item" href="<?php echo base_url();?>babyM/BabyAdmissionPDF/<?php echo $value1['id'] ?>">Admission PDF</a>
-                                            <a class="dropdown-item" href="<?php echo base_url();?>babyM/BabyWeightPDF/<?php echo $value1['id'] ?>">DailyWeight PDF</a>
-                                            <a class="dropdown-item" href="<?php echo base_url();?>babyM/BabyKmcPDF/<?php echo $value1['id'] ?>">DailyKMC PDF</a>
-                                            <a class="dropdown-item" href="<?php echo base_url();?>babyM/BabyFeedingPDF/<?php echo $value1['id'] ?>">Feeding PDF</a>
-                                            <?php if($value1['status'] == '2') { ?>
-                                              <a class="dropdown-item" href="<?php echo base_url();?>babyM/BabyDischargePdf/<?php echo $value1['id'] ?>">Discharged PDF</a>
-                                            <?php } ?>
+                                        <?php if($babyAdmissionData['status'] == '2') { ?>
+                                          <div class="dropdown">
+                                            <span class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                                              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
+                                            <div class="dropdown-menu dropdown-menu-right">
+                                              <?php if(!empty($babyAdmissionData['babyPdfFileName'])){ ?>
+                                                <a class="dropdown-item" target="_blank" href="<?php echo pdfDirectoryUrl.$babyAdmissionData['babyPdfFileName'];?>">Admission PDF</a>
+                                              <?php } ?>
+                                              <?php if(!empty($babyAdmissionData['babyWeightPdfName'])){ ?>
+                                                <a class="dropdown-item" target="_blank" href="<?php echo pdfDirectoryUrl.$babyAdmissionData['babyWeightPdfName']; ?>">Daily Weight PDF</a>
+                                              <?php } ?>
+                                              <?php if(!empty($babyAdmissionData['babyKMCPdfName'])){ ?>
+                                                <a class="dropdown-item" target="_blank" href="<?php echo pdfDirectoryUrl.$babyAdmissionData['babyKMCPdfName']; ?>">Daily KMC PDF</a>
+                                              <?php } ?>
+                                              <?php if(!empty($babyAdmissionData['babyFeedingPdfName'])){ ?>
+                                                <a class="dropdown-item" target="_blank" href="<?php echo pdfDirectoryUrl.$babyAdmissionData['babyFeedingPdfName']; ?>">Daily Feeding PDF</a>
+                                              <?php } ?>
+                                              <?php if(!empty($babyAdmissionData['babyDischargePdfName'])){ ?>
+                                                <a class="dropdown-item" target="_blank" href="<?php echo pdfDirectoryUrl.$babyAdmissionData['babyDischargePdfName']; ?>">Discharged PDF</a>
+                                              <?php } ?>
+                                            </div>
                                           </div>
-                                        </div>
-
+                                        <?php }else{ echo "-"; } ?>
                                         
                                       </td>
                                       <td><?php echo '<span style="left:70%;position:relative;top:16px">'.$icon.'</span><span class="hover-image cursor-pointer" onclick="showBabyImage('.$url.')">'.$babyPhoto; ?></span></td>

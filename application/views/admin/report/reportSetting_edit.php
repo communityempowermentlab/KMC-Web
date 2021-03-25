@@ -123,6 +123,21 @@ input:checked + .slider:before {
 
                   <div class="col-md-4">
                     <div class="form-group">
+                      <label>Report Type <span class="red">*</span></label>
+                      <div class="controls">
+                        <select class="select2 form-control" name="category" id="category">
+                          <option value="">Select Report Category</option>
+                          <?php
+                            foreach ($reportCategory as $key => $value) {?>
+                              <option value="<?php echo $value['id']; ?>" <?php if($GetReport['category'] == $value['id']) { echo 'selected'; } ?>><?php echo $value['name']; ?></option>
+                          <?php } ?>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <div class="form-group">
                       <label>Subject <span class="red">*</span></label>
                       <div class="controls">
                         <input type="text" class="form-control" required="" data-validation-required-message="This field is required" name="subject" id="subject" value="<?php echo $GetReport['subject']; ?>" placeholder="Subject" <?php echo $inputDisable; ?>>
@@ -138,6 +153,9 @@ input:checked + .slider:before {
                       </div>
                     </div>
                   </div>
+              </div>
+
+              <div class="row col-12">
 
                   <div class="col-md-4">
                     <div class="form-group">
@@ -147,10 +165,6 @@ input:checked + .slider:before {
                       </div>
                     </div>
                   </div>
-                  
-              </div>
-
-              <div class="row col-12">
                   <div class="col-md-4">
                     <div class="form-group" id="tabDiv">
                       <label>Email From <span class="red">*</span></label>

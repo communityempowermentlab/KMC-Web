@@ -111,6 +111,8 @@ class LoungeModel extends CI_Model {
     } 
     $array['addDate']                     = date('Y-m-d H:i:s');
     $array['modifyDate']                  = date('Y-m-d H:i:s');
+    $array['phase']      = $data['phase'];
+    $array['appLaunchOn']         = $data['appLaunchOn'];
 
     $this->db->where('loungeId',$id);
     $this->db->update('loungeMaster',$array);
@@ -366,6 +368,8 @@ class LoungeModel extends CI_Model {
     $array['facilityId']      = $data['facility_id'];
     $array['address']         = $data['address'];
     $array['imeiNumber']      = ($data['imeiNumber']!='') ? $data['imeiNumber']:NULL;
+    $array['phase']      = $data['phase'];
+    $array['appLaunchOn']         = $data['appLaunchOn'];
     if($data['imeiNumber']!=''){
         $checkImeiDuplicate = $this->checkImeiNumber($data['imeiNumber']);
         if($checkImeiDuplicate > 0) {

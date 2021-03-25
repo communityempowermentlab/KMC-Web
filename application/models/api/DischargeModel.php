@@ -5,7 +5,12 @@ class DischargeModel extends CI_Model {
 	{
 		parent::__construct();
 		$this->load->database();
-		$this->load->model('api/GeneratePdfSNCU');		
+		$this->load->model('api/GeneratePdfSNCU');	
+		$this->load->model('api/BabyAdmissionPDF'); 
+      	$this->load->model('api/BabyWeightPDF');
+      	$this->load->model('api/BabyKmcPDF'); 
+      	$this->load->model('api/BabyFeedingPDF');
+      	$this->load->model('api/BabyDischargePdf'); 	
 		date_default_timezone_set("Asia/KolKata");
 	}
 
@@ -1106,6 +1111,13 @@ class DischargeModel extends CI_Model {
 				$this->db->update('motherAdmission', $arrayName2);
 
 			} 
+
+			// generate pdf
+			// $admissionPdf = $this->BabyAdmissionPDF->pdfGenerate($babyAdmission['id']);
+			// $weightPdf = $this->BabyWeightPDF->WeightpdfGenerate($babyAdmission['id']);
+			// $kmcPdf = $this->BabyKmcPDF->KMCpdfGenerate($babyAdmission['id']);
+			// $feedingPdf = $this->BabyFeedingPDF->FeedingpdfGenerate($babyAdmission['id']);
+			// $dischargePdf = $this->BabyDischargePdf->FinalpdfGenerate($babyAdmission['id']);
 
 			return 1;
 	}

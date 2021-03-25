@@ -33,10 +33,10 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
     $toDate = '';
   }
 
-  if(isset($_GET['facilityname'])){
-    $facilityname = $_GET['facilityname']; 
+  if(isset($_GET['category'])){
+    $category = $_GET['category']; 
   } else {
-    $facilityname = '';
+    $category = '';
   }
 
 
@@ -63,7 +63,7 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                       </div>
                     </div>
                     <div class="col-6 pull-right">
-                        <p>Resources [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/staffERDiagram.png', 'Staff Data Flow Diagram (DFD)')">Data Flow Diagram</a>]
+                        <p>Resources [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/report.png', 'Staff Data Flow Diagram (DFD)')">Data Flow Diagram</a>]
                          <!-- [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/staffFlowChart.png', 'Staff Functional Diagram')">Functional Diagram</a>] -->
                         </p>
 
@@ -77,7 +77,7 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                         <div id="hiddenSms"><?php echo $this->session->flashdata('activate'); ?></div>
 
                         <div class="table-responsive">
-                          <div class="row col-md-10 search pl-1" style="float: right;">
+                          <div class="row col-md-6 search pl-1" style="float: right;">
                             <div class="col-md-12">
                               <form action="" method="GET">
                                 <div class="row">
@@ -93,16 +93,16 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                                           <?php } ?>
                                         </select>
                                       </div> -->
-                                      <!-- <div class="col-md-3 p-0">
-                                        <select class="select2 form-control" name="facilityname" id="facilityname" onchange="getLounge(this.value, '<?php echo base_url('motherM/getLounge/') ?>'), getNurse(this.value, '<?php echo base_url('motherM/getNurse/') ?>')">
-                                          <option value="">Select Facility</option>
+                                      <div class="col-md-6 p-0">
+                                        <select class="select2 form-control" name="category" id="category">
+                                          <option value="">Select Report Category</option>
                                           <?php
-                                            foreach ($Facility as $key => $value) {?>
-                                              <option value="<?php echo $value['FacilityID']; ?>" <?php if($facilityname == $value['FacilityID']) { echo 'selected'; } ?>><?php echo $value['FacilityName']; ?></option>
+                                            foreach ($reportCategory as $key => $value) {?>
+                                              <option value="<?php echo $value['id']; ?>" <?php if($category == $value['id']) { echo 'selected'; } ?>><?php echo $value['name']; ?></option>
                                           <?php } ?>
                                         </select>
-                                      </div> -->
-                                      <!-- <div class="col-md-9 p-0">
+                                      </div>
+                                      <div class="col-md-6 p-0">
                                         <fieldset>
                                           <div class="input-group">
                                             <input type="text" class="form-control" placeholder="Enter Keywords" aria-describedby="button-addon2" name="keyword" value="<?php
@@ -115,7 +115,7 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                                             </div>
                                           </div>
                                         </fieldset>
-                                      </div> -->
+                                      </div>
                                       
                                     </div>
                                   </div>
@@ -129,11 +129,12 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                                 <thead>
                                     <tr>
                                       <th>S&nbsp;No.</th>
+                                      <th>Report Category</th>
                                       <th>Subject</th>
                                       <!-- <th>Body</th> -->
                                       <th>Subscription</th>
                                       <th>Action</th>
-                                      <th>UPDATED&nbsp;AT</th>
+                                      <!-- <th>UPDATED&nbsp;AT</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -144,7 +145,16 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                                   foreach ($results as $value) { ?>
                                   <tr>
                                     <td><?php echo $counter; ?></td>
-                                    <td><?php echo $value['subject']; ?></td>
+                                    <td><?php echo $value['categoryName']; ?></td>
+                                    <td><?php echo $value['subject'];
+                                    $totalloungeInReport = $this->ReportSettingModel->GettotalLoungeAddInReport($value['id']);
+                                    if ($totalloungeInReport == $totalActivLounge) { ?> &nbsp;
+                                      <i class="fas fa-check-square green-color fa-1x" title="All Lounge Add"></i>
+                                    <?php } else{
+                                     ?>
+                                        <i class="fa fa-window-close red-color" aria-hidden="true" title="Missing Lounge"></i>
+                                    <?php } ?>
+                                    </td>
                                     <!-- <td><?php echo $value['body']; ?></td> -->
                                     
                                     <td>
@@ -158,7 +168,7 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                                           </span>
                                       <?php } ?>
                                     </td>
-                                    <td><a href="<?php echo base_url(); ?>/GenerateReportM/updateReport/<?php echo $value['id']; ?>" title="View/Edit Report" class="btn btn-info btn-sm">
+                                    <td><a href="<?php echo base_url(); ?>/GenerateReportM/updateReport/<?php echo $value['id']; ?>" title="View/Edit Report" class="btn btn-info btn-sm" style="margin: 1px;">
                                       <?php if(($sessionData['Type']==1) || in_array(70, $userPermittedMenuData)){
                                         echo VIEW_BUTTON;
                                       }
@@ -172,17 +182,17 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                                       ?>
                                     </a>
 
+
                                     <?php if(($sessionData['Type']==1) || in_array(72, $userPermittedMenuData)){ ?>
-                                      <a href="<?php echo base_url(); ?>/GenerateReportM/dailyDownloadReport/<?php echo $value['id']; ?>" title="Reports" class="btn btn-primary btn-sm">Reports</a>
+                                      <a href="<?php echo base_url(); ?>/GenerateReportM/dailyDownloadReport/<?php echo $value['id']; ?>" title="Reports" class="btn btn-primary btn-sm" style="margin: 1px;">Reports</a>
                                     <?php } ?>
                                     </td>
                                    
                                     
                                     
-                                    <td><?php if(!empty($value['addDate'])) { ?><span class="tooltiptext"><?php
+                                    <!-- <td><?php if(!empty($value['addDate'])) { ?><span class="tooltiptext"><?php
                                    echo $last_updated =     $this->load->FacilityModel->time_ago_in_php($value['addDate']);
-                                     // echo date("m/d/y, h:i A",strtotime($value['addDate'])) 
-                                     ?></span><?php } else { echo "N/A"; } ?> </td>
+                                     ?></span><?php } else { echo "N/A"; } ?> </td> -->
                                     
                                   </tr>
                                     <?php $counter ++ ; } } else {
@@ -221,3 +231,20 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
     </a>
   </div>
 <?php } ?>
+<style>
+.blue-color {
+color:blue;
+}
+.green-color {
+color:green;
+}
+.teal-color {
+color:teal;
+}
+.yellow-color {
+color:yellow;
+}
+.red-color {
+color:red;
+}
+</style>
