@@ -307,7 +307,7 @@ function generateServerResponse($resCode, $resMsg, $data = '', $dynamicValue = '
     else
     {
 
-        $array[APP_NAME]["syncTime"] = $getDateTime['date'];
+        $array[APP_NAME]["syncTime"] = date('Y-m-d H:i:s');
     }
 
     if (!empty($data))

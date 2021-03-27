@@ -66,7 +66,7 @@ class CronjobArvind extends CI_Controller {
       //   //$dischargePdf = $this->BabyDischargePdf->FinalpdfGenerate($babyAdmission['id']);
       // }
 
-      $feedingPdf = $this->BabyFeedingPDF->FeedingpdfGenerate(1567);
+      $weightPdf = $this->BabyDischargePdf->FinalpdfGenerate(1552);
     }
 
     // LBW Count Report

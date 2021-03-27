@@ -38,7 +38,7 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <div class="col-12 pull-left">
+                    <div class="col-6 pull-left">
                       <h5 class="content-header-title float-left pr-1 mb-0">Enquiries</h5>
                       <div class="breadcrumb-wrapper col-12">
                         <ol class="breadcrumb p-0 mb-0 breadcrumb-white">
@@ -48,6 +48,12 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                           </li>
                         </ol>
                       </div>
+                    </div>
+                    <div class="col-6 pull-right">
+                        <p>Resources [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/enquiryDFD.png', 'Enquiry Data Flow Diagram (DFD)')">Data Flow Diagram</a>]
+                         [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/KMC Application-Need Help - Enquiry process 1.png', 'Enquiry Functional Diagram')">Functional Diagram</a>]
+                        </p>
+
                     </div>
                     
                 </div>

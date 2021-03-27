@@ -14,10 +14,13 @@ class BabyAdmissionPDF extends CI_Model {
       $fileName = "b_".$babyAdmisionLastId['id'].".pdf";
       $GetMotherAllData = $this->GetMotherAllData($getMotherId['motherId']);
       $GetBabyAllData   = $this->GetBabyAllData($babyAdmisionLastId['id']);
-      $PdfFile = $this->pdfconventer($GetMotherAllData,$GetBabyAllData,$fileName,$babyAdmisionLastId['id']);
+
+      $pdfHtml = $this->pdfconventer($GetMotherAllData,$GetBabyAllData,$fileName,$babyAdmisionLastId['id']);
+      // create pdf file
+      $PdfName = $this->createBabyAdmissionPdfFile($pdfHtml['htmlData'],$id);
 
       $this->db->where('id',$babyAdmisionLastId['id']);
-      $this->db->update('babyAdmission', array('babyPdfFileName'=>$PdfFile));
+      $this->db->update('babyAdmission', array('babyPdfFileName'=>$PdfName));
 
 
       // $PdfName = $this->BabyWeightPdfFile($babyAdmisionLastId['loungeId'],$babyAdmisionLastId['babyId'],$babyAdmisionLastId['id']);
@@ -63,7 +66,6 @@ class BabyAdmissionPDF extends CI_Model {
     public function GetBabyAllData($BabyAdmissionID)
     {   
       return $this->db->query("SELECT *,BA.`addDate` as AddDate FROM  babyRegistration AS BR LEFT JOIN babyAdmission AS BA ON BR.`babyId` = BA.`babyId`  WHERE BA.`id` = '".$BabyAdmissionID."'")->row_array();
-        //echo $this->db->last_query();
     }
 
     public function DistrictVillageBlock($id, $type='')
@@ -84,8 +86,24 @@ class BabyAdmissionPDF extends CI_Model {
          
     }
 
+    // create Baby admission pdf file
+    public function createBabyAdmissionPdfFile($html,$admissionId){
+
+      $pdfFilePath =  pdfDirectory."b_".$admissionId.".pdf";
+
+      $this->m_pdf->pdf->autoScriptToLang = true;
+      $this->m_pdf->pdf->baseScript = 1;
+      $this->m_pdf->pdf->autoVietnamese = true;
+      $this->m_pdf->pdf->autoArabic = true;
+      $this->m_pdf->pdf->autoLangToFont = true;
+      $PDFContent = mb_convert_encoding($html, 'UTF-8', 'UTF-8');
+      $this->m_pdf->pdf->WriteHTML($PDFContent);
+      $this->m_pdf->pdf->Output($pdfFilePath, "F"); 
+      return "b_".$admissionId.".pdf";
+    }
+
     public function pdfconventer($MotherData, $BabyData,$filename ='',$id)
-    {   //print_r($BabyData);exit;
+    {   
         error_reporting(0);
         if($MotherData['motherLmpDate']!=NULL){
         $gestationAge = $this->GetDateDifference(strtotime($BabyData['deliveryDate']),strtotime($MotherData['motherLmpDate']));
@@ -195,19 +213,7 @@ class BabyAdmissionPDF extends CI_Model {
             $MotherName2   =  ($MotherName=='Unknown') ? '__________________':'';
         }
 
-        //$Mname = ($MotherData['Type']=='2')? $MotherData['MotherName'] : $MotherName;
-
         $FatherName = ($MotherData['fatherName']!='') ? $MotherData['fatherName'] :'__________________';
-
-        // if($MotherData['guardianName']==NULL){
-        //     if($GR_Relation=='Father'){
-        //         $GR_NAME = $FatherName;
-        //     }else{
-        //         $GR_NAME = $MotherData['motherName'];   
-        //     }
-        // }else{
-        //     $GR_NAME = ($MotherData['guardianName']!='') ?  $MotherData['guardianName'] :'  _________________________________________________';
-        // }
 
         if($MotherData['isMotherAdmitted']=="Yes"){
           $GR_NAME = $MotherData['motherName'];  
@@ -254,29 +260,30 @@ class BabyAdmissionPDF extends CI_Model {
         }
          
 
+        $header ='';
+        $content = '';
+        $footer = '';
+        $finalHtml = '';
 
-        $html ='';
-        $html.= '<!DOCTYPE html>
+        $header.= '<!DOCTYPE html>
         <html>
         <head>
           <title>FORM A: KMC UNIT ADMISSION FORM</title>
 
           <style>
             table, th, td {
-
                 border-collapse: collapse;
             }
-            td,div { font-family: freeserif; }
         </style>
 
         </head>
-        <body>
-          <div style="">
+        <body>';
+          $content .='<div style="">
        
-            <h3 style ="text-align: center; margin-top:-5px !important"><u> FORM A: KMC UNIT ADMISSION FORM</u> </h3>
+            <h3 style ="text-align: center;font-family: sans-serif; margin-top:-5px !important"><u> FORM A: KMC UNIT ADMISSION FORM</u> </h3>
             <p style="font-size: 14px"> <b>Objective:</b> To be filled at the time of admission to the KMC unit, before starting long-duration KMC. The form contains information on eligibility of the baby of KMC and detail required for follow-up. </p>
             <p style=" font-size: 14px ; padding-bottom:-5px !important ;"><b><u><i> Information to be collect by nurse on duty in KMC unit from the case sheet, health officials, mother and caregivers. </i></u></b></p>
-            <span style="margin-top:-10px">------------------------------------------------------------------------------------------------------------------------------------------</span>
+            <span style="margin-top:-10px">----------------------------------------------------------------------------------------------------------------------------------------------------</span>
         
 
          <div>
@@ -471,7 +478,7 @@ class BabyAdmissionPDF extends CI_Model {
         
 
         if($MotherData['type']=='2'){
-            $html.='<div style="margin-top: 3px; margin-left:20px">    
+            $content.='<div style="margin-top: 3px; margin-left:20px">    
                       <b> 2.7 Address: </b>
                       <br><br>
                       <b> Rural/Urban: </b> ' .$RuralUrban.  '<br>
@@ -496,7 +503,7 @@ class BabyAdmissionPDF extends CI_Model {
 
         } else{
 
-            $html.='<div style="margin-top: 3px; margin-left:20px">    
+            $content.='<div style="margin-top: 3px; margin-left:20px">    
               <b> 2.7 Address: </b>
               <br><br>
               <b> Rural/Urban: </b> ' .$RuralUrban.  '<br>
@@ -510,7 +517,7 @@ class BabyAdmissionPDF extends CI_Model {
             </div>         
             <br>';
         }
-          $html.='<div style="margin-top: 15px; margin-left:20px"> 
+          $content.='<div style="margin-top: 15px; margin-left:20px"> 
                     <div style="width:70%; float: left;">
                     <b> Signature of Nurse at the time of admission. </b>
                     </div>   
@@ -534,21 +541,17 @@ class BabyAdmissionPDF extends CI_Model {
 
               </div>
                 
-            </div>
+            </div>';
 
-          </body>
-          </html>'; 
+          $footer .='</body></html>';
 
-        /*$fileName = "b_".$BabyData['BabyID'].".pdf";*/
-        $pdfFilePath =  pdfDirectory.$filename;
+          $finalHtml .= $header;
+          $finalHtml .= $content;
+          $finalHtml .= $footer;
 
-        $mpdf =  new mPDF('utf-8');
-        $PDFContent = mb_convert_encoding($html, 'UTF-8', 'UTF-8');
-
-        $mpdf->WriteHTML($PDFContent);
-
-        $mpdf->Output($pdfFilePath, "F"); 
-        return  $filename;
+          $returnOutput['content'] = $content;
+          $returnOutput['htmlData'] = $finalHtml;
+          return $returnOutput; 
     }
 
     public function BabyWeightPdfFile($LoungeID, $BabyID,$id)

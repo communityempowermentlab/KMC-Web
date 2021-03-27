@@ -11,11 +11,29 @@ class BabyKmcPDF extends CI_Model {
       $this->db->order_by('id','desc');
       $babyAdmisionLastId = $this->db->get_where('babyAdmission',array('id'=>$id))->row_array();
 
-      $PdfName = $this->BabySkinToSkinPdfFile($babyAdmisionLastId['loungeId'],$babyAdmisionLastId['babyId'],$id);
+      $pdfHtml = $this->BabySkinToSkinPdfFile($babyAdmisionLastId['loungeId'],$babyAdmisionLastId['babyId'],$id);
+
+      // create pdf file
+      $PdfName = $this->createBabyKmcPdfFile($pdfHtml['htmlData'],$id);
+
       $this->db->where('id',$babyAdmisionLastId['id']);     
       $res = $this->db->update('babyAdmission',array('babyKMCPdfName'=>$PdfName));
-      return $res;
-           
+      return $res;      
+    }
+
+    // create Baby kmc pdf file
+    public function createBabyKmcPdfFile($html,$admissionId){
+      $pdfFilePath =  pdfDirectory."b_".$admissionId."_KMC.pdf";
+
+      $this->m_pdf->pdf->autoScriptToLang = true;
+      $this->m_pdf->pdf->baseScript = 1;
+      $this->m_pdf->pdf->autoVietnamese = true;
+      $this->m_pdf->pdf->autoArabic = true;
+      $this->m_pdf->pdf->autoLangToFont = true;
+      $PDFContent = mb_convert_encoding($html, 'UTF-8', 'UTF-8');
+      $this->m_pdf->pdf->WriteHTML($PDFContent);
+      $this->m_pdf->pdf->Output($pdfFilePath, "F"); 
+      return "b_".$admissionId."_KMC.pdf";
     }
 
     public function BabySkinToSkinPdfFile($LoungeID, $BabyID,$id)
@@ -35,14 +53,18 @@ class BabyKmcPDF extends CI_Model {
           $dischargeDate = date('Y-m-d', strtotime("+1 day",strtotime(date('Y-m-d'))));
         }
 
-        $html.='<html>
+        $header ='';
+        $content = '';
+        $footer = '';
+        $finalHtml = '';
+
+        $header.='<html>
           <head>
           <title>FORM C: DAILY KMC COMPLIANCE FORM</title>
           <style>
             table,th,td,tr{
-            border-collapse:collapse;
-              }
-
+              border-collapse:collapse;
+            }
           </style>
           </head>
           <body>';
@@ -64,10 +86,10 @@ class BabyKmcPDF extends CI_Model {
 
           if(!empty($GetKMCDayDetail)){
             if($y != 0){
-              $html.= "<pagebreak />";
+              $content.= "<pagebreak />";
             }
             
-            $html.= '<table style="width: 100%;margin-bottom: -11px;border-bottom:none;" >
+            $content.= '<table style="width: 100%;margin-bottom: -11px;border-bottom:none;" >
               <tr><th style="text-align: center;font-family: sans-serif;" colspan= "7"><u><h3>FORM C: DAILY KMC COMPLIANCE FORM</h3></u></th></tr>
               <tr><td style="text-align: left;" colspan= "8"><strong><i>Objective:</i></strong><i style="font-family: serif;"> To record the number of hour of KMC given to the baby admitted in the KMC unit in 24 hours (8AM - 8AM), the duration of each session and the reason for not giving continuous KMC. To be collected by nurse on duty in KMC room via direct observation or from mother/caregiver</i> </td></tr>
 
@@ -106,7 +128,7 @@ class BabyKmcPDF extends CI_Model {
 
                   $nurseName = $this->singlerowparameter('name','staffId',$value2['nurseId'],'staffMaster');
                   $differ = $this->getTimeDiff($value2['startTime'],$value2['endTime']);
-                  $html.= '<tr style="border:1px solid" >
+                  $content.= '<tr style="border:1px solid" >
                       <td style="width: 5%;text-align: center;border:1px solid; padding: 11px;border-bottom:none;">'.$i.'</td>
                       <td style="width: 13%;text-align: center;border:1px solid ; padding: 11px;border-bottom:none;">'.date('F j, Y',strtotime($value2['startDate'])).' '.date('g:i A',strtotime($value2['startTime'])).'</td>
                       <td style="width: 13%;text-align: center;border:1px solid ; padding: 11px;border-bottom:none;">'.date('F j, Y',strtotime($value2['endDate'])).' '.date('g:i A',strtotime($value2['endTime'])).'</td>
@@ -124,7 +146,7 @@ class BabyKmcPDF extends CI_Model {
                 if(($GetRowCount<9) && ($GetRowCount>0))
                 {
                   for($z = $RowCount; $z <= 8 ; $z++) { 
-                  $html.= '<tr style="border:1px solid" >  
+                  $content.= '<tr style="border:1px solid" >  
                   <td style="width: 5%;text-align: center;border:1px solid; padding: 11px;border-bottom:none;">'.$z.'</td>
                         <td style="width: 13%;text-align: center;border:1px solid ; padding: 11px;border-bottom:none;"></td>
                         <td style="width: 13%;text-align: center;border:1px solid ; padding: 11px;border-bottom:none;"></td>
@@ -139,7 +161,7 @@ class BabyKmcPDF extends CI_Model {
                 }
 
                   $GetTotalTime = $this->AddPlayTime($Time);
-                  $html.= '<tr>
+                  $content.= '<tr>
                       <td style="text-align: left;width: 5.4%;border:1px solid "></td>
                       <td style="text-align: left;padding:5px" colspan = "6" >
                         Total KMC duration in 24 hours ('.$from.' 8 AM to '.$to.' 8 AM):<br><br>
@@ -152,22 +174,16 @@ class BabyKmcPDF extends CI_Model {
           }
           
         }
-        $html.='</body></html>'; 
 
+        $footer .='</body></html>';
 
-        $pdfFilePath =  pdfDirectory."b_".$getBabyFileId['id']."_KMC.pdf";
+        $finalHtml .= $header;
+        $finalHtml .= $content;
+        $finalHtml .= $footer;
 
-        include_once APPPATH.'/third_party/mpdf/mpdf.php';
-        $this->m_pdf->pdf->autoScriptToLang = true;
-        $this->m_pdf->pdf->baseScript = 1;
-        $this->m_pdf->pdf->autoVietnamese = true;
-        $this->m_pdf->pdf->autoArabic = true;
-        $this->m_pdf->pdf->autoLangToFont = true;
-        $PDFContent = mb_convert_encoding($html, 'UTF-8', 'UTF-8');
-        $this->m_pdf->pdf->WriteHTML($PDFContent);
-        $this->m_pdf->pdf->Output($pdfFilePath, "F"); 
-
-        return  "b_".$getBabyFileId['id']."_KMC.pdf";
+        $returnOutput['content'] = $content;
+        $returnOutput['htmlData'] = $finalHtml;
+        return $returnOutput;
     }
 
 
