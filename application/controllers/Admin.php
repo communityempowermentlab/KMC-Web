@@ -171,7 +171,7 @@ public function captcha(){
     $this->is_not_logged_in(); 
     $adminData = $this->session->userdata('adminData'); 
     $dashboardMenuSettings = array();
-    if($adminData['Type']=='2' || $adminData['Type']=='3'){
+    if($adminData['Type']=='2' || $adminData['Type']=='3' || $adminData['Type']=='4'){
       $getMenus = $this->UserModel->getEmployeeMenu($adminData['Id'],$adminData['Type']);
       $this->session->set_userdata('userPermission', $getMenus);
     }

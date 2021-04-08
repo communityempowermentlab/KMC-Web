@@ -187,7 +187,7 @@ class DischargeModel extends CI_Model {
 							} else if($getLoungetype['type'] == 2){    // KMC
 								//$pdf = $this->AllMixPdf->finalPdfDischargeTime($request['loungeId'],$getStatus['id'],$request['type']);
 								//$pdf = 
-								$this->BabyDischargePdf->FinalpdfGenerate($getStatus['id']);
+								//$this->BabyDischargePdf->FinalpdfGenerate($getStatus['id']);
 							}
 							
 							//$this->db->where(array('id'=>$getStatus['id']));
@@ -271,7 +271,7 @@ class DischargeModel extends CI_Model {
 							//$this->db->where('id',$getStatus['id']);
 							//$this->db->update('babyAdmission',array('babyWeightPdfName'=>$PdfName));
 
-			                $this->BabyWeightPDF->WeightpdfGenerate($getStatus['id']);
+			                //$this->BabyWeightPDF->WeightpdfGenerate($getStatus['id']);
 			                
 							return 1;
 

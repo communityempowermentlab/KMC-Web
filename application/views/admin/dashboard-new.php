@@ -125,6 +125,24 @@
             </div>
           <?php } ?>
 
+          <?php if($sessionData['Type']==4){ ?>
+            <div class="col-sm-2 col-12 dashboard-users-success">
+              <a href="<?php echo base_url('FeedbackManagement/dischargeMother/all/all'); ?>">
+                <div class="card text-center">
+                  <div class="card-content">
+                    <div class="card-body py-1">
+                      <div class="badge-circle badge-circle-lg badge-circle-light-success mx-auto mb-50">
+                        <i class="bx bx-donate-heart font-medium-5"></i>
+                      </div>
+                      <div class="text-muted line-ellipsis">Mother Feedback</div>
+                      <h3 class="mb-0"><?php echo $getDashboardData['mother_feedbacks']; ?></h3>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          <?php } ?>
+
         </div>
       </div>
       <!-- Revenue Growth Chart Starts -->

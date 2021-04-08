@@ -44,12 +44,12 @@
                                       <th>Code</th>
                                       <th>Name</th>
                                       <th>Email</th>
-                                      <th>Mobile</th>
+                                      <!-- <th>Mobile</th> -->
                                       
                                       <th>Status</th>
                                       <th>Action</th>
                                       
-                                      <th>Login&nbsp;Details</th>
+                                      <!-- <th>Login&nbsp;Details</th> -->
                                       <th>Updated On</th>
                                     </tr>
                                 </thead>
@@ -74,7 +74,7 @@
                                       <span onclick="showEmployeeImage('<?= $url ?>', 'Employee Picture')" class="hover-image"><i class="bx bx-paperclip cursor-pointer mr-50"></i></span>
                                     <?php } ?></td>
                                     <td><?php echo $value['email']; ?></td>
-                                    <td><?php echo $value['contactNumber']; ?></td>
+                                    <!-- <td><?php echo $value['contactNumber']; ?></td> -->
                                     
                                     <td>
                                     <?php if($value['status'] == 1) { ?> 
@@ -88,7 +88,7 @@
                                     <?php } ?>
                                     </td>
                                     <td><a href="<?php echo base_url(); ?>employeeM/updateEmployee/<?php echo $value['id']; ?>" title="Edit EMployee Information" class="btn btn-info btn-sm">View/Edit</a></td>
-                                    <td></td>
+                                    <!-- <td></td> -->
                                     <td><a class="tooltip" href="<?php echo base_url(); ?>employeeM/viewEmployeeLog/<?php echo $value['id']; ?>"><?php echo $last_updated; ?><span class="tooltiptext"><?php echo date("m/d/y, h:i A",strtotime($value['modifyDate'])) ?></span></a></td>
                                     
                                   </tr>

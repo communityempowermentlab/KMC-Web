@@ -572,5 +572,21 @@ ORDER BY `V_totalAdmissionDischargein7days`.`loungeId` ASC";
   }
 
 
+  // get baby Discharge data
+  public function getMotherDischargeDataForFeedback($loungeArray=false){
+    $start_date = date('Y-m-d',strtotime("-1 days")).' 08:00:00';
+    $end_date = date('Y-m-d').' 07:59:59';
+
+    $this->db->where('V_dischargeReportForMotherReview.dateOfDischarge >=', $start_date);
+    $this->db->where('V_dischargeReportForMotherReview.dateOfDischarge <=', $end_date);
+    if(!empty($loungeArray)){
+      $this->db->where_in('V_dischargeReportForMotherReview.loungeId',$loungeArray);
+    }
+    $this->db->order_by('V_dischargeReportForMotherReview.loungeId','desc');
+    $query = $this->db->get('V_dischargeReportForMotherReview')->result_array();
+    return $query;
+  }
+
+
 }
 ?>

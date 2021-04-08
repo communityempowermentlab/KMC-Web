@@ -97,12 +97,17 @@
   <!-- BEGIN: Body-->
   <body class="horizontal-layout horizontal-menu navbar-sticky 2-columns   footer-static  " data-open="hover" data-menu="horizontal-menu" data-col="2-columns">
 
-    <?php $adminData = $this->session->userdata('adminData');   
+    <?php $adminData = $this->session->userdata('adminData'); 
           if($adminData['Type']==1) {
             $userlogindata  = $this->UserModel->GetDataById('adminMaster',$adminData['Id']);
           }
-          else{
+          elseif($adminData['Type']==2) {
             $userlogindata  = $this->UserModel->GetDataById('coachMaster',$adminData['Id']);
+          }
+          elseif($adminData['Type']==3) {
+            $userlogindata  = $this->UserModel->GetDataById('loungeMaster',$adminData['Id']);
+          }else{
+            $userlogindata  = $this->UserModel->GetDataById('employeesData',$adminData['Id']);
           }
     ?>
 
@@ -192,22 +197,28 @@
               
               <li class="dropdown dropdown-user nav-item"><a class="dropdown-toggle nav-link dropdown-user-link" href="#" data-toggle="dropdown">
                   <div class="user-nav d-lg-flex d-none"><span class="user-name"><?php echo $adminData['Name']; ?></span><span class="user-status">Available</span></div><span>
-                    <?php if($userlogindata['profileImage']){ ?>
-                      <img class="round" src="<?php echo base_url(); ?>assets/admin/<?php echo $userlogindata['profileImage']; ?>" alt="avatar" height="40" width="40">
+                    <?php if(isset($userlogindata['profileImage']) && !empty($userlogindata['profileImage'])){ 
+                      if($adminData['Type']==4) {
+                        $profilePictureFolder = "employee";
+                      }else{
+                        $profilePictureFolder = "admin";
+                      }
+                    ?>
+                      <img class="round" src="<?php echo base_url(); ?>assets/<?php echo $profilePictureFolder; ?>/<?php echo $userlogindata['profileImage']; ?>" alt="avatar" height="40" width="40">
                       <?php
                     } else{ ?>
-                      <img class="round" src="<?php echo base_url(); ?>app-assets/images/portrait/small/avatar-s-11.jpg" alt="avatar" height="40" width="40">
+                      <img class="round" src="<?php echo base_url(); ?>app-assets/images/portrait/small/default_user.png" alt="avatar" height="40" width="40">
                     <?php } ?>
                     <!-- <img class="round" src="<?php echo base_url(); ?>app-assets/images/portrait/small/avatar-s-11.jpg" alt="avatar" height="40" width="40"> -->
                   </span></a>
                 <div class="dropdown-menu dropdown-menu-right pb-0">
 
-                  <?php if($adminData['Type']!=3) {  if($adminData['Type']==1) { $profileUrl = base_url()."ProfileM/updateProfile"; } else { $profileUrl = base_url()."ProfileM/updateProfile";  } ?>
+                  <?php if($adminData['Type']!=3 && $adminData['Type']!=4) {  if($adminData['Type']==1) { $profileUrl = base_url()."ProfileM/updateProfile"; } else { $profileUrl = base_url()."ProfileM/updateProfile";  } ?>
                     <a class="dropdown-item" href="<?= $profileUrl; ?>"><i class="bx bx-user mr-50"></i> Edit Profile</a>
                   <?php } ?>
                   
                   <a class="dropdown-item" href="#"><i class="bx bx-envelope mr-50"></i> My Inbox</a><a class="dropdown-item" href="#"><i class="bx bx-check-square mr-50"></i> Task</a><a class="dropdown-item" href="#"><i class="bx bx-message mr-50"></i> Chats</a>
-                  <?php if($adminData['Type']==1) { $logoutUrl = base_url()."Welcome/logout"; } elseif($adminData['Type']==2) { $logoutUrl = base_url()."Welcome/employeeLogout"; }else{ $logoutUrl = base_url()."Welcome/loungeLogout"; } ?>
+                  <?php if($adminData['Type']==1) { $logoutUrl = base_url()."Welcome/logout"; } elseif($adminData['Type']==2 || $adminData['Type']==4) { $logoutUrl = base_url()."Welcome/employeeLogout"; }else{ $logoutUrl = base_url()."Welcome/loungeLogout"; } ?>
                   <div class="dropdown-divider mb-0"></div><a class="dropdown-item" href="<?= $logoutUrl; ?>"><i class="bx bx-power-off mr-50"></i> Logout</a>
                 </div>
               </li>
@@ -303,6 +314,8 @@
                 </li>
                 <li data-menu="" class="<?php echo (($index=='Setting')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/MemoryM/detail/1'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Memory Details</a>
                 </li>
+                <li data-menu="" class="<?php echo (($index=='dischargeMother')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo base_url(); ?>FeedbackManagement/dischargeMother/all/all" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Mother Feedback</a>
+                </li>
               </ul>
             </li>
             <li class="dropdown nav-item" data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i class="menu-livicon" data-icon="counselling"></i><span>Counselling</span></a>
@@ -317,9 +330,9 @@
             </li>
             <li class="dropdown nav-item" data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i class="menu-livicon" data-icon="communication"></i><span>Communication</span></a>
               <ul class="dropdown-menu">
-                <li data-menu=""><a class="dropdown-item align-items-center" href="chart-apex.html" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>SMS</a>
+                <li data-menu=""><a class="dropdown-item align-items-center" href="http://cloud.smsindiahub.in/Apps/SMS/ManageTemplate.aspx" data-toggle="dropdown" target="_blank"><i class="bx bx-right-arrow-alt"></i>SMS</a>
                 </li>
-                <li data-menu=""><a class="dropdown-item align-items-center" href="chart-chartjs.html" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Notification</a>
+                <li data-menu=""><a class="dropdown-item align-items-center" href="https://analytics.google.com/analytics/web/?authuser=1#/p259036591/reports/defaulthome?params=_u..nav%3Ddefault" data-toggle="dropdown" target="_blank"><i class="bx bx-right-arrow-alt"></i>Google Analytics</a>
                 </li>
               </ul>
             </li>
@@ -440,6 +453,10 @@
                     <li data-menu="" class="<?php echo (($index=='Setting')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo site_url('/MemoryM/detail/1'); ?>" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Memory Details</a>
                     </li>
                   <?php } ?>
+                  <?php if(in_array(92, $userPermittedMenuData)){ ?>
+                    <li data-menu="" class="<?php echo (($index=='dischargeMother')? 'active' : ''); ?>"><a class="dropdown-item align-items-center" href="<?php echo base_url(); ?>FeedbackManagement/dischargeMother/all/all" data-toggle="dropdown" ><i class="bx bx-right-arrow-alt"></i>Mother Feedback</a>
+                    </li>
+                  <?php } ?>
                 </ul>
               </li>
             <?php } ?>
@@ -467,13 +484,13 @@
               <li class="dropdown nav-item" data-menu="dropdown"><a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown"><i class="menu-livicon" data-icon="communication"></i><span>Communication</span></a>
                 <ul class="dropdown-menu">
                   <?php if(in_array(27, $userPermittedMenuData)){ ?>
-                    <li data-menu=""><a class="dropdown-item align-items-center" href="chart-apex.html" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>SMS</a>
+                    <li data-menu=""><a class="dropdown-item align-items-center" href="http://cloud.smsindiahub.in/Apps/SMS/ManageTemplate.aspx" data-toggle="dropdown"><i class="bx bx-right-arrow-alt" target="_blank"></i>SMS</a>
                     </li>
                   <?php } ?>
 
                   <?php if(in_array(28, $userPermittedMenuData)){ ?>
-                    <li data-menu=""><a class="dropdown-item align-items-center" href="chart-chartjs.html" data-toggle="dropdown"><i class="bx bx-right-arrow-alt"></i>Notification</a>
-                    </li>
+                    <li data-menu=""><a class="dropdown-item align-items-center" href="https://analytics.google.com/analytics/web/?authuser=1#/p259036591/reports/defaulthome?params=_u..nav%3Ddefault" data-toggle="dropdown" target="_blank"><i class="bx bx-right-arrow-alt"></i>Google Analytics</a>
+                  </li>
                   <?php } ?>
                 </ul>
               </li>

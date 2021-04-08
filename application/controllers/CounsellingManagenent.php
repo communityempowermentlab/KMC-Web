@@ -20,7 +20,34 @@ class CounsellingManagenent extends Welcome {
       $this->load->view('admin/counselling/counselling-video-list');
       $this->load->view('admin/include/footer-new');
       $this->load->view('admin/include/datatable-new');
-    }  
+    }
+
+    public function ApplicationVideoClickList(){
+      $id = $this->uri->segment(3);
+      $data['index']         = 'Application Training Videos';
+      $data['index2']        = '';
+      $data['title']         = 'Counselling Videos | '.PROJECT_NAME; 
+      $data['fileName']      = 'VideoList'; 
+      $data['GetVideo']      = $this->CounsellingModel->GetVideoWatchlist($id);
+
+      $this->load->view('admin/include/header-new',$data);
+      $this->load->view('admin/counselling/application-video-watch-list');
+      $this->load->view('admin/include/footer-new');
+      $this->load->view('admin/include/datatable-new');
+    } 
+
+    public function counsellingVideoClickList(){
+      $id = $this->uri->segment(3);
+      $data['index']         = 'Counselling Videos';
+      $data['index2']        = '';
+      $data['title']         = 'Counselling Videos | '.PROJECT_NAME; 
+      $data['fileName']      = 'VideoList'; 
+      $data['GetVideo']      = $this->CounsellingModel->GetVideoWatchlist($id);
+      $this->load->view('admin/include/header-new',$data);
+      $this->load->view('admin/counselling/application-video-watch-list');
+      $this->load->view('admin/include/footer-new');
+      $this->load->view('admin/include/datatable-new');
+    }     
 
   /* Add Video Page Call*/
     public function addCounsellingVideos(){
@@ -47,19 +74,28 @@ class CounsellingManagenent extends Welcome {
     public function AddCounsellingVideoData(){
        $table='counsellingMaster';
        $data = $this->input->post(); 
-       $fileName   = $_FILES['image']['name'];
-       $extension  = explode('.',$fileName);
-       $extension  = strtolower(end($extension));
-       $videoName = time();
-       $uniqueName = time().'.'.$extension;
-       $tmp_name   = $_FILES['image']['tmp_name'];
-       $targetlocation= $_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$uniqueName; 
-       $InsertImg = utf8_encode(trim($uniqueName));
-       move_uploaded_file($tmp_name,$targetlocation);
+       $chk = $this->db->get_where("counsellingMaster",array("videoName" => $data['image'], "videoType"=> 1))->row_array();
+       if(!empty($chk))
+       {
+         //echo "hoooo";
+         $this->session->set_flashdata('activate', getCustomAlert('W','Video Name Already Exist.'));      
+         redirect('counsellingM/addCounsellingVideos');
+         
+       }
+
+       // $fileName   = $_FILES['image']['name'];
+       // $extension  = explode('.',$fileName);
+       // $extension  = strtolower(end($extension));
+       // $videoName = time();
+       // $uniqueName = time().'.'.$extension;
+       // $tmp_name   = $_FILES['image']['tmp_name'];
+       // $targetlocation= $_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$uniqueName; 
+       // $InsertImg = utf8_encode(trim($uniqueName));
+       // move_uploaded_file($tmp_name,$targetlocation);
        $fields                      = array();
-       $fields['videoName']         = $InsertImg;
+       $fields['videoName']         = $data['image'];
        $fields['videoType']         = 1;
-       $fields['videoTitle']        = $data['VideoTitle'];        
+       $fields['videoTitle']        = $data['VideoTitle'].'|'.$data['videoTitleHindi'];        
        $fields['status']            = 1;      
        $fields['addDate']           = date('Y-m-d H:i:s');
        $fields['modifyDate']        = date('Y-m-d H:i:s');
@@ -75,29 +111,38 @@ class CounsellingManagenent extends Welcome {
   public function UpdateCounsellingVideoData(){
        $id = $this->uri->segment(3);
        $table='counsellingMaster';
+
        $data = $this->input->post();
-       $fileName   = $_FILES['image']['name'];
-       if (!empty($fileName)) {   
-         $extension  = explode('.',$fileName);
-         $extension  = strtolower(end($extension));
-         $uniqueName = time().'.'.$extension;
-         $time = time();
-         $tmp_name   = $_FILES['image']['tmp_name'];
-         $targetlocation= $_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$uniqueName; 
-         $InsertImg = utf8_encode(trim($uniqueName));
-          move_uploaded_file($tmp_name,$targetlocation);
-
-          unlink($_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$data['imageOld']);
+       $chk = $this->db->get_where("counsellingMaster",array("videoName" => $data['image'], "videoType"=> 1,'id!=' => $id))->row_array();
+       if(!empty($chk))
+       {
+         //echo "hoooo";
+         $this->session->set_flashdata('activate', getCustomAlert('W','Video Name Already Exist.'));      
+         redirect('counsellingM/editCounsellingVideo/'.$id);
          
-          $videoName = $InsertImg;
-
-       } else {
-            $videoName = $data['imageOld'];
        }
+       // $fileName   = $_FILES['image']['name'];
+       // if (!empty($fileName)) {   
+       //   $extension  = explode('.',$fileName);
+       //   $extension  = strtolower(end($extension));
+       //   $uniqueName = time().'.'.$extension;
+       //   $time = time();
+       //   $tmp_name   = $_FILES['image']['tmp_name'];
+       //   $targetlocation= $_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$uniqueName; 
+       //   $InsertImg = utf8_encode(trim($uniqueName));
+       //    move_uploaded_file($tmp_name,$targetlocation);
+
+       //    unlink($_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$data['imageOld']);
+         
+       //    $videoName = $InsertImg;
+
+       // } else {
+       //      $videoName = $data['imageOld'];
+       // }
        
        $fields                     = array();
-       $fields['videoName']        = $videoName;
-       $fields['videoTitle']       = $data['VideoTitle']; 
+       $fields['videoName']        = $data['image'];
+       $fields['videoTitle']        = $data['VideoTitle'].'|'.$data['videoTitleHindi']; 
        $fields['modifyDate']       = date('Y-m-d H:i:s');       
        $fields['status']           = $data['status']; 
 
@@ -148,19 +193,30 @@ class CounsellingManagenent extends Welcome {
     public function AddApplicationVideoData(){
        $table='counsellingMaster';
        $data = $this->input->post(); 
-       $fileName   = $_FILES['image']['name'];
-       $extension  = explode('.',$fileName);
-       $extension  = strtolower(end($extension));
-       $videoName = time();
-       $uniqueName = time().'.'.$extension;
-       $tmp_name   = $_FILES['image']['tmp_name'];
-       $targetlocation= $_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$uniqueName; 
-       $InsertImg = utf8_encode(trim($uniqueName));
-       move_uploaded_file($tmp_name,$targetlocation);
+
+       $chk = $this->db->get_where("counsellingMaster",array("videoName" => $data['image'], "videoType"=> 2))->row_array();
+       if(!empty($chk))
+       {
+         //echo "hoooo";
+         $this->session->set_flashdata('activate', getCustomAlert('W','Video Name Already Exist.'));      
+         redirect('counsellingM/addApplicationVideos');
+         
+       }
+
+       // $fileName   = $_FILES['image']['name'];
+       // $extension  = explode('.',$fileName);
+       // $extension  = strtolower(end($extension));
+       // $videoName = time();
+       // $uniqueName = time().'.'.$extension;
+       // $tmp_name   = $_FILES['image']['tmp_name'];
+       // $targetlocation= $_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$uniqueName; 
+       // $InsertImg = utf8_encode(trim($uniqueName));
+       // move_uploaded_file($tmp_name,$targetlocation);
        $fields                      = array();
-       $fields['videoName']         = $InsertImg;
+       //$fields['videoName']         = $InsertImg;
+       $fields['videoName']         = $data['image'];
        $fields['videoType']         = 2;
-       $fields['videoTitle']        = $data['VideoTitle'];        
+       $fields['videoTitle']        = $data['VideoTitle'].'|'.$data['videoTitleHindi'];         
        $fields['status']            = 1;      
        $fields['addDate']           = date('Y-m-d H:i:s');
        $fields['modifyDate']        = date('Y-m-d H:i:s');
@@ -177,28 +233,38 @@ class CounsellingManagenent extends Welcome {
        $id = $this->uri->segment(3);
        $table='counsellingMaster';
        $data = $this->input->post();
-       $fileName   = $_FILES['image']['name'];
-       if (!empty($fileName)) {   
-         $extension  = explode('.',$fileName);
-         $extension  = strtolower(end($extension));
-         $uniqueName = time().'.'.$extension;
-         $time = time();
-         $tmp_name   = $_FILES['image']['tmp_name'];
-         $targetlocation= $_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$uniqueName; 
-         $InsertImg = utf8_encode(trim($uniqueName));
-          move_uploaded_file($tmp_name,$targetlocation);
 
-          unlink($_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$data['imageOld']);
+       $chk = $this->db->get_where("counsellingMaster",array("videoName" => $data['image'], "videoType"=> 2,'id!=' => $id))->row_array();
+       if(!empty($chk))
+       {
+         //echo "hoooo";
+         $this->session->set_flashdata('activate', getCustomAlert('W','Video Name Already Exist.'));      
+         redirect('counsellingM/editApplicationVideo/'.$id);
          
-          $videoName = $InsertImg;
-
-       } else {
-            $videoName = $data['imageOld'];
        }
+       // $fileName   = $_FILES['image']['name'];
+       // if (!empty($fileName)) {   
+       //   $extension  = explode('.',$fileName);
+       //   $extension  = strtolower(end($extension));
+       //   $uniqueName = time().'.'.$extension;
+       //   $time = time();
+       //   $tmp_name   = $_FILES['image']['tmp_name'];
+       //   $targetlocation= $_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$uniqueName; 
+       //   $InsertImg = utf8_encode(trim($uniqueName));
+       //    move_uploaded_file($tmp_name,$targetlocation);
+
+       //    unlink($_SERVER['DOCUMENT_ROOT']."/".folderName."/assets/images/video/".$data['imageOld']);
+         
+       //    $videoName = $InsertImg;
+
+       // } else {
+       //      $videoName = $data['imageOld'];
+       // }
        
        $fields                     = array();
-       $fields['videoName']        = $videoName;
-       $fields['videoTitle']       = $data['VideoTitle']; 
+       // $fields['videoName']        = $videoName;
+       $fields['videoName']         = $data['image'];
+       $fields['videoTitle']        = $data['VideoTitle'].'|'.$data['videoTitleHindi']; 
        $fields['modifyDate']       = date('Y-m-d H:i:s');       
        $fields['status']           = $data['status']; 
 
@@ -451,6 +517,65 @@ class CounsellingManagenent extends Welcome {
       $this->load->view('admin/include/header-new',$data);
       $this->load->view('admin/video/video-type-edit');
       $this->load->view('admin/include/footer-new');
+  }
+
+
+  public function checkVideoName(){ 
+    if(isset($_REQUEST['name']))
+    {
+      $name = $_REQUEST['name']; 
+      $table = $_REQUEST['table_name']; 
+      $column = $_REQUEST['column_name']; 
+      $id = $_REQUEST['id']; 
+      $id_column = $_REQUEST['id_column'];
+      $type = $_REQUEST['type'];
+      $data = $this->CounsellingModel->checkVideoName($name, $table, $column, $id, $id_column, $type); 
+
+      if($data[$column]==$name){
+        echo 1;  
+      }
+    }
+  }
+
+
+  public function ajaxVideowatchlist()
+  {
+    //print_r($_REQUEST);
+    $this->db->order_by("id","desc");
+    $query = $this->db->get_where('counsellingVideoLog', array('loungeId' => $_REQUEST['loungeId'], 'counsellingMasterId' => $_REQUEST['id']))->result_array();
+    ?>
+
+    <div class="table-responsive">
+                            <table class="table table-striped dataex-html5-selectors-log">
+                                <thead>
+                                    <tr>
+                                        <th>S&nbsp;No.</th>
+                                        <th>views</th>  
+                                         
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                  <?php 
+                                    $counter ="1";
+                                    foreach ($query as $value) {
+                                       $last_updated          = $this->FacilityModel->time_ago_in_php($value['addDate']);
+                                      // $timewatch = $this->CounsellingModel->videoWatchlasttime( $value['loungeId']);
+                                      //   $last_updated          = $this->FacilityModel->time_ago_in_php($timewatch['addDate']);
+                                  ?>
+
+                                    <tr>
+                                      <td><?php  echo $counter; ?></td>
+                                      
+                                       <td><a class="tooltip nonclick_link"><?php echo $last_updated; ?><span class="tooltiptext"><?php echo date("m/d/y, h:i A",strtotime($value['addDate'])) ?></span></a></td>
+                                    </tr>
+                                      <?php $counter ++ ; } ?>
+                                    
+                                </tbody>
+                                
+                            </table>
+                        </div>
+    <?php
   }
 
 

@@ -589,6 +589,7 @@ function messages($resMsg = '', $dynamicValue = '')
         '234' => 'Lounge already loggedin in another device.',
         '235' => 'Invalid Poster Id.',
         '236' => 'Medicine List',
+        '237' => 'Invalid Video Type',
         'E' => 'Data Not Found',
         'W' => 'Something Went Wrong',
         'S' => 'Success',

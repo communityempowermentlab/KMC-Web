@@ -1079,9 +1079,7 @@ class MotherBabyAdmissionModel extends CI_Model
                 'nurseId' => $request['nurseId']
             ));
 
-            $this
-                ->BabyAdmissionPDF
-                ->pdfGenerate($babyAdmisionLastId['id']);
+            //$this->BabyAdmissionPDF->pdfGenerate($babyAdmisionLastId['id']);
 
             //$PdfName = $this ->babyWeightPdfFile($request['loungeId'], $babyAdmisionLastId['id']);
 

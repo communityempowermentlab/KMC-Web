@@ -26,6 +26,7 @@
             </div>
           </div>
         </div>
+        <div id="hiddenSms"><?php echo $this->session->flashdata('activate'); ?></div>
         <div class="card-content">
           <div class="card-body">
             <form class="form-horizontal" method="post" novalidate action="<?php echo site_url('counsellingM/AddApplicationVideoData/');?>" enctype="multipart/form-data">
@@ -45,13 +46,31 @@
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
+                      <label>Video Title (Hindi)<span class="red">*</span></label>
+                      <div class="controls">
+                        <input type="text" class="form-control" name="videoTitleHindi" id="videoTitleHindi" placeholder="Video Title (Hindi)" required="" data-validation-required-message="This field is required">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Upload Video </label>
+                      <div class="controls">
+                        <input type="text" class="form-control" name="image" id="image" required="" placeholder="Video Name" onblur="checkVideoName(this.value, '<?php echo base_url('counsellingM/checkVideoName');?>')" data-validation-required-message="This field is required">
+                        <span class="custom-error" id="err_video_name"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <div class="col-md-4">
+                    <div class="form-group">
                       <label>Upload Video </label>
                       <div class="controls">
                         <input type="file" class="form-control" name="image" id="image" required="" data-validation-required-message="This field is required">
                       </div>
                     </div>
-                  </div>
+                  </div> -->
               </div>
+
               
               <button type="submit" class="btn btn-primary">Submit</button>
             </form>

@@ -63,7 +63,7 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                       </div>
                     </div>
                     <div class="col-6 pull-right">
-                        <p>Resources [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/staffERDiagram.png', 'Staff Data Flow Diagram (DFD)')">Data Flow Diagram</a>] [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/staffFlowChart.png', 'Staff Functional Diagram')">Functional Diagram</a>]</p>
+                        <p>Resources [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/staffDFD.png', 'Staff Data Flow Diagram (DFD)')">Data Flow Diagram</a>] [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/staffFlowChart.png', 'Staff Functional Diagram')">Functional Diagram</a>]</p>
                     </div>
                 </div>
                 <div class="card-content">
@@ -120,7 +120,7 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                               </form>
                             </div>
                           </div>
-                            <table class="table table-striped dataex-html5-selectors-staff">
+                            <table class="table table-striped dataex-html5-selectors-lounge">
                                 <thead>
                                     <tr>
                                       <th>S&nbsp;No.</th>

@@ -1648,3 +1648,43 @@ function validateAmenities(){
       focusConfirm: !1
     }) 
   }
+
+  function checkVideoName(name, url, id=false){ 
+    
+    if(name != ''){
+      $.ajax({
+            type:"POST",
+            url: url,
+            data: {"name":name, "column_name":'videoName', "table_name": 'counsellingMaster', "id": id, "id_column":'id',"type":'2'},
+            success: function(html){ //alert(html);
+              if(html > 0){
+                $('#err_video_name').html("Not a unique Video Name").show();
+                $('#image').val("").focus();
+              }else{
+                $('#err_video_name').html("").hide();
+              }
+            }
+          });
+    }
+    
+  }
+
+  function checkVideoName1(name, url, id=false){ 
+    
+    if(name != ''){
+      $.ajax({
+            type:"POST",
+            url: url,
+            data: {"name":name, "column_name":'videoName', "table_name": 'counsellingMaster', "id": id, "id_column":'id',"type":'1'},
+            success: function(html){ //alert(html);
+              if(html > 0){
+                $('#err_video_name').html("Not a unique Video Name").show();
+                $('#image').val("").focus();
+              }else{
+                $('#err_video_name').html("").hide();
+              }
+            }
+          });
+    }
+    
+  }

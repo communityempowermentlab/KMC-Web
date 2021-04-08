@@ -43,6 +43,9 @@ if(($sessionData['Type']==2) && (in_array(77, $userPermittedMenuData) && !in_arr
             </div>
           </div>
         </div>
+        <div id="hiddenSms">
+          <?php echo $this->session->flashdata('activate'); ?>
+        </div>
         <div class="card-content">
           <div class="card-body">
             <form class="form-horizontal" method="post" novalidate action="<?php echo site_url();?>counsellingM/UpdateApplicationVideoData/<?php echo $this->uri->segment(3);?>" enctype="multipart/form-data">
@@ -50,33 +53,49 @@ if(($sessionData['Type']==2) && (in_array(77, $userPermittedMenuData) && !in_arr
               <div class="col-12">
                 <h5 class="float-left pr-1">Video Information</h5>
               </div>
+
+              <?php
+              $titlebreak = explode("|",$VideoData['videoTitle']);
+               //echo $VideoData['videoTitle'];
+
+              ?>
               
               <div class="row col-12">
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Video Title <span class="red">*</span></label>
                       <div class="controls">
-                        <input type="text" class="form-control" name="VideoTitle" id="VideoTitle" placeholder="Video Title" required="" data-validation-required-message="This field is required" value="<?php echo $VideoData['videoTitle'];?>" <?php echo $inputDisable; ?>>
+                        <input type="text" class="form-control" name="VideoTitle" id="VideoTitle" placeholder="Video Title" required="" data-validation-required-message="This field is required" value="<?php echo $titlebreak['0'];?>" <?php echo $inputDisable; ?>>
                       </div>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label>Status <span class="red">*</span></label>
+                      <label>Video Title (Hindi)<span class="red">*</span></label>
                       <div class="controls">
-                        <select class="select2 form-control" name="status" id="status" required="" data-validation-required-message="This field is required" <?php echo $dropdownDisable; ?>>
-                          <option value="">Select Status</option>
-                          <option value="1" <?php if($VideoData['status'] == 1) { echo 'selected'; } ?>>Active</option>
-                          <option value="2" <?php if($VideoData['status'] == 2) { echo 'selected'; } ?>>Deactive</option>
-                        </select>
+                        <input type="text" class="form-control" name="videoTitleHindi" id="videoTitleHindi" placeholder="Video Title (Hindi)" value="<?php echo $titlebreak['1'];?>" <?php echo $inputDisable; ?> required="" data-validation-required-message="This field is required">
                       </div>
                     </div>
                   </div>
+                  
               </div>
 
 
               <div class="row col-12">
+
                 <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Upload Video </label>
+                      <div class="controls">
+                        <input type="text" class="form-control" name="image" id="image" value="<?php echo $VideoData['videoName'];?>" required="" placeholder="Video Name"
+                        onblur="checkVideoName(this.value, '<?php echo base_url('counsellingM/checkVideoName');?>', '<?php echo $VideoData['id'];?>')"
+                        data-validation-required-message="This field is required">
+                        <span class="custom-error" id="err_video_name"></span>
+                      </div>
+                    </div>
+                  </div>
+
+                <!-- <div class="col-md-4">
                     <div class="form-group">
                       <label>Upload Video </label>
                       <div class="controls">
@@ -88,6 +107,20 @@ if(($sessionData['Type']==2) && (in_array(77, $userPermittedMenuData) && !in_arr
                             <source src="<?php echo base_url();?>assets/images/video/<?=$VideoData['videoName'];?>" type='video/mp4'>
                           </video>
                         </span>
+                      </div>
+                    </div>
+                  </div> -->
+
+
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Status <span class="red">*</span></label>
+                      <div class="controls">
+                        <select class="select2 form-control" name="status" id="status" required="" data-validation-required-message="This field is required" <?php echo $dropdownDisable; ?>>
+                          <option value="">Select Status</option>
+                          <option value="1" <?php if($VideoData['status'] == 1) { echo 'selected'; } ?>>Active</option>
+                          <option value="2" <?php if($VideoData['status'] == 2) { echo 'selected'; } ?>>Deactive</option>
+                        </select>
                       </div>
                     </div>
                   </div>

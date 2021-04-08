@@ -31,8 +31,10 @@ class BabyFeedingPDF extends CI_Model {
       $this->m_pdf->pdf->autoArabic = true;
       $this->m_pdf->pdf->autoLangToFont = true;
       $PDFContent = mb_convert_encoding($html, 'UTF-8', 'UTF-8');
-      $this->m_pdf->pdf->WriteHTML($PDFContent);
-      $this->m_pdf->pdf->Output($pdfFilePath, "F"); 
+      if(!empty($PDFContent)){
+        $this->m_pdf->pdf->WriteHTML($PDFContent);
+        $this->m_pdf->pdf->Output($pdfFilePath, "F");
+      } 
       return "b_".$admissionId."_Feeding.pdf";
     }
 

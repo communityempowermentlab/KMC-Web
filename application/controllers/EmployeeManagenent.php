@@ -6,6 +6,7 @@ class EmployeeManagenent extends Welcome {
     parent::__construct();
     $this->load->model('EmployeeModel');  
     $this->load->model('FacilityModel'); 
+    $this->load->model('LoungeModel');  
     $this->is_not_logged_in(); 
     $this->restrictPageAccess(array('20'));
   }
@@ -47,7 +48,7 @@ class EmployeeManagenent extends Welcome {
 
       if($this->input->post()){ 
         $employee_name        = $this->input->post('employee_name');
-        $employee_mobile_number        = $this->input->post('employee_mobile_number');
+        //$employee_mobile_number        = $this->input->post('employee_mobile_number');
         $employee_email       = $this->input->post('employee_email');
         $password             = $this->input->post('password');
         $employee_code        = $this->input->post('employee_code');
@@ -70,7 +71,7 @@ class EmployeeManagenent extends Welcome {
 
         $insertData   = array('name'          => ucwords($employee_name),
                               'email'         => $employee_email,
-                              'contactNumber' => $employee_mobile_number,
+                              'contactNumber' => "",
                               'employeeCode'  => $employee_code,
                               'profileImage'  => $InsertImg,
                               'password'      => base64_encode($password),
@@ -86,6 +87,7 @@ class EmployeeManagenent extends Welcome {
 
         foreach ($menu_group as $key => $value) {
           $insertData2   = array( 'employeeId'    => $id,
+                                  'userType'      => 4,
                                   'groupId'       => $value,
                                   'status'        => 1,
                                   'addDate'       => date('Y-m-d H:i:s'),
@@ -99,7 +101,7 @@ class EmployeeManagenent extends Welcome {
         $logData      = array('employeeId'    => $id,
                               'name'          => ucwords($employee_name),
                               'email'         => $employee_email,
-                              'contactNumber' => $employee_mobile_number,
+                              //'contactNumber' => $employee_mobile_number,
                               'profileImage'  => $InsertImg,
                               'employeeCode'  => $employee_code,
                               'menuGroup'     => $strMenu,
@@ -113,16 +115,40 @@ class EmployeeManagenent extends Welcome {
 
         $this->EmployeeModel->insertData('employeesDataLog', $logData);
 
+        // save facility lounge
+        $lounge = $this->input->post('lounge');
+        if(!empty($lounge)){
+          foreach($lounge as $loungevalue)
+          {
+            $explode = explode("-",$loungevalue); 
+            $district = $explode[0];
+            $facility = $explode[1];
+            $lounge   = $explode[2];
+
+            $loungeArray                    = array();
+            $loungeArray['masterId']        = $id;
+            $loungeArray['districtId']      = $district;
+            $loungeArray['facilityId']      = $facility;
+            $loungeArray['loungeId']        = $lounge;
+            $loungeArray['status']          = 1;
+            $loungeArray['addDate']         = date('Y-m-d H:i:s');
+            $loungeArray['modifyDate']      = date('Y-m-d H:i:s');
+            $this->db->insert('employeeDistrictFacilityLounge',$loungeArray);
+          }
+        }
+
         if ($id > 0) {
             $this->session->set_flashdata('activate', getCustomAlert('S','Data has been Added Successfully.'));
             redirect('employeeM/manageEmployee');
         } else {
-            $this->session->set_flashdata('activate', getCustomAlert('W','Oops! somthing is worng please try again.'));
+            $this->session->set_flashdata('activate', getCustomAlert('W','Oops! something is wrong please try again.'));
             redirect('employeeM/manageEmployee');
         }
 
       }
       
+      $data['GetDistrict'] = $this->FacilityModel->selectquery();
+
       $this->load->view('admin/include/header-new',$data);
       $this->load->view('admin/employee/employee-add');
       $this->load->view('admin/include/footer-new');
@@ -192,7 +218,7 @@ class EmployeeManagenent extends Welcome {
       $data['title']          = 'Edit CEL Employee | '.PROJECT_NAME;
       $data['GetEmployeeData'] = $this->EmployeeModel->GetDataById('employeesData', array('id' => $id));
       $data['menuGroup'] = $this->EmployeeModel->GetDataOrderByAsc('manageMenuGroupSetting', array('status' => 1), 'groupName');
-      $GetEmployeeMenuGroup = $this->EmployeeModel->GetData('employeeMenuGroup', array('employeeId' => $id, 'status' => 1));
+      $GetEmployeeMenuGroup = $this->EmployeeModel->GetData('employeeMenuGroup', array('employeeId' => $id, 'userType'=>4, 'status' => 1));
       $key_arr = array();
       $data['key_arr'] = $key_arr;
       foreach ($GetEmployeeMenuGroup as $key => $value) {
@@ -200,7 +226,7 @@ class EmployeeManagenent extends Welcome {
       }
       if($this->input->post()){
         $employee_name        = $this->input->post('employee_name');
-        $employee_mobile_number        = $this->input->post('employee_mobile_number');
+        //$employee_mobile_number        = $this->input->post('employee_mobile_number');
         $employee_email       = $this->input->post('employee_email');
         $password             = $this->input->post('password');
         $employee_code        = $this->input->post('employee_code');
@@ -224,7 +250,7 @@ class EmployeeManagenent extends Welcome {
 
           $updateData   = array('name'          => ucwords($employee_name),
                               'email'         => $employee_email,
-                              'contactNumber' => $employee_mobile_number,
+                              //'contactNumber' => $employee_mobile_number,
                               'profileImage'  => $InsertImg,
                               'employeeCode'  => $employee_code,
                               'password'      => base64_encode($password),
@@ -235,7 +261,7 @@ class EmployeeManagenent extends Welcome {
         } else {
           $updateData   = array('name'          => ucwords($employee_name),
                               'email'         => $employee_email,
-                              'contactNumber' => $employee_mobile_number,
+                              //'contactNumber' => $employee_mobile_number,
                               'profileImage'  => $InsertImg,
                               'employeeCode'  => $employee_code,
                               'status'        => $status,
@@ -244,15 +270,41 @@ class EmployeeManagenent extends Welcome {
         }
 
         $res = $this->EmployeeModel->updateData('employeesData', $updateData, array('id' => $id));
-        $this->EmployeeModel->deleteData('employeeMenuGroup', array('employeeId' => $id));
+        $this->EmployeeModel->deleteData('employeeMenuGroup', array('employeeId' => $id,'userType'=>4));
         foreach ($menu_group as $key => $value) {
-          $insertData2   = array( 'employeeId'          => $id,
-                                  'groupId'         => $value,
+          $insertData2   = array( 'employeeId'    => $id,
+                                  'groupId'       => $value,
+                                  'userType'      => 4,
                                   'status'        => 1,
                                   'addDate'       => date('Y-m-d H:i:s'),
                                   'modifyDate'    => date('Y-m-d H:i:s')
                              );
           $this->EmployeeModel->insertData('employeeMenuGroup', $insertData2);
+        }
+
+
+        $this->db->where('masterId', $id);
+        $this->db->delete('employeeDistrictFacilityLounge');
+        // save facility lounge
+        $lounge = $this->input->post('lounge');
+        if(!empty($lounge)){
+          foreach($lounge as $loungevalue)
+          {
+            $explode = explode("-",$loungevalue); 
+            $district = $explode[0];
+            $facility = $explode[1];
+            $lounge   = $explode[2];
+
+            $loungeArray                    = array();
+            $loungeArray['masterId']        = $id;
+            $loungeArray['districtId']      = $district;
+            $loungeArray['facilityId']      = $facility;
+            $loungeArray['loungeId']        = $lounge;
+            $loungeArray['status']          = 1;
+            $loungeArray['addDate']         = date('Y-m-d H:i:s');
+            $loungeArray['modifyDate']      = date('Y-m-d H:i:s');
+            $this->db->insert('employeeDistrictFacilityLounge',$loungeArray);
+          }
         }
 
         $loginId = $this->session->userdata('adminData')['Id'];
@@ -265,7 +317,7 @@ class EmployeeManagenent extends Welcome {
           $logData      = array('employeeId'    => $id,
                               'name'          => ucwords($employee_name),
                               'email'         => $employee_email,
-                              'contactNumber' => $employee_mobile_number,
+                              //'contactNumber' => $employee_mobile_number,
                               'profileImage'  => $InsertImg,
                               'employeeCode'  => $employee_code,
                               'menuGroup'     => $strMenu,
@@ -280,7 +332,7 @@ class EmployeeManagenent extends Welcome {
           $logData      = array('employeeId'    => $id,
                               'name'          => ucwords($employee_name),
                               'email'         => $employee_email,
-                              'contactNumber' => $employee_mobile_number,
+                              //'contactNumber' => $employee_mobile_number,
                               'profileImage'  => $InsertImg,
                               'employeeCode'  => $employee_code,
                               'menuGroup'     => $strMenu,
@@ -303,13 +355,93 @@ class EmployeeManagenent extends Welcome {
         }
 
       }
-      
+
+      $facilitydata = $this->EmployeeModel->GetFacilityByEmployeeId($id);
+      $key_arr = array();
+      $data['dis_arr'] = $key_arr;
+      $data['fac_arr'] = $key_arr;
+      $data['lounge_arr'] = $key_arr;
+      foreach ($facilitydata as $key => $value) {
+        if(!in_array($value['districtId'], $data['dis_arr'])){
+          $data['dis_arr'][] = $value['districtId'];
+        }
+
+        if(!in_array($value['facilityId'], $data['fac_arr'])){
+          $data['fac_arr'][] = $value['facilityId'];
+        }
+
+        if(!in_array($value['loungeId'], $data['lounge_arr'])){
+          $data['lounge_arr'][] = $value['loungeId'];
+        }
+      }
+
+      $data['GetDistrict']    = $this->EmployeeModel->getDistrict(); 
+      $data['GetFacilities'] = $this->EmployeeModel->GetFacilities();
+      $data['employeeid'] = $id;
       $this->load->view('admin/include/header-new',$data);
       $this->load->view('admin/employee/employee-edit');
       $this->load->view('admin/include/footer-new');
   }
   
+  // get lounges by facilities
+  public function getFacilityMultipleLounge(){
+    if($this->input->post()){
+    
+      $facility = $this->input->post('facility');
+      $district = $this->input->post('district');
+      $id = $this->input->post('id');
 
+      $lounge_arr = array();
+      if(!empty($id)){
+        $facilitydata = $this->EmployeeModel->GetFacilityByEmployeeId($id);
+        foreach ($facilitydata as $key => $value) {
+          if(!in_array($value['loungeId'], $lounge_arr)){
+            $lounge_arr[] = $value['loungeId'];
+          }
+        }
+      }
+      
+      $html = ''; 
+      $selected = "";
+
+      foreach ($facility as $key => $value) {
+        $facilityIds = $value;
+        $getFacility = $this->FacilityModel->GetFacilitiesById('facilitylist', $facilityIds); 
+        
+        $getLounge = $this->LoungeModel->GetLoungeByFAcility($facilityIds); 
+        
+        if(!empty($getLounge)){
+          $html.='<optgroup label="'.$getFacility['FacilityName'].'">';
+          foreach ($getLounge as $key2 => $value2) {
+            if(in_array($value2['loungeId'], $lounge_arr)){
+              $selected = "selected";
+            }else{
+              $selected = "";
+            }
+            $html.='<option value="'.$district.'-'.$facilityIds.'-'.$value2['loungeId'].'" '.$selected.'>'.$value2['loungeName'].'</option>';
+          }
+        }
+      }
+
+      echo $html;die;
+    }
+  }
+
+  public function validateCelEmpEmail(){
+    $email = $this->input->post('email');
+    $id = $this->input->post('id');
+
+    $checkEmail = $this->db->query('select email from adminMaster where email="'.$email.'"')->row_array();
+    if(empty($checkEmail)){
+      $checkEmail = $this->db->query('select email from employeesData where email="'.$email.'" and id != "'.$id.'"')->row_array();
+    }
+    
+    if(!empty($checkEmail)){
+      echo "0";
+    }else{
+      echo "1";
+    }
+  }
 
 }
 

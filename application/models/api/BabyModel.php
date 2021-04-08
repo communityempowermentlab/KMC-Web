@@ -2071,7 +2071,7 @@ class BabyModel extends CI_Model
                             ->db
                             ->insert('timeline', $paramArray);
 
-                        $this->BabyWeightPDF->WeightpdfGenerate($babyAdmisionLastId['id']);
+                        //$this->BabyWeightPDF->WeightpdfGenerate($babyAdmisionLastId['id']);
 
                         /*$this
                             ->db
@@ -2147,7 +2147,7 @@ class BabyModel extends CI_Model
                         $listID['localId'] = $request['localId'];
                         $param[] = $listID;
 
-                        $this->BabyWeightPDF->WeightpdfGenerate($babyAdmisionLastId['id']);
+                        //$this->BabyWeightPDF->WeightpdfGenerate($babyAdmisionLastId['id']);
 
                         /*$this
                             ->db
@@ -2264,7 +2264,7 @@ class BabyModel extends CI_Model
                         $listID['localId'] = $request['localId'];
                         $param[] = $listID;
                        
-                        $this->BabyFeedingPDF->FeedingpdfGenerate($babyAdmisionLastId['id']);
+                        //$this->BabyFeedingPDF->FeedingpdfGenerate($babyAdmisionLastId['id']);
 
                         /*$PdfName = $this->babyDailyFeedPDFFile($request['loungeId'], $babyAdmisionLastId['id']);
                         $this
@@ -2304,7 +2304,7 @@ class BabyModel extends CI_Model
                         $listID['localId'] = $request['localId'];
                         $param[] = $listID;
 
-                        $this->BabyFeedingPDF->FeedingpdfGenerate($babyAdmisionLastId['id']);
+                        //$this->BabyFeedingPDF->FeedingpdfGenerate($babyAdmisionLastId['id']);
 
                         /*$this
                             ->db
@@ -2464,7 +2464,7 @@ class BabyModel extends CI_Model
                                 ->db
                                 ->insert('timeline', $paramArray);
 
-                            $this->BabyKmcPDF->KMCpdfGenerate($babyAdmisionLastId['id']);
+                            //$this->BabyKmcPDF->KMCpdfGenerate($babyAdmisionLastId['id']);
 
                             /*$this
                                 ->db
@@ -2536,7 +2536,7 @@ class BabyModel extends CI_Model
                         $listID['localId'] = $request['localId'];
                         $param[] = $listID;
 
-                        $this->BabyKmcPDF->KMCpdfGenerate($babyAdmisionLastId['id']);
+                        //$this->BabyKmcPDF->KMCpdfGenerate($babyAdmisionLastId['id']);
 
                         /*$PdfName = $this->generateBabyKMCPdfFile($request['loungeId'], $babyAdmisionLastId['id']);
                         $this

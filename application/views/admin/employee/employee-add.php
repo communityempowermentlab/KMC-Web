@@ -33,7 +33,7 @@
         </div>
         <div class="card-content">
           <div class="card-body">
-            <form class="form-horizontal" method="post" action="<?php echo site_url('employeeM/addEmployee/');?>" enctype="multipart/form-data" onsubmit="return celEmpValidate('1')">
+            <form class="form-horizontal" method="post" action="<?php echo site_url('employeeM/addEmployee');?>" enctype="multipart/form-data" onsubmit="return celEmpValidate('1')">
 
               <div class="col-12">
                 <h5 class="float-left pr-1">Employee Information</h5>
@@ -49,7 +49,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-md-4">
+                  <!-- <div class="col-md-4">
                     <div class="form-group" id="mobileDiv">
                       <label>Mobile Number <span class="red">*</span></label>
                       <div class="controls">
@@ -57,20 +57,17 @@
                         <span class="custom-error" id="err_employee_mobile_number"></span>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                   <div class="col-md-4">
                     <div class="form-group" id="emailDiv">
                       <label>Email Id <span class="red">*</span></label>
                       <div class="controls">
-                        <input type="email" class="form-control" onblur="checkCelEmpEmail(this.value, '<?php echo base_url('employeeM/checkLogInEmail');?>')" name="employee_email" id="employee_email" placeholder="Email Id" >
+                        <input type="email" class="form-control" onblur="validateCelEmpEmail(this.value,'')" name="employee_email" id="employee_email" placeholder="Email Id" >
                         <span class="custom-error" id="err_employee_email"></span>
                       </div>
                     </div>
                   </div>
-              </div>
 
-              <div class="row col-12">
-                  
                   <div class="col-md-4">
                     <div class="form-group">
                       <label>Employee Code <span class="red">*</span></label>
@@ -80,6 +77,10 @@
                       </div>
                     </div>
                   </div>
+              </div>
+
+              <div class="row col-12">
+                  
                   <div class="col-md-4">
                     <div class="form-group" id="tabDiv">
                       <label>Password <span class="red">*</span></label>
@@ -102,7 +103,7 @@
               </div>
 
               <div class="col-12">
-                <h5 class="float-left pr-1">Assign Menu Privilege</h5>
+                <h5 class="float-left pr-1">Header Menu Privilege</h5>
               </div>
 
               <div class="row col-12">
@@ -121,9 +122,57 @@
                 </div>
               </div>
 
+              <hr>
+              <div class="col-12">
+                <h5 class="float-left pr-1">Select Facility Lounge</h5>
+              </div>
+
+              <?php foreach ($GetDistrict as $key => $districtValue) { 
+                $GetFacilities = $this->EmployeeModel->GetFacilityByDistrict($districtValue['PRIDistrictCode']);
+                ?>
+                <div class="row col-12">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <?php if($key == 0){ ?>
+                        <label>District</label>
+                      <?php } ?>
+                      <div class="controls">
+                        <input type="text" class="form-control" value="<?php echo $districtValue['DistrictNameProperCase'] ?>" readonly>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <?php if($key == 0){ ?>
+                        <label>Facility</label>
+                      <?php } ?>
+                      <div class="controls">
+                        <select class="select2 form-control" multiple="multiple" name="facility[]" id="facility<?php echo $districtValue['PRIDistrictCode'] ?>" onchange="getFacilityMultipleLounge('<?php echo $districtValue['PRIDistrictCode'] ?>','<?php echo base_url('employeeM/getFacilityMultipleLounge') ?>','');">
+                          <?php foreach($GetFacilities as $GetFacilitiesData){ ?>
+                            <option value="<?php echo $GetFacilitiesData['FacilityID']?>"><?php echo $GetFacilitiesData['FacilityName'] ?></option>
+                          <?php } ?>
+                        </select>
+                        <span class="custom-error" id="err_facility"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-5">
+                    <div class="form-group">
+                      <?php if($key == 0){ ?>
+                        <label>Lounge</label>
+                      <?php } ?>
+                      <div class="controls">
+                        <select class="select2 form-control" multiple="multiple" name="lounge[]" id="lounge<?php echo $districtValue['PRIDistrictCode'] ?>"></select>
+                        <span class="custom-error" id="err_lounge"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <?php } ?>
+
           
               
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
             </form>
           </div>
         </div>
@@ -136,6 +185,25 @@
       </div>
     </div>
     <!-- END: Content-->
+
+    <script type="text/javascript">
+      function validateCelEmpEmail(val,id){
+        $.ajax({
+          type:"POST",
+          url: '<?php echo base_url('employeeM/validateCelEmpEmail'); ?>',
+          data: {"email":val,"id": id},
+          success: function(html){
+            if(html == 0){
+              $('#err_employee_email').html("Email id already exist.").show();
+              $('#submitButton').prop('disabled', true);
+            }else{
+              $('#err_employee_email').html("").hide();
+              $('#submitButton').prop('disabled', false);
+            }
+          }
+        });
+      }
+    </script>
 
 
     

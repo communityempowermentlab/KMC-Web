@@ -181,6 +181,22 @@ class SmsManagenent extends Welcome {
     $this->load->view('admin/likeList');
     $this->load->view('admin/include/dataTable');
     $this->load->view('admin/include/footer');
+  }
+
+  public function smsPanel(){
+    $data['index']         = 'timeline';
+    $data['index2']        = '';
+    $data['title']         = 'Comments | '.PROJECT_NAME; 
+    $data['fileName']      = 'commentList'; 
+
+    $this->load->view('admin/include/header-new',$data);
+      $this->load->view('admin/sms/smsPanel');
+      $this->load->view('admin/include/footer-new');
+    
+    // $this->load->view('admin/include/header',$data);
+    // $this->load->view('admin/commentList');
+    // $this->load->view('admin/include/smsPanel');
+    // $this->load->view('admin/include/footer');
   } 
 
 }

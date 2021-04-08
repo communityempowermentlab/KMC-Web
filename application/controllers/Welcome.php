@@ -156,8 +156,15 @@ class Welcome extends CI_Controller {
 
       // maintain login history
       if($admin['type'] == 2){
+        $userType = 2;
+      }elseif($admin['type'] == 4){
+        $userType = 4;
+      }
+
+
+      if($admin['type'] == 2 || $admin['type'] == 4){
         $updateArr = array( 'employeeId'  => $admin['id'],
-                            'userType'    => 2,
+                            'userType'    => $userType,
                             'ipAddress'   => $this->input->ip_address(),
                             'type'        => 1,
                             'loginTime'   => date('Y-m-d H:i:s'),
@@ -296,6 +303,7 @@ class Welcome extends CI_Controller {
   // logout employee and redirect to index page
   public function employeeLogout() {
     $employeeId = $this->session->userdata('adminData')['Id'];
+    $userType = $this->session->userdata('adminData')['Type'];
 
     $updateArr = array(     
                             'type'        => 2,
@@ -303,7 +311,7 @@ class Welcome extends CI_Controller {
                             'status'      => 1
                            );  
 
-    $this->db->where(array('employeeId' => $employeeId, 'type' => 1,'userType'=>2));
+    $this->db->where(array('employeeId' => $employeeId, 'type' => 1,'userType'=>$userType));
     $this->db->update('employeeLoginMaster',$updateArr); 
 
     $this->session->unset_userdata('adminData');

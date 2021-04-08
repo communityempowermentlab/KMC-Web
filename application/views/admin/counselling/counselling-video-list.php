@@ -16,8 +16,8 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header ">
-                    <div class="col-12 pull-left">
+                <div class="card-header pb-0">
+                    <div class="col-6 pull-left">
                       <h5 class="content-header-title float-left pr-1 mb-0">Counselling</h5>
                       <div class="breadcrumb-wrapper col-12">
                         <ol class="breadcrumb p-0 mb-0 breadcrumb-white">
@@ -27,6 +27,9 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                           </li>
                         </ol>
                       </div>
+                    </div>
+                    <div class="col-6 pull-right">
+                        <p>Resources [<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/counsellingVideoDFD.png', 'Counselling Videos Data Flow Diagram (DFD)')">Data Flow Diagram</a>][<a href="javascript:void(0)" onclick="facilityDfd('<?php echo base_url(); ?>assets/dfdAndFunctionalDiagram/councelingPSD.png', 'Counselling Videos Data Flow Diagram (DFD)')">Functional Diagram</a>] </p>
                     </div>
                     
                 </div>
@@ -41,6 +44,7 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                                     <tr>
                                         <th>S&nbsp;No.</th>
                                         <th>Video&nbsp;Title</th>  
+                                        <th>Clicks</th>
                                         <th>Status</th> 
                                         <th>Action</th> 
                                         <th>Updated&nbsp;On</th> 
@@ -56,6 +60,11 @@ $userPermittedMenuData = $this->session->userdata('userPermission');
                                     <tr>
                                       <td><?php  echo $counter; ?></td>
                                       <td ><?php  echo $value['videoTitle']; ?></td>
+                                      <td ><a href="<?php echo base_url(); ?>counsellingM/counsellingVideoClickList/<?php echo $value['id']; ?>" title="Video Information">
+                                        <?php 
+                                        echo $result = $this->CounsellingModel->clickVideoCount($value['id']);
+                                      ?> 
+                                    </a></td>
                                       <td>
                                         <?php if ($value['status'] == 1) { ?> 
                                           <span class="badge badge-pill badge-light-success mr-1">

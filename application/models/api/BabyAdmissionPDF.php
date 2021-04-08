@@ -17,7 +17,9 @@ class BabyAdmissionPDF extends CI_Model {
 
       $pdfHtml = $this->pdfconventer($GetMotherAllData,$GetBabyAllData,$fileName,$babyAdmisionLastId['id']);
       // create pdf file
-      $PdfName = $this->createBabyAdmissionPdfFile($pdfHtml['htmlData'],$id);
+      if(isset($pdfHtml['htmlData']) && !empty($pdfHtml['htmlData'])){
+        $PdfName = $this->createBabyAdmissionPdfFile($pdfHtml['htmlData'],$id);
+      }
 
       $this->db->where('id',$babyAdmisionLastId['id']);
       $this->db->update('babyAdmission', array('babyPdfFileName'=>$PdfName));
@@ -97,8 +99,11 @@ class BabyAdmissionPDF extends CI_Model {
       $this->m_pdf->pdf->autoArabic = true;
       $this->m_pdf->pdf->autoLangToFont = true;
       $PDFContent = mb_convert_encoding($html, 'UTF-8', 'UTF-8');
-      $this->m_pdf->pdf->WriteHTML($PDFContent);
-      $this->m_pdf->pdf->Output($pdfFilePath, "F"); 
+      if(!empty($PDFContent)){
+        $this->m_pdf->pdf->WriteHTML($PDFContent);
+        $this->m_pdf->pdf->Output($pdfFilePath, "F"); 
+      }
+      
       return "b_".$admissionId.".pdf";
     }
 

@@ -5,18 +5,29 @@ class UserModel extends CI_Model {
     $this->load->database();
     $this->load->model('MotherModel');
     $this->load->model('BabyModel');  
+    $this->load->model('FeedbackManagementModel');
   }
  
  // get admin data when login
   public function login($username,$password) {
-      
+    
+    // admin login  
     $this->db->select("id, name,email,profileImage");
     $query = $this->db->get_where('adminMaster', array(EMAIL => $username,PASSWORD=>base64_encode($password)))->row_array();
     $query['type'] = 1;
     if(empty($query['id'])){
-      $this->db->select("id, name,email,mobile,profileImage");
-      $query = $this->db->get_where('coachMaster', array('mobile' => $username,'password'=>md5($password)))->row_array();
-      $query['type'] = 2;
+
+      // employee login
+      $this->db->select("id, name,email,contactNumber as mobile,profileImage");
+      $query = $this->db->get_where('employeesData', array('email' => $username,'password'=>base64_encode($password)))->row_array();
+      $query['type'] = 4;
+      if(empty($query['id'])){
+        // coach login
+        $this->db->select("id, name,email,mobile,profileImage");
+        $query = $this->db->get_where('coachMaster', array('mobile' => $username,'password'=>md5($password)))->row_array();
+        $query['type'] = 2;
+      }
+      
     }
     return $query;
 
@@ -299,6 +310,11 @@ class UserModel extends CI_Model {
       $coachDistrictArray  = array('0'=>$getFacilityLoungeList['PRIDistrictCode']);
       $coachFacilityArray  = array('0'=>$getFacilityLoungeList['FacilityID']);
       $coachLoungeArray  = array('0'=>$getFacilityLoungeList['loungeId']);
+    }elseif($adminData['Type'] == 4){
+      $getEmployeeFacilityLoungeList = $this->db->get_where('employeeDistrictFacilityLounge',array('masterId'=>$adminData['Id'],'status'=>1))->result_array();
+      $coachDistrictArray  = array_unique(array_column($getEmployeeFacilityLoungeList, 'districtId'));
+      $coachFacilityArray  = array_unique(array_column($getEmployeeFacilityLoungeList, 'facilityId'));
+      $coachLoungeArray  = array_column($getEmployeeFacilityLoungeList, 'loungeId');
     }
     //print_r($coachLoungeArray);exit;
     $response['coachDistrictArray'] = $coachDistrictArray;
@@ -324,6 +340,10 @@ class UserModel extends CI_Model {
       $getFacilityLoungeList = $this->db->get_where('loungeMaster',array('loungeMaster.loungeId'=>$adminData['Id'],'loungeMaster.status'=>1))->row_array();
       $coachFacilityArray  = array('0'=>$getFacilityLoungeList['FacilityID']);
       $coachLoungeArray  = array('0'=>$getFacilityLoungeList['loungeId']);
+    }elseif($adminData['Type'] == 4){
+      $getEmployeeFacilityLoungeList = $this->db->get_where('employeeDistrictFacilityLounge',array('masterId'=>$adminData['Id'],'status'=>1))->result_array();
+      $coachFacilityArray  = array_column($getEmployeeFacilityLoungeList, 'facilityId');
+      $coachLoungeArray  = array_column($getEmployeeFacilityLoungeList, 'loungeId');
     }
 
     // facility count
@@ -385,6 +405,7 @@ class UserModel extends CI_Model {
 
     $total_mothers = $this->MotherModel->getAllMotherCount();
     $total_baby = $this->BabyModel->countAllBabies('all','current');
+    $mother_feedbacks = $this->FeedbackManagementModel->getAllMotherCount();
                   
     $result = array();
     $result['facility_count'] = $facility;
@@ -398,6 +419,7 @@ class UserModel extends CI_Model {
     $result['total_video']   = $total_video;
     $result['total_mothers']   = $total_mothers;
     $result['total_baby']   = $total_baby;
+    $result['mother_feedbacks']   = $mother_feedbacks;
 
     return $result;
   }
